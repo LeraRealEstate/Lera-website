@@ -345,6 +345,8 @@ section{padding:110px 0}
 @media(max-width:520px){.trio{gap:5px}.trio figcaption{font-size:9px;padding:4px 7px;left:5px;bottom:5px;letter-spacing:.1em}}
 .receipt .rnote{margin-top:12px;font-size:13px;line-height:1.5;color:var(--muted,#6b6257)}
 .receipt .lg{margin:16px 0 4px;font:600 11px var(--display,sans-serif);letter-spacing:.18em;text-transform:uppercase;color:var(--gold-deep,#9B7330)}.receipt h3+.lg{margin-top:6px}.receipt li.tot{font-weight:600;border-top:1px solid rgba(21,18,14,.25)}.receipt li.tot b{font-weight:700}
+.rcta{margin-top:14px;padding:18px 20px;border-radius:18px;border:1px solid rgba(207,168,100,.35);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}.rcta p{color:#F5EFE4;font-size:16px;margin:0}
+#film{scroll-margin-top:10px}
 </style>
 </head>
 <body>
@@ -358,11 +360,11 @@ section{padding:110px 0}
     <div class="hero-grid">
       <div>
         <h1>A tired family house. <strong>Now a fully let en-suite HMO.</strong></h1>
-        <p class="lede">Bought for £486,000, converted with £170,000 of works and valued at £830,000. Watch Akiva walk round the finished house and see every room before, during and after. The investor approved the house, the plan and the budget. We did everything else.</p>
+        <p class="lede">Bought for £486,000, converted with £170,000 of works and valued at £830,000. Below: every number, a walk-round of the finished house and every room before, during and after. The investor approved the house, the plan and the budget. We did everything else.</p>
         <p class="ask">Want a project like this one?</p>
         <div class="ctas">
           <button class="btn btn-gold" data-open="call">Book a free 15-minute call</button>
-          <button class="btn btn-ghost" data-open="guide">Get the free guide</button>
+          <a class="btn btn-ghost" href="#film" onclick="trackC('ClickWatchWalkround')">Watch the walk-round ↓</a>
         </div>
         <div class="reassure"><span>Speak with an HMO specialist</span><span>No obligation</span><span>You own 100% of the property</span></div>
       </div>
@@ -378,6 +380,7 @@ section{padding:110px 0}
         <div class="receipt"> <h3>This project <span>Family house to en-suite HMO</span></h3> <p class="lg">The house</p><ul class="ledger"> <li>Bought for<b>£486,000</b></li> <li>Cost of works<b>£170,000</b></li> <li class="hi">Valued after works<b>£830,000</b></li> </ul>
 <p class="lg">Cash the client put in</p><ul class="ledger"> <li>Deposit (25% of price)<b>£121,500</b></li> <li>Stamp duty (higher rates)<b>£38,600</b></li> <li>Lera sourcing fee (2%)<b>£9,720</b></li> <li>Lera project fee (2% of value)<b>£16,600</b></li> <li>Legal, bridging, furnishing and set-up costs<b>£30,800</b></li> <li class="tot">Cash needed for the deal<b>£217,220</b></li> </ul>
 <p class="lg">Bridging finance did the rest</p><ul class="ledger"> <li>Rest of the purchase (75%)<b>£364,500</b></li> <li>All of the works<b>£170,000</b></li> <li class="tot">Covered by bridging<b>£534,500</b></li> <li>Refinanced at 80% of value<b>£664,000</b></li> </ul> <p class="rnote">Once the rooms were let, the house was refinanced onto a mortgage, which paid off the bridging loan. Legal, bridging, furnishing and set-up costs are taken from our Enfield N9 project, a near-identical deal. We'll take you through the rent and full return on the call.</p> </div>
+        <div class="rcta"><p>Want these numbers worked out for your budget?</p><button class="btn btn-gold" data-open="call">Book a free 15-minute call</button></div>
         <p class="fine" style="color:rgba(245,239,228,.45)">A real Lera project. Past results are not a guide to future returns and your capital is at risk.</p>
       </div>
     </div>
@@ -385,16 +388,39 @@ section{padding:110px 0}
 </header>
 
 <main>
-<section class="filmsec">
+<section class="filmsec" id="film">
   <div class="wrap">
     <h2 class="sec-h">Walk round the finished house.</h2> <p class="sec-p">One minute with Akiva, room by room, with the before and during photos as he goes.</p>
     <div class="vid tall" id="vid"> <img src="/img/cs/poster.jpg" alt="">
       <button aria-label="Play the walk-round video"><span><svg width="30" height="30" viewBox="0 0 24 24" fill="#15120E" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>Watch the walk-round</button>
     </div>
+    <div class="ctas" style="justify-content:center;margin-top:28px"><button class="btn btn-gold" data-open="call">Book a call to go through this deal</button></div>
   </div>
 </section>
 
-<section id="rooms"> <div class="wrap"> <p class="kicker">Before, during, after</p> <h2 class="sec-h">Room by room, start to finish.</h2> <p class="sec-p">Real photos from this project: as it was bought, during the strip-out and build, and the finished rooms.</p> <div class="rooms"><article class="room"><h3>The garden <span>→ New rear extension</span></h3><div class="trio"><figure><img src="/img/cs/garden-before.jpg" alt="The garden before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/garden-during.jpg" alt="The garden during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/garden-after.jpg" alt="New rear extension finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>The old conservatory <span>→ New en-suite room</span></h3><div class="trio"><figure><img src="/img/cs/rear-before.jpg" alt="The old conservatory before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/rear-during.jpg" alt="The old conservatory during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/rear-after.jpg" alt="New en-suite room finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>The old kitchen <span>→ New kitchen</span></h3><div class="trio"><figure><img src="/img/cs/kitchen-before.jpg" alt="The old kitchen before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/kitchen-during.jpg" alt="The old kitchen during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/kitchen-after.jpg" alt="New kitchen finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>The front room <span>→ New en-suite room</span></h3><div class="trio"><figure><img src="/img/cs/front-before.jpg" alt="The front room before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/front-during.jpg" alt="The front room during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/front-after.jpg" alt="New en-suite room finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>A bedroom <span>→ New en-suite room</span></h3><div class="trio"><figure><img src="/img/cs/bed-before.jpg" alt="A bedroom before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/bed-during.jpg" alt="A bedroom during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/bed-after.jpg" alt="New en-suite room finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>Finished to the same standard <span>throughout</span></h3><div class="trio"><figure><img src="/img/cs/ensuite-1.jpg" alt="Finished en-suite shower room" loading="lazy"><figcaption class="t-a">En-suite</figcaption></figure><figure><img src="/img/cs/kitchen-2.jpg" alt="The new kitchen" loading="lazy"><figcaption class="t-a">Kitchen</figcaption></figure><figure><img src="/img/cs/hall.jpg" alt="Finished hallway" loading="lazy"><figcaption class="t-a">Hallway</figcaption></figure></div></article></div> <div class="ctas" style="margin-top:34px"><button class="btn btn-ink" data-open="call">Talk to us about a project like this</button></div> </div> </section> <section id="projects">
+<section id="rooms"> <div class="wrap"> <p class="kicker">Before, during, after</p> <h2 class="sec-h">Room by room, start to finish.</h2> <p class="sec-p">Real photos from this project: as it was bought, during the strip-out and build, and the finished rooms.</p> <div class="rooms"><article class="room"><h3>The garden <span>→ New rear extension</span></h3><div class="trio"><figure><img src="/img/cs/garden-before.jpg" alt="The garden before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/garden-during.jpg" alt="The garden during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/garden-after.jpg" alt="New rear extension finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>The old conservatory <span>→ New en-suite room</span></h3><div class="trio"><figure><img src="/img/cs/rear-before.jpg" alt="The old conservatory before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/rear-during.jpg" alt="The old conservatory during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/rear-after.jpg" alt="New en-suite room finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>The old kitchen <span>→ New kitchen</span></h3><div class="trio"><figure><img src="/img/cs/kitchen-before.jpg" alt="The old kitchen before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/kitchen-during.jpg" alt="The old kitchen during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/kitchen-after.jpg" alt="New kitchen finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>The front room <span>→ New en-suite room</span></h3><div class="trio"><figure><img src="/img/cs/front-before.jpg" alt="The front room before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/front-during.jpg" alt="The front room during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/front-after.jpg" alt="New en-suite room finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>A bedroom <span>→ New en-suite room</span></h3><div class="trio"><figure><img src="/img/cs/bed-before.jpg" alt="A bedroom before the works" loading="lazy"><figcaption class="t-b">Before</figcaption></figure><figure><img src="/img/cs/bed-during.jpg" alt="A bedroom during the works" loading="lazy"><figcaption class="t-d">During</figcaption></figure><figure><img src="/img/cs/bed-after.jpg" alt="New en-suite room finished" loading="lazy"><figcaption class="t-a">After</figcaption></figure></div></article><article class="room"><h3>Finished to the same standard <span>throughout</span></h3><div class="trio"><figure><img src="/img/cs/ensuite-1.jpg" alt="Finished en-suite shower room" loading="lazy"><figcaption class="t-a">En-suite</figcaption></figure><figure><img src="/img/cs/kitchen-2.jpg" alt="The new kitchen" loading="lazy"><figcaption class="t-a">Kitchen</figcaption></figure><figure><img src="/img/cs/hall.jpg" alt="Finished hallway" loading="lazy"><figcaption class="t-a">Hallway</figcaption></figure></div></article></div> <div class="ctas" style="margin-top:34px"><button class="btn btn-ink" data-open="call">Book a call about a project like this</button></div> </div> </section> <section class="call">
+  <div class="wrap">
+    <div class="callbox">
+      <div class="l">
+        <p class="kicker">The next step</p>
+        <h2>15 minutes with an HMO specialist.</h2>
+        <ul class="gets">
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15120E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.5A4 4 0 0010 8v11M6 13h8M6 19h12"/></svg></span><div><b>This deal, line by line</b><span>The rent, the finance costs, what came back at refinance and the full return.</span></div></li>
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15120E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></span><div><b>What your budget could do</b><span>An honest view of the house your money could buy, and what it needs to cover.</span></div></li>
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15120E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span><div><b>The risks, plainly</b><span>Build costs, valuations, Article 4 and the Renters' Rights Act.</span></div></li>
+        </ul>
+        <button class="btn btn-ink" data-open="call">Choose a time for your call</button>
+        <p class="nopress">No obligation and no hard sell. If it isn't right for you, we'll say so.</p>
+      </div>
+      <div class="r">
+        <img src="https://images.unsplash.com/photo-1758876204242-787309002a8f?w=1200&q=75&auto=format&fit=crop" alt="A man on a phone call at his desk" loading="lazy">
+        <div class="slot"><div class="cal"><small>FREE</small>15</div><div><b>HMO strategy call</b><span>Phone or video, at a time that suits you</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
   <div class="wrap">
     <p class="kicker">More completed projects</p> <h2 class="sec-h">Four more houses, before and after. With every number.</h2>
     <p class="sec-p">Each one started as a family home. We bought it, converted it into an HMO with en-suite rooms, let every room and refinanced, so most of the money came back out. Switch any project between before and after.</p>
@@ -486,50 +512,7 @@ section{padding:110px 0}
   </div>
 </section>
 
-<section class="call">
-  <div class="wrap">
-    <div class="callbox">
-      <div class="l">
-        <p class="kicker">The free call</p>
-        <h2>15 minutes with an HMO specialist.</h2>
-        <ul class="gets">
-          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15120E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.5A4 4 0 0010 8v11M6 13h8M6 19h12"/></svg></span><div><b>Whether your budget works</b><span>An honest view of what your money could buy and what it needs to cover.</span></div></li>
-          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15120E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></span><div><b>A real deal in your price range</b><span>Purchase, build, refinance and income, walked through line by line.</span></div></li>
-          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15120E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span><div><b>The risks, plainly</b><span>Build costs, valuations, Article 4 and the Renters' Rights Act.</span></div></li>
-        </ul>
-        <button class="btn btn-ink" data-open="call">Choose a time for your call</button>
-        <p class="nopress">No obligation and no hard sell. If it isn't right for you, we'll say so.</p>
-      </div>
-      <div class="r">
-        <img src="https://images.unsplash.com/photo-1758876204242-787309002a8f?w=1200&q=75&auto=format&fit=crop" alt="A man on a phone call at his desk" loading="lazy">
-        <div class="slot"><div class="cal"><small>FREE</small>15</div><div><b>HMO strategy call</b><span>Phone or video, at a time that suits you</span></div></div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section class="guide">
-  <div class="wrap gwrap">
-    <div class="cover"><div class="book" role="img" aria-label="Cover of HMOs In and Out, the free Lera Real Estate guide">
-      <div class="bl"><img src="/email/lera-logo.png" alt=""><span>The investor's guide<br>UK HMOs 2026</span></div>
-      <div class="bg"><img src="/img/bad7efc6c855a3ca.jpg" alt="" loading="lazy"><img src="/img/53ab3013668e6892.jpg" alt="" loading="lazy"><img src="/img/2b6e2e85d4400f91.jpg" alt="" loading="lazy"><img src="/img/394e7ec9d4d7647b.jpg" alt="" loading="lazy"><img src="/img/ef4821e549a1a0a9.jpg" alt="" loading="lazy"><img src="/img/140d9bc0f33dde8b.jpg" alt="" loading="lazy"></div>
-      <p class="bt">HMOs <i>In &amp; Out.</i></p>
-      <p class="bs">Everything you need to know about houses in multiple occupation: the rules, the money and the real projects.</p>
-      <div class="bk"><div><b>5–6 mo</b><small>purchase to fully let</small></div><div><b>0%</b><small>share of your deal</small></div><div><b>2 + 2%</b><small>our fees</small></div></div>
-    </div><span class="pg">41<small>pages</small></span></div>
-    <div>
-      <p class="kicker">Not ready to talk yet?</p>
-      <h2 class="sec-h">Read the whole playbook first.</h2>
-      <p class="sec-p">HMOs In &amp; Out is our free guide to how an HMO project really works, written from the four houses above.</p>
-      <ul class="chap">
-        <li><b>The rules</b><span>Licensing, Article 4, minimum room sizes and the Renters' Rights Act.</span></li>
-        <li><b>The money</b><span>Purchase, build, bridging, refinance and what's left in at the end.</span></li>
-        <li><b>The projects</b><span>Four completed Lera HMOs with their real costs and income.</span></li>
-      </ul>
-      <button class="btn btn-ink" data-open="guide">Download the free guide</button>
-    </div>
-  </div>
-</section>
 
 <section style="padding-top:0">
   <div class="wrap founderwrap">
@@ -571,8 +554,8 @@ section{padding:110px 0}
 <section class="final"> <div class="wrap"> <h2>Want a project like this one?</h2> <p>Book 15 minutes with an HMO specialist and we'll go through this deal and what your budget could do.</p>
     <div class="ctas">
       <button class="btn btn-gold" data-open="call">Book a free 15-minute call</button>
-      <button class="btn btn-ghost" data-open="guide">Get the free guide</button>
-    </div>
+      </div>
+    <p style="margin-top:18px;font-size:14px;opacity:.7">Not ready to talk yet? <a href="/guide/?utm_source=case-study" style="color:inherit" onclick="trackC('ClickGuideFromCaseStudy')">Read our free HMO guide</a>.</p>
   </div>
 </section>
 <footer class="legal">
@@ -583,8 +566,7 @@ section{padding:110px 0}
 </footer>
 
 <div class="sticky" id="sticky">
-  <button class="btn btn-gold" data-open="call">Book a free call</button>
-  <button class="btn btn-ghost" data-open="guide">Free guide</button>
+  <button class="btn btn-gold" data-open="call">Book a free 15-minute call</button>
 </div>
 
 <!-- ===== FORM ===== -->
