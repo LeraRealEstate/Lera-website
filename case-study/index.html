@@ -711,7 +711,7 @@ section{padding:110px 0}
     ["utm_source","utm_campaign","utm_content","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)sc.append(k,v)}catch(x){}});sc.append('page',location.pathname);
     fetch(EXEC,{method:'POST',body:sc}).then(function(r){return r.json()}).then(function(res){
       if(res&&res.ok){var first=fv('name').split(' ')[0];track('Schedule',{content_name:location.pathname});trackC('CallBooked',{page:location.pathname});
-        $('#calbox').innerHTML='<div class="slok"><div class="tick">✓</div><h3>You\'re booked in, '+esc(first)+'.</h3><p><b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b></p><p>One of our property experts will call you on <b>'+esc(fv('phone'))+'</b>. We\'ve emailed a confirmation and a calendar invite to '+esc(fv('email'))+'.</p></div>';
+        $('#calbox').innerHTML='<div class="slok"><div class="tick">✓</div><h3>You\'re booked in, '+esc(first)+'.</h3><p><b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b></p><p>One of our property experts will call you on <b>'+esc(fv('phone'))+'</b> at that time.</p></div>';
         $('#calstep h2').textContent='All booked.';var sub=$('#calstep .sub');if(sub)sub.style.display='none'}
       else loadSlots('Sorry, that time has just gone. Please pick another.')})
     .catch(function(){btn.disabled=false;btn.textContent='Confirm my free call';var s=$('#slsum');if(s)s.innerHTML='Something went wrong. Please try again.'})}
