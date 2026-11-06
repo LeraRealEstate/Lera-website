@@ -292,7 +292,7 @@ function book_(p) {
   var first = name.split(/\s+/)[0];
   sendMail_(email, 'Booked: your free call with Lera, ' + when,
     'Hi ' + first + ',\n\nYou\'re booked in for a free 15-minute ' + (video ? 'video' : 'phone') + ' call with one of our property experts on ' + when + '.\n\n' +
-    (video ? 'Join the video call here: ' + (meet || 'the link is in your calendar invite') + '\nWe\'ll show you some of our projects. It\'s' : 'We\'ll call you on ' + phone + '. It\'s') a chance to tell us what you\'re looking for: your budget, the areas you like and your timescale, so we can find you a property that fits.\n\n' +
+    (video ? 'Join the video call here: ' + (meet || 'the link is in your calendar invite') + '\nWe\'ll show you some of our projects. It\'s' : 'We\'ll call you on ' + phone + '. It\'s') + ' a chance to tell us what you\'re looking for: your budget, the areas you like and your timescale, so we can find you a property that fits.\n\n' +
     'Need to change the time? Just reply to this email.\n\nLera Real Estate\n' + REPLY_TO);
   sendWa_(phone, 'lera_call_booked', [first, when]);
   return { ok: true, when: when, meet: meet };
