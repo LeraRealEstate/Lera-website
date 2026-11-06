@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/img/cs/front-before.jpg"><link rel="preload" as="image" href="/img/cs/front-after.jpg">
 <script>
-window.LERA={PIXEL_ID:"2172003110059229",EMAIL:"info@lera-realestate.com",BOOKING_URL:"https://calendar.google.com/calendar/appointments/schedules/AcZssZ1EUKmAkKU3gCOdi9LlVCpBkySQxklN_d_5arh9GlpfKpF6nnzHSb_otALH9JLdG3jWJgsWdToZ?gv=true",WHATSAPP:"__WHATSAPP__",MIN_BUDGET:100000};
+window.LERA={PIXEL_ID:"1448791074109307",EMAIL:"info@lera-realestate.com",BOOKING_URL:"https://calendar.google.com/calendar/appointments/schedules/AcZssZ1EUKmAkKU3gCOdi9LlVCpBkySQxklN_d_5arh9GlpfKpF6nnzHSb_otALH9JLdG3jWJgsWdToZ?gv=true",WHATSAPP:"__WHATSAPP__",MIN_BUDGET:100000};
 function set(v){return v&&v.indexOf("__")!==0}
 if(set(LERA.PIXEL_ID)){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',LERA.PIXEL_ID);fbq('track','PageView');fbq('track','ViewContent',{content_name:'case-study'})}
 function track(e,p){try{window.fbq&&fbq('track',e,p||{})}catch(x){}}
@@ -384,6 +384,7 @@ section{padding:110px 0}
 .slday{flex:none;width:66px;padding:10px 0;border-radius:14px;border:1px solid var(--line);background:#fff;display:grid;gap:2px;cursor:pointer;font:inherit;color:var(--ink)}
 .slday small{font-size:11.5px;color:var(--stone)}.slday b{font-size:20px;font-weight:500}
 .slday.on{background:var(--ink);border-color:var(--ink);color:#F5EFE4}.slday.on small{color:var(--gold)}
+.sltype{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}.sltype button{text-align:left;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#fff;font:inherit;cursor:pointer;color:var(--ink);display:grid;gap:3px}.sltype small{font-size:12.5px;color:var(--stone);line-height:1.35}.sltype button.on{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}.sltype button.on b::before{content:"✓ ";color:var(--gold-deep)}
 .sltimes{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;max-height:260px;overflow:auto}
 .sltime{padding:12px 0;border-radius:12px;border:1px solid var(--line);background:#fff;font:inherit;font-weight:600;cursor:pointer;color:var(--ink)}
 .sltime:hover{border-color:var(--gold)}.sltime.on{background:var(--gold);border-color:var(--gold)}
@@ -657,7 +658,7 @@ section{padding:110px 0}
       </div>
     </form>
     <div class="step" data-step="4" id="done"></div>
-    <div class="step" data-step="5" id="calstep"><h2>Pick a time for your free call.</h2><p class="sub">A free 15-minute call with a property expert. We'll call you on your mobile.</p><div class="cal-embed" id="calbox"></div></div>
+    <div class="step" data-step="5" id="calstep"><h2>Pick a time for your free call.</h2><p class="sub">A free 15-minute video or phone call with a property expert.</p><div class="cal-embed" id="calbox"></div></div>
   </div>
 </div>
 
@@ -686,32 +687,33 @@ section{padding:110px 0}
   /* modal + form */
   var modal=$('#modal'),mode='guide',data={},stepN=1,lastFocus=null;
   function show(n){stepN=n;$$('.step',modal).forEach(function(s){s.classList.toggle('on',+s.dataset.step===n)});$$('.prog i',modal).forEach(function(i,k){i.classList.toggle('on',k<n)});$('.prog',modal).style.display=n>3?'none':'flex';var f=$('.step.on .tile,.step.on input',modal);if(f&&n<4)setTimeout(function(){f.focus()},60)}
-  var EXEC='https://script.google.com/macros/s/AKfycbw9Vl5crYfSeJv0Ejcya52k7qYF1oJy8V5lxwNjD2ZL4AA99EnoKXSrpUrczF2Rk4VNjw/exec';
+  var EXEC='https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec';
   function calFrame(){return ''}
   function fv(n){var i=$('#lead [name="'+n+'"]');return i?String(i.value||'').trim():''}
   function fmtT(iso){return new Date(iso).toLocaleTimeString('en-GB',{timeZone:'Europe/London',hour:'numeric',minute:'2-digit',hour12:true}).replace(' ','').toLowerCase()}
   function fmtD(iso){return new Date(iso).toLocaleDateString('en-GB',{timeZone:'Europe/London',weekday:'long',day:'numeric',month:'long'})}
-  var slotDays=[],pickDay=0,pickTime='';
+  var slotDays=[],pickDay=0,pickTime='',callType='video';
   function openCal(){$('.sheet',modal).classList.add('wide');show(5);trackC('OpenBooking');loadSlots()}
   function loadSlots(msg){var b=$('#calbox');b.innerHTML='<p class="slmsg">'+(msg||'Finding available times…')+'</p>';pickTime='';
     fetch(EXEC+'?action=slots&t='+Date.now()).then(function(r){return r.json()}).then(function(d){slotDays=d.days||[];pickDay=0;if(!slotDays.length){b.innerHTML='<p class="slmsg">No times are free right now. We\'ll call you on '+esc(fv('phone'))+' to arrange one.</p>';return}renderSlots(msg)})
     .catch(function(){b.innerHTML='<p class="slmsg">Sorry, the times didn\'t load. <button type="button" class="btn btn-ghost" id="slretry">Try again</button></p>';$('#slretry').onclick=function(){loadSlots()}})}
   function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function renderSlots(msg){var b=$('#calbox');var d=slotDays[pickDay];
-    var h=(msg?'<p class="slwarn">'+msg+'</p>':'')+'<p class="sllab">Choose a day</p><div class="sldays">'+slotDays.map(function(x,i){var p=x.label.split(' ');return '<button type="button" class="slday'+(i===pickDay?' on':'')+'" data-d="'+i+'"><small>'+p[0]+'</small><b>'+p[1]+'</b><small>'+p[2]+'</small></button>'}).join('')+'</div>'+
+    var h=(msg?'<p class="slwarn">'+msg+'</p>':'')+'<p class="sllab">How would you like to talk?</p><div class="sltype"><button type="button" data-c="video" class="'+(callType==='video'?'on':'')+'"><b>Video call</b><small>Google Meet. We can show you our projects.</small></button><button type="button" data-c="phone" class="'+(callType==='phone'?'on':'')+'"><b>Phone call</b><small>We call your mobile.</small></button></div><p class="sllab">Choose a day</p><div class="sldays">'+slotDays.map(function(x,i){var p=x.label.split(' ');return '<button type="button" class="slday'+(i===pickDay?' on':'')+'" data-d="'+i+'"><small>'+p[0]+'</small><b>'+p[1]+'</b><small>'+p[2]+'</small></button>'}).join('')+'</div>'+
       '<p class="sllab">Choose a time <span>(15-minute call, UK time)</span></p><div class="sltimes">'+d.times.map(function(t){return '<button type="button" class="sltime'+(t===pickTime?' on':'')+'" data-t="'+t+'">'+fmtT(t)+'</button>'}).join('')+'</div>'+
-      '<div class="slconf"><p id="slsum">'+(pickTime?'<b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b><br>We\'ll call you on '+esc(fv('phone')):'Pick a time above')+'</p><button type="button" class="btn btn-gold" id="slbook"'+(pickTime?'':' disabled')+'>Confirm my free call</button></div>';
+      '<div class="slconf"><p id="slsum">'+(pickTime?'<b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b><br>'+(callType==='video'?'Video call. We\'ll email you the link.':'We\'ll call you on '+esc(fv('phone'))):'Pick a time above')+'</p><button type="button" class="btn btn-gold" id="slbook"'+(pickTime?'':' disabled')+'>Confirm my free call</button></div>';
     b.innerHTML=h;
     $$('.slday',b).forEach(function(x){x.onclick=function(){pickDay=+x.dataset.d;pickTime='';renderSlots()}});
+    $$('.sltype button',b).forEach(function(x){x.onclick=function(){callType=x.dataset.c;renderSlots()}});
     $$('.sltime',b).forEach(function(x){x.onclick=function(){pickTime=x.dataset.t;renderSlots()}});
     $('#slbook').onclick=bookIt}
   function bookIt(){var btn=$('#slbook');btn.disabled=true;btn.textContent='Booking…';
-    var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','book');sc.append('start',pickTime);sc.append('name',fv('name'));sc.append('email',fv('email'));sc.append('phone',fv('phone'));
+    var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','book');sc.append('type',callType);sc.append('start',pickTime);sc.append('name',fv('name'));sc.append('email',fv('email'));sc.append('phone',fv('phone'));
     try{if(data&&data.budget)sc.append('budget',data.budget)}catch(x){}
     ["utm_source","utm_campaign","utm_content","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)sc.append(k,v)}catch(x){}});sc.append('page',location.pathname);
     fetch(EXEC,{method:'POST',body:sc}).then(function(r){return r.json()}).then(function(res){
       if(res&&res.ok){var first=fv('name').split(' ')[0];track('Schedule',{content_name:location.pathname});trackC('CallBooked',{page:location.pathname});
-        $('#calbox').innerHTML='<div class="slok"><div class="tick">✓</div><h3>You\'re booked in, '+esc(first)+'.</h3><p><b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b></p><p>One of our property experts will call you on <b>'+esc(fv('phone'))+'</b> at that time.</p></div>';
+        $('#calbox').innerHTML='<div class="slok"><div class="tick">✓</div><h3>You\'re booked in, '+esc(first)+'.</h3><p><b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b></p><p>'+(callType==='video'?'Your video call link has been emailed to <b>'+esc(fv('email'))+'</b>. We\'ll show you some of our projects.':'One of our property experts will call you on <b>'+esc(fv('phone'))+'</b>.')+' We\'ll send reminders 1 hour and 5 minutes before.</p></div>';
         $('#calstep h2').textContent='All booked.';var sub=$('#calstep .sub');if(sub)sub.style.display='none'}
       else loadSlots('Sorry, that time has just gone. Please pick another.')})
     .catch(function(){btn.disabled=false;btn.textContent='Confirm my free call';var s=$('#slsum');if(s)s.innerHTML='Something went wrong. Please try again.'})}
@@ -744,7 +746,7 @@ section{padding:110px 0}
       var pc={name:name,email:email,phone:phone,budget:data.budget,timeline:data.timeline,wants:'A call',qualified:q?'Yes':'No',page:location.href,_subject:(q?'🔥 Call request – ':'Call request (under £100k) – ')+'case-study – '+name+' – '+data.budget,_template:'table',_captcha:'false'};
       ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)pc[k]=v}catch(x){}});
       try{fetch('https://formsubmit.co/ajax/'+LERA.EMAIL,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(pc)}).catch(function(){})}catch(x){}
-      try{var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','call');sc.append('name',name);sc.append('email',email);sc.append('phone',phone);sc.append('budget',data.budget||'');['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){if(pc[k])sc.append(k,pc[k])});sc.append('page',location.pathname);fetch('https://script.google.com/macros/s/AKfycbw9Vl5crYfSeJv0Ejcya52k7qYF1oJy8V5lxwNjD2ZL4AA99EnoKXSrpUrczF2Rk4VNjw/exec',{method:'POST',mode:'no-cors',keepalive:true,body:sc}).catch(function(){})}catch(x){}
+      try{var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','call');sc.append('name',name);sc.append('email',email);sc.append('phone',phone);sc.append('budget',data.budget||'');['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){if(pc[k])sc.append(k,pc[k])});sc.append('page',location.pathname);fetch('https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec',{method:'POST',mode:'no-cors',keepalive:true,body:sc}).catch(function(){})}catch(x){}
       track('Lead',{content_name:'case-study-call',value:q?1:0,currency:'GBP'});if(q)trackC('QualifiedLead',{budget:data.budget,type:'call'});
       openCal();return}
     var p={name:name,email:email,phone:phone,budget:data.budget,timeline:data.timeline,wants:'The guide',qualified:q?'Yes':'No',page:location.href,
@@ -752,7 +754,7 @@ section{padding:110px 0}
     ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)p[k]=v}catch(x){}});
     try{fetch('https://formsubmit.co/ajax/'+LERA.EMAIL,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(p)}).catch(function(){})}catch(x){}
     try{var f=new FormData(),nm=name.trim().split(/\s+/);f.append('fields[email]',email);f.append('fields[name]',nm[0]||'');f.append('fields[last_name]',nm.slice(1).join(' '));f.append('fields[phone]',phone);f.append('fields[budget]',data.budget||'');f.append('fields[timeline]',data.timeline||'');f.append('fields[lead_source]',p.utm_source||'guide page');f.append('ml-submit','1');f.append('anticsrf','true');fetch('https://assets.mailerlite.com/jsonp/2765599/forms/203126641862378699/subscribe',{method:'POST',keepalive:true,body:f}).catch(function(){})}catch(x){}
-    try{var sb=new URLSearchParams();sb.append('key','lera-7Qm4xV9pT2');sb.append('action','guide');sb.append('name',name);sb.append('email',email);sb.append('phone',phone);sb.append('budget',data.budget||'');['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){if(p[k])sb.append(k,p[k])});sb.append('page',location.pathname);fetch('https://script.google.com/macros/s/AKfycbw9Vl5crYfSeJv0Ejcya52k7qYF1oJy8V5lxwNjD2ZL4AA99EnoKXSrpUrczF2Rk4VNjw/exec',{method:'POST',mode:'no-cors',keepalive:true,body:sb}).catch(function(){})}catch(x){}
+    try{var sb=new URLSearchParams();sb.append('key','lera-7Qm4xV9pT2');sb.append('action','guide');sb.append('name',name);sb.append('email',email);sb.append('phone',phone);sb.append('budget',data.budget||'');['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){if(p[k])sb.append(k,p[k])});sb.append('page',location.pathname);fetch('https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec',{method:'POST',mode:'no-cors',keepalive:true,body:sb}).catch(function(){})}catch(x){}
     track('Lead',{content_name:'guide',value:q?1:0,currency:'GBP'});if(q)trackC('QualifiedLead',{budget:data.budget});
     finish(name,q)});
 
