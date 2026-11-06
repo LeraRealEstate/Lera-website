@@ -1,0 +1,123 @@
+
+// ===================== MESSAGES TO LEADS =====================
+// Email goes out from this Google account, with replies going to info@.
+// WhatsApp goes out through the WhatsApp Business Platform once WA_TOKEN and WA_PHONE_ID are filled in.
+
+var BOOK_URL  = 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ1EUKmAkKU3gCOdi9LlVCpBkySQxklN_d_5arh9GlpfKpF6nnzHSb_otALH9JLdG3jWJgsWdToZ?gv=true';
+var GUIDE_URL = 'https://lera-realestate.com/lera-hmo-guide.pdf';
+var CASE_URL  = 'https://lera-realestate.com/case-study/';
+var REPLY_TO  = 'info@lera-realestate.com';
+var FROM_NAME = 'Lera Real Estate';
+var CAL_ID    = 'primary';   // the calendar that receives booked calls
+var WA_TOKEN  = '';          // WhatsApp Cloud API access token (filled in once WhatsApp is set up)
+var WA_PHONE_ID = '';        // WhatsApp phone number ID
+
+// Runs straight after a lead is saved
+function notifyLead_(p) {
+  var first = String(p.name || '').trim().split(/\s+/)[0] || 'there';
+  var email = String(p.email || '').trim();
+  if (p.action === 'call') {
+    if (email) sendMail_(email, 'Your call with Lera: pick a time',
+      'Hi ' + first + ',\n\nThanks for asking for a call. If you haven\'t picked a time yet, choose one here:\n' + BOOK_URL +
+      '\n\nIt\'s 15 minutes with an HMO specialist. We\'ll go through what your budget could do and walk you through a real deal line by line.\n\nLera Real Estate\n' + REPLY_TO);
+    sendWa_(p.phone, 'lera_call_request', [first]);
+  } else {
+    if (email) sendMail_(email, 'Your free HMO guide from Lera',
+      'Hi ' + first + ',\n\nHere\'s your copy of the Lera HMO guide:\n' + GUIDE_URL +
+      '\n\nIt shows how an HMO project works from start to finish, with four of our completed projects and every number.\n\n' +
+      'Want to see what your budget could do? Book a free 15-minute call:\n' + BOOK_URL + '\n\nLera Real Estate\n' + REPLY_TO);
+    sendWa_(p.phone, 'lera_guide', [first]);
+  }
+}
+
+// Runs every minute: reminds people 1 hour and 5 minutes before their call
+function callReminders() {
+  var cal = CalendarApp.getCalendarById(CAL_ID) || CalendarApp.getDefaultCalendar();
+  var me = Session.getEffectiveUser().getEmail().toLowerCase();
+  var now = new Date();
+  var events = cal.getEvents(now, new Date(now.getTime() + 66 * 60000));
+  events.forEach(function (ev) {
+    var guests = ev.getGuestList().filter(function (g) { return g.getEmail().toLowerCase() !== me; });
+    if (!guests.length) return;                       // not a booked call
+    var g = guests[0], email = g.getEmail();
+    var mins = (ev.getStartTime().getTime() - now.getTime()) / 60000;
+    var lead = findLead_(email);
+    var first = (lead.first || g.getName() || '').split(/\s+/)[0] || 'there';
+    var phone = lead.phone || phoneFrom_(ev.getDescription());
+    var time = Utilities.formatDate(ev.getStartTime(), 'Europe/London', 'h:mm a');
+    var link = meetLink_(ev);
+    if (mins <= 62 && mins > 50 && !ev.getTag('lera_r60')) {
+      sendMail_(email, 'Reminder: your Lera call is at ' + time,
+        'Hi ' + first + ',\n\nJust a reminder that your call with Lera is in one hour, at ' + time + '.' +
+        (link ? '\n\nJoin here: ' + link : '') + '\n\nSpeak soon,\nLera Real Estate');
+      sendWa_(phone, 'lera_call_reminder_hour', [first, time]);
+      ev.setTag('lera_r60', '1');
+    }
+    if (mins <= 6 && mins > 0 && !ev.getTag('lera_r5')) {
+      sendMail_(email, 'Your Lera call starts in 5 minutes',
+        'Hi ' + first + ',\n\nYour call with Lera starts in 5 minutes, at ' + time + '.' +
+        (link ? '\n\nJoin here: ' + link : '') + '\n\nLera Real Estate');
+      sendWa_(phone, 'lera_call_reminder_5min', [first, time]);
+      ev.setTag('lera_r5', '1');
+    }
+  });
+}
+
+function findLead_(email) {
+  var ss = SpreadsheetApp.openById(SHEET_ID), out = {};
+  [FB_TAB, WEB_TAB].forEach(function (t) {
+    var sh = ss.getSheetByName(t); if (!sh || out.phone) return;
+    var data = sh.getDataRange().getValues(), h = data[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, ''); });
+    var ce = h.indexOf('email') > -1 ? h.indexOf('email') : h.indexOf('email address');
+    var cp = h.indexOf('phone number') > -1 ? h.indexOf('phone number') : h.indexOf('phone');
+    var cf = h.indexOf('first name');
+    for (var r = data.length - 1; r > 0; r--) {
+      if (String(data[r][ce]).trim().toLowerCase() === email.toLowerCase()) {
+        out.phone = cp > -1 ? String(data[r][cp]).replace(/^'/, '') : ''; out.first = cf > -1 ? String(data[r][cf]) : ''; break;
+      }
+    }
+  });
+  return out;
+}
+
+function phoneFrom_(text) { var m = String(text || '').match(/(\+?44|0)\s?7[\d\s]{9,12}/); return m ? m[0] : ''; }
+function meetLink_(ev) { var m = String(ev.getDescription() || '').match(/https:\/\/meet\.google\.com\/[a-z\-]+/); return m ? m[0] : ''; }
+
+function sendMail_(to, subject, body) {
+  try { GmailApp.sendEmail(to, subject, body, { name: FROM_NAME, replyTo: REPLY_TO }); }
+  catch (e) { console.error('email failed ' + to + ': ' + e); }
+}
+
+// WhatsApp needs approved message templates with these names (body variables {{1}}, {{2}}).
+function sendWa_(phone, template, vars) {
+  if (!WA_TOKEN || !WA_PHONE_ID || !phone) return;
+  var n = String(phone).replace(/[^\d+]/g, '');
+  if (/^07\d{9}$/.test(n)) n = '44' + n.slice(1);
+  n = n.replace(/^\+/, '').replace(/^0044/, '44');
+  var payload = { messaging_product: 'whatsapp', to: n, type: 'template',
+    template: { name: template, language: { code: 'en_GB' },
+      components: [{ type: 'body', parameters: vars.map(function (v) { return { type: 'text', text: String(v) }; }) }] } };
+  try {
+    var r = UrlFetchApp.fetch('https://graph.facebook.com/v21.0/' + WA_PHONE_ID + '/messages', {
+      method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+      headers: { Authorization: 'Bearer ' + WA_TOKEN }, payload: JSON.stringify(payload) });
+    if (r.getResponseCode() >= 300) console.error('WhatsApp ' + template + ' failed: ' + r.getContentText());
+  } catch (e) { console.error('WhatsApp failed: ' + e); }
+}
+
+// Run once: adds Campaign / Ad / Landing page columns and starts the reminder clock
+function setup() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  [FB_TAB, WEB_TAB].forEach(function (t) {
+    var sh = ss.getSheetByName(t); if (!sh) return;
+    var h = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim().toLowerCase(); });
+    ['Campaign', 'Ad', 'Landing page'].forEach(function (c) {
+      if (h.indexOf(c.toLowerCase()) === -1) { sh.getRange(1, sh.getLastColumn() + 1).setValue(c); h.push(c.toLowerCase()); }
+    });
+  });
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'callReminders') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('callReminders').timeBased().everyMinutes(1).create();
+  var cal = CalendarApp.getCalendarById(CAL_ID) || CalendarApp.getDefaultCalendar();
+  console.log('Reminders running on calendar: ' + cal.getName() + '. Upcoming booked calls: ' +
+    cal.getEvents(new Date(), new Date(Date.now() + 14 * 864e5)).filter(function (e) { return e.getGuestList().length; }).length);
+}
