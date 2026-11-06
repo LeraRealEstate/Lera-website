@@ -703,7 +703,7 @@ section{padding:110px 0}
     
     $('#s3h').textContent=m==='call'?'Last step: your details':'Last step: your details';
     $('#s3s').textContent=m==='call'?'Then pick a time that suits you.':'Your guide starts downloading as soon as you tap the button.';
-    $('#go').textContent=m==='call'?'Continue to book my call':'Download the guide';
+    $('#go').textContent=m==='call'?'Continue to pick a time':'Get the free guide';
     if(stepN>=4){$('#lead').reset();data={};$$('.tile',modal).forEach(function(t){t.setAttribute('aria-pressed','false')})}
     show(stepN>=4?1:stepN);trackC('OpenForm',{mode:m})}
   function close(){modal.classList.remove('open');document.body.style.overflow='';lastFocus&&lastFocus.focus()}
