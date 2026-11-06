@@ -1,0 +1,91 @@
+
+// ===================== BOOKING (calls booked straight from the landing page) =====================
+var SLOT_DAYS = 10;           // working days shown
+var SLOT_FIRST_HOUR = 9;      // first call 9:00
+var SLOT_LAST_START = '16:30';// last call 16:30
+var CALL_MINS = 15;           // length of the call
+var MIN_NOTICE_HOURS = 2;     // earliest bookable slot from now
+var OLD_SCHEDULE_TITLE = 'Free 15-minute HMO strategy call';
+
+function cal_() { return CalendarApp.getCalendarById(CAL_ID) || CalendarApp.getDefaultCalendar(); }
+function pad_(n) { return (n < 10 ? '0' : '') + n; }
+
+function blocks_(ev) {
+  if (ev.isAllDayEvent()) return false;
+  try { if (ev.getTransparency && String(ev.getTransparency()) === 'TRANSPARENT') return false; } catch (x) {}
+  if (ev.getTitle() === OLD_SCHEDULE_TITLE && ev.getGuestList().length === 0) return false; // the old availability block
+  return true;
+}
+
+function slotsResult_() {
+  var tz = 'Europe/London', now = new Date(), minStart = now.getTime() + MIN_NOTICE_HOURS * 3600000;
+  var horizon = new Date(now.getTime() + 21 * 864e5);
+  var evs = cal_().getEvents(now, horizon).filter(blocks_);
+  var lastH = +SLOT_LAST_START.split(':')[0], lastM = +SLOT_LAST_START.split(':')[1];
+  var days = [];
+  for (var i = 0; i < 21 && days.length < SLOT_DAYS; i++) {
+    var day = new Date(now.getTime() + i * 864e5);
+    if (+Utilities.formatDate(day, tz, 'u') > 5) continue; // Mon-Fri only
+    var ymd = Utilities.formatDate(day, tz, 'yyyy-MM-dd'), times = [];
+    for (var h = SLOT_FIRST_HOUR; h <= lastH; h++) {
+      for (var m = 0; m < 60; m += 30) {
+        if (h === lastH && m > lastM) continue;
+        var s = Utilities.parseDate(ymd + ' ' + pad_(h) + ':' + pad_(m), tz, 'yyyy-MM-dd HH:mm').getTime();
+        var e = s + CALL_MINS * 60000;
+        if (s < minStart) continue;
+        var clash = evs.some(function (ev) { return ev.getStartTime().getTime() < e && ev.getEndTime().getTime() > s; });
+        if (!clash) times.push(new Date(s).toISOString());
+      }
+    }
+    if (times.length) days.push({ date: ymd, label: Utilities.formatDate(day, tz, 'EEE d MMM'), times: times });
+  }
+  return { ok: true, days: days };
+}
+
+function book_(p) {
+  var start = new Date(String(p.start || ''));
+  if (isNaN(start.getTime()) || start.getTime() < Date.now()) return { ok: false, taken: true };
+  var end = new Date(start.getTime() + CALL_MINS * 60000);
+  var name = String(p.name || '').trim(), email = String(p.email || '').trim(), phone = String(p.phone || '').trim();
+  if (!name || !/@/.test(email)) return { ok: false };
+  var lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    var cal = cal_();
+    var clash = cal.getEvents(start, end).filter(blocks_).length > 0;
+    if (clash) return { ok: false, taken: true };
+    var ev = cal.createEvent('Free call with Lera Real Estate: ' + name, start, end, {
+      description: 'Free 15-minute call with a Lera property expert. We will call you on ' + phone + '.\n\n' +
+        'Name: ' + name + '\nPhone: ' + phone + '\nEmail: ' + email + '\nBudget: ' + (p.budget || '') +
+        '\nCampaign: ' + (p.utm_campaign || '') + '\nAd: ' + (p.utm_content || '') + '\nPage: ' + (p.page || ''),
+      guests: email, sendInvites: true });
+    ev.addPopupReminder(10);
+  } finally { lock.releaseLock(); }
+  var when = Utilities.formatDate(start, 'Europe/London', "EEEE d MMMM 'at' h:mm a");
+  try { markBooked_(email, Utilities.formatDate(start, 'Europe/London', 'dd/MM/yyyy HH:mm')); } catch (x) { console.error(x); }
+  var first = name.split(/\s+/)[0];
+  sendMail_(email, 'Booked: your free call with Lera, ' + when,
+    'Hi ' + first + ',\n\nYou\'re booked in for a free 15-minute call with one of our property experts on ' + when + '.\n\n' +
+    'We\'ll call you on ' + phone + '. It\'s a chance to tell us what you\'re looking for: your budget, the areas you like and your timescale, so we can find you a property that fits.\n\n' +
+    'Need to change the time? Just reply to this email.\n\nLera Real Estate\n' + REPLY_TO);
+  sendWa_(phone, 'lera_call_booked', [first, when]);
+  return { ok: true, when: when };
+}
+
+function markBooked_(email, whenTxt) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var tabs = [FB_TAB, WEB_TAB];
+  for (var t = 0; t < tabs.length; t++) {
+    var sh = ss.getSheetByName(tabs[t]); if (!sh) continue;
+    var data = sh.getDataRange().getValues();
+    var h = data[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, ''); });
+    var ce = h.indexOf('email') > -1 ? h.indexOf('email') : h.indexOf('email address');
+    var cn = h.indexOf('notes'), cs = h.indexOf('status');
+    for (var r = data.length - 1; r > 0; r--) {
+      if (String(data[r][ce]).trim().toLowerCase() === email.toLowerCase()) {
+        if (cn > -1) sh.getRange(r + 1, cn + 1).setValue(String(data[r][cn]) + ' | CALL BOOKED for ' + whenTxt);
+        if (cs > -1) sh.getRange(r + 1, cs + 1).setValue('Call booked');
+        return;
+      }
+    }
+  }
+}

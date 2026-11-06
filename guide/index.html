@@ -332,6 +332,22 @@ section{padding:110px 0}
   .final{padding:84px 0}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.slmsg{padding:30px 6px;text-align:center;color:var(--stone)}
+.sllab{font-weight:600;margin:6px 0 10px;font-size:14px}.sllab span{font-weight:400;color:var(--stone)}
+.sldays{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:thin}
+.slday{flex:none;width:66px;padding:10px 0;border-radius:14px;border:1px solid var(--line);background:#fff;display:grid;gap:2px;cursor:pointer;font:inherit;color:var(--ink)}
+.slday small{font-size:11.5px;color:var(--stone)}.slday b{font-size:20px;font-weight:500}
+.slday.on{background:var(--ink);border-color:var(--ink);color:#F5EFE4}.slday.on small{color:var(--gold)}
+.sltimes{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;max-height:260px;overflow:auto}
+.sltime{padding:12px 0;border-radius:12px;border:1px solid var(--line);background:#fff;font:inherit;font-weight:600;cursor:pointer;color:var(--ink)}
+.sltime:hover{border-color:var(--gold)}.sltime.on{background:var(--gold);border-color:var(--gold)}
+.slconf{position:sticky;bottom:0;background:inherit;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.slconf p{margin:0;font-size:14.5px;line-height:1.4}.slconf .btn[disabled]{opacity:.45;cursor:not-allowed}
+.slwarn{background:#FBEBD9;color:#7A4B12;padding:10px 14px;border-radius:12px;font-size:14px;margin-bottom:12px}
+.slok{text-align:center;padding:20px 6px}.slok .tick{width:58px;height:58px;border-radius:50%;background:var(--gold);display:grid;place-items:center;margin:0 auto 14px;font-size:28px;color:var(--ink)}
+.slok h3{font-size:24px;margin-bottom:10px}.slok p{margin:8px 0;color:var(--stone)}.slok b{color:var(--ink)}
+.cal-embed:has(.sldays),.cal-embed:has(.slok),.cal-embed:has(.slmsg){height:auto;min-height:0;border:0;background:none}
+.layer:not(.after) img,.cg.bef img{filter:brightness(.78) saturate(.8) contrast(.95)}.layer.after img,.cg.aft img{filter:brightness(1.12) saturate(1.05)}
 </style>
 </head>
 <body>
@@ -625,7 +641,7 @@ section{padding:110px 0}
       </div>
     </form>
     <div class="step" data-step="4" id="done"></div>
-    <div class="step" data-step="5" id="calstep"><h2>Pick a time for your free call.</h2><p class="sub">A free call with a property expert. Choose a day and time that suits you.</p><div class="cal-embed" id="calbox"></div></div>
+    <div class="step" data-step="5" id="calstep"><h2>Pick a time for your free call.</h2><p class="sub">A free 15-minute call with a property expert. We'll call you on your mobile.</p><div class="cal-embed" id="calbox"></div></div>
   </div>
 </div>
 
@@ -654,8 +670,35 @@ section{padding:110px 0}
   /* modal + form */
   var modal=$('#modal'),mode='guide',data={},stepN=1,lastFocus=null;
   function show(n){stepN=n;$$('.step',modal).forEach(function(s){s.classList.toggle('on',+s.dataset.step===n)});$$('.prog i',modal).forEach(function(i,k){i.classList.toggle('on',k<n)});$('.prog',modal).style.display=n>3?'none':'flex';var f=$('.step.on .tile,.step.on input',modal);if(f&&n<4)setTimeout(function(){f.focus()},60)}
-  function calFrame(){return '<iframe title="Book your call" src="'+LERA.BOOKING_URL+'" loading="eager"></iframe>'}
-  function openCal(){$('.sheet',modal).classList.add('wide');var b=$('#calbox');if(!b.firstChild)b.innerHTML=calFrame();show(5);trackC('OpenBooking')}
+  var EXEC='https://script.google.com/macros/s/AKfycbw9Vl5crYfSeJv0Ejcya52k7qYF1oJy8V5lxwNjD2ZL4AA99EnoKXSrpUrczF2Rk4VNjw/exec';
+  function calFrame(){return ''}
+  function fv(n){var i=$('#lead [name="'+n+'"]');return i?String(i.value||'').trim():''}
+  function fmtT(iso){return new Date(iso).toLocaleTimeString('en-GB',{timeZone:'Europe/London',hour:'numeric',minute:'2-digit',hour12:true}).replace(' ','').toLowerCase()}
+  function fmtD(iso){return new Date(iso).toLocaleDateString('en-GB',{timeZone:'Europe/London',weekday:'long',day:'numeric',month:'long'})}
+  var slotDays=[],pickDay=0,pickTime='';
+  function openCal(){$('.sheet',modal).classList.add('wide');show(5);trackC('OpenBooking');loadSlots()}
+  function loadSlots(msg){var b=$('#calbox');b.innerHTML='<p class="slmsg">'+(msg||'Finding available times…')+'</p>';pickTime='';
+    fetch(EXEC+'?action=slots&t='+Date.now()).then(function(r){return r.json()}).then(function(d){slotDays=d.days||[];pickDay=0;if(!slotDays.length){b.innerHTML='<p class="slmsg">No times are free right now. We\'ll call you on '+esc(fv('phone'))+' to arrange one.</p>';return}renderSlots(msg)})
+    .catch(function(){b.innerHTML='<p class="slmsg">Sorry, the times didn\'t load. <button type="button" class="btn btn-ghost" id="slretry">Try again</button></p>';$('#slretry').onclick=function(){loadSlots()}})}
+  function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function renderSlots(msg){var b=$('#calbox');var d=slotDays[pickDay];
+    var h=(msg?'<p class="slwarn">'+msg+'</p>':'')+'<p class="sllab">Choose a day</p><div class="sldays">'+slotDays.map(function(x,i){var p=x.label.split(' ');return '<button type="button" class="slday'+(i===pickDay?' on':'')+'" data-d="'+i+'"><small>'+p[0]+'</small><b>'+p[1]+'</b><small>'+p[2]+'</small></button>'}).join('')+'</div>'+
+      '<p class="sllab">Choose a time <span>(15-minute call, UK time)</span></p><div class="sltimes">'+d.times.map(function(t){return '<button type="button" class="sltime'+(t===pickTime?' on':'')+'" data-t="'+t+'">'+fmtT(t)+'</button>'}).join('')+'</div>'+
+      '<div class="slconf"><p id="slsum">'+(pickTime?'<b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b><br>We\'ll call you on '+esc(fv('phone')):'Pick a time above')+'</p><button type="button" class="btn btn-gold" id="slbook"'+(pickTime?'':' disabled')+'>Confirm my free call</button></div>';
+    b.innerHTML=h;
+    $$('.slday',b).forEach(function(x){x.onclick=function(){pickDay=+x.dataset.d;pickTime='';renderSlots()}});
+    $$('.sltime',b).forEach(function(x){x.onclick=function(){pickTime=x.dataset.t;renderSlots()}});
+    $('#slbook').onclick=bookIt}
+  function bookIt(){var btn=$('#slbook');btn.disabled=true;btn.textContent='Booking…';
+    var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','book');sc.append('start',pickTime);sc.append('name',fv('name'));sc.append('email',fv('email'));sc.append('phone',fv('phone'));
+    try{if(data&&data.budget)sc.append('budget',data.budget)}catch(x){}
+    ["utm_source","utm_campaign","utm_content","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)sc.append(k,v)}catch(x){}});sc.append('page',location.pathname);
+    fetch(EXEC,{method:'POST',body:sc}).then(function(r){return r.json()}).then(function(res){
+      if(res&&res.ok){var first=fv('name').split(' ')[0];track('Schedule',{content_name:location.pathname});trackC('CallBooked',{page:location.pathname});
+        $('#calbox').innerHTML='<div class="slok"><div class="tick">✓</div><h3>You\'re booked in, '+esc(first)+'.</h3><p><b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b></p><p>One of our property experts will call you on <b>'+esc(fv('phone'))+'</b>. We\'ve emailed a confirmation and a calendar invite to '+esc(fv('email'))+'.</p></div>';
+        $('#calstep h2').textContent='All booked.';var sub=$('#calstep .sub');if(sub)sub.style.display='none'}
+      else loadSlots('Sorry, that time has just gone. Please pick another.')})
+    .catch(function(){btn.disabled=false;btn.textContent='Confirm my free call';var s=$('#slsum');if(s)s.innerHTML='Something went wrong. Please try again.'})}
   function open(m){mode=m;lastFocus=document.activeElement;modal.classList.add('open');document.body.style.overflow='hidden';$('.sheet',modal).classList.remove('wide');
     
     $('#s3h').textContent=m==='call'?'Last step: your details':'Last step: your details';
@@ -722,5 +765,6 @@ section{padding:110px 0}
   window.addEventListener('message',function(e){if(e.data&&e.data.event==='calendly.event_scheduled'){track('Schedule');trackC('BookedCall')}});
 })();
 </script>
+<script>try{if(/[?&]book=1/.test(location.search))setTimeout(function(){var b=document.querySelector('[data-open="call"]');b&&b.click()},400)}catch(e){}</script>
 </body>
 </html>
