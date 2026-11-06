@@ -655,9 +655,9 @@ section{padding:110px 0}
   var modal=$('#modal'),mode='guide',data={},stepN=1,lastFocus=null;
   function show(n){stepN=n;$$('.step',modal).forEach(function(s){s.classList.toggle('on',+s.dataset.step===n)});$$('.prog i',modal).forEach(function(i,k){i.classList.toggle('on',k<n)});$('.prog',modal).style.display=n>3?'none':'flex';var f=$('.step.on .tile,.step.on input',modal);if(f&&n<4)setTimeout(function(){f.focus()},60)}
   function calFrame(){return '<iframe title="Book your call" src="'+LERA.BOOKING_URL+'" loading="eager"></iframe>'}
-  function openCal(){$('.sheet',modal).classList.add('wide');var b=$('#calbox');if(!b.firstChild)b.innerHTML=calFrame();show(5);trackC('OpenBooking');track('Lead',{content_name:'call',currency:'GBP',value:0})}
+  function openCal(){$('.sheet',modal).classList.add('wide');var b=$('#calbox');if(!b.firstChild)b.innerHTML=calFrame();show(5);trackC('OpenBooking')}
   function open(m){mode=m;lastFocus=document.activeElement;modal.classList.add('open');document.body.style.overflow='hidden';$('.sheet',modal).classList.remove('wide');
-    if(m==='call'&&set(LERA.BOOKING_URL)){openCal();return}
+    
     $('#s3h').textContent=m==='call'?'Last step: your details':'Last step: your details';
     $('#s3s').textContent=m==='call'?'Then pick a time that suits you.':'Your guide starts downloading as soon as you tap the button.';
     $('#go').textContent=m==='call'?'Continue to book my call':'Download the guide';
@@ -681,6 +681,13 @@ section{padding:110px 0}
     if(phone.replace(/\D/g,'').length<10){f.phone.setAttribute('aria-invalid','true');err.textContent='Enter a mobile number with at least 10 digits.';f.phone.focus();return}
     err.textContent='';if(f._honey.value)return;
     var q=(data.amt||0)>=LERA.MIN_BUDGET,go=$('#go');
+    if(mode==='call'){
+      var pc={name:name,email:email,phone:phone,budget:data.budget,timeline:data.timeline,wants:'A call',qualified:q?'Yes':'No',page:location.href,_subject:(q?'🔥 Call request – ':'Call request (under £100k) – ')+'guide – '+name+' – '+data.budget,_template:'table',_captcha:'false'};
+      ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)pc[k]=v}catch(x){}});
+      try{fetch('https://formsubmit.co/ajax/'+LERA.EMAIL,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(pc)}).catch(function(){})}catch(x){}
+      try{var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','call');sc.append('name',name);sc.append('email',email);sc.append('phone',phone);sc.append('budget',data.budget||'');['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){if(pc[k])sc.append(k,pc[k])});fetch('https://script.google.com/macros/s/AKfycbw9Vl5crYfSeJv0Ejcya52k7qYF1oJy8V5lxwNjD2ZL4AA99EnoKXSrpUrczF2Rk4VNjw/exec',{method:'POST',mode:'no-cors',keepalive:true,body:sc}).catch(function(){})}catch(x){}
+      track('Lead',{content_name:'guide-call',value:q?1:0,currency:'GBP'});if(q)trackC('QualifiedLead',{budget:data.budget,type:'call'});
+      openCal();return}
     var p={name:name,email:email,phone:phone,budget:data.budget,timeline:data.timeline,wants:'The guide',qualified:q?'Yes':'No',page:location.href,
       _subject:(q?'🔥 Ad lead – ':'Ad lead (under £100k) – ')+'guide – '+name+' – '+data.budget,_template:'table',_captcha:'false'};
     ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)p[k]=v}catch(x){}});
