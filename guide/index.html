@@ -347,8 +347,26 @@ section{padding:110px 0}
 .slwarn{background:#FBEBD9;color:#7A4B12;padding:10px 14px;border-radius:12px;font-size:14px;margin-bottom:12px}
 .slok{text-align:center;padding:20px 6px}.slok .tick{width:58px;height:58px;border-radius:50%;background:var(--gold);display:grid;place-items:center;margin:0 auto 14px;font-size:28px;color:var(--ink)}
 .slok h3{font-size:24px;margin-bottom:10px}.slok p{margin:8px 0;color:var(--stone)}.slok b{color:var(--ink)}
-.cal-embed:has(.sldays),.cal-embed:has(.slok),.cal-embed:has(.slmsg){height:auto;min-height:0;border:0;background:none}
+.cal-embed:has(.sldays),.cal-embed:has(.slok),.cal-embed:has(.slmsg),.cal-embed:has(.ok2),.cal-embed:has(.bk){height:auto;min-height:0;border:0;background:none}
 .layer:not(.after) img,.cg.bef img{filter:brightness(.78) saturate(.8) contrast(.95)}.layer.after img,.cg.aft img{filter:brightness(1.12) saturate(1.05)}
+.bk{text-align:center;padding:26px 6px}.bk-k{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-deep,#9B7330);font-weight:600}
+.bk-h{font-size:24px;margin:8px 0 18px;min-height:30px}.bk-bar{height:12px;border-radius:999px;background:#EFE6D8;overflow:hidden}.bk-bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#C49A55,#E8CB93);transition:width .25s ease}
+.bk-pc{margin-top:8px;font-size:13px;color:var(--stone)}.bk-rev{margin-top:26px;padding:18px;border-radius:16px;background:#fff;border:1px solid var(--line)}.bk-st{color:#CFA864;letter-spacing:3px}.bk-rev p{margin:8px 0;font-style:italic;transition:opacity .25s;min-height:48px}.bk-rev small{color:var(--stone)}
+.ok2{position:relative;text-align:center;padding:8px 2px 4px}.ok2-tick{width:78px;height:78px;border-radius:50%;margin:0 auto;background:linear-gradient(135deg,#E8CB93,#C49A55);display:grid;place-items:center;box-shadow:0 10px 30px rgba(196,154,85,.45);animation:okpop .5s cubic-bezier(.2,1.6,.4,1)}
+.ok2-tick svg{width:40px;height:40px;fill:none;stroke:#15120E;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:30;stroke-dashoffset:30;animation:okdraw .5s .35s forwards}
+@keyframes okpop{from{transform:scale(.3);opacity:0}}@keyframes okdraw{to{stroke-dashoffset:0}}
+.ok2-k{margin-top:16px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#2F8F5B;font-weight:700}.ok2 h3{font-size:clamp(26px,4vw,34px);margin-top:6px}.ok2-s{color:var(--stone);margin-top:6px}
+.ok2-when{display:flex;gap:16px;align-items:center;text-align:left;margin:20px auto 0;max-width:460px;padding:16px;border-radius:18px;background:#15120E;color:#F5EFE4}
+.ok2-cal{flex:none;width:64px;border-radius:12px;overflow:hidden;background:#FBF6EE;color:#15120E;text-align:center}.ok2-cal small{display:block;background:#C49A55;color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 0}.ok2-cal b{display:block;font-size:28px;padding:4px 0 6px}
+.ok2-when b{display:block;font-size:17px}.ok2-when span{display:block;font-size:13.5px;color:#D6C9B5;margin-top:3px}
+.ok2-add{margin-top:12px;display:inline-flex;background:#fff!important;border:1.5px solid #15120E!important;color:#15120E!important;padding:12px 22px;border-radius:999px;font-weight:600;text-decoration:none}
+.ok2-next{text-align:left;margin:22px auto 0;max-width:460px}.ok2-nh{font-weight:700;font-size:14px;margin-bottom:8px}.ok2-next ol{list-style:none;counter-reset:n;display:grid;gap:10px}
+.ok2-next li{counter-increment:n;position:relative;padding-left:40px}.ok2-next li::before{content:counter(n);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:#EFE6D8;display:grid;place-items:center;font-weight:700;font-size:13px}
+.ok2-next b{display:block;font-size:15px}.ok2-next span{display:block;font-size:13.5px;color:var(--stone)}
+.ok2-proof{margin:22px auto 0;max-width:460px;padding:16px;border-radius:18px;background:#fff;border:1px solid var(--line)}.ok2-stars{color:#CFA864;letter-spacing:2px}.ok2-stars span{color:var(--stone);letter-spacing:0;font-size:13px}
+.ok2-proof p{font-style:italic;margin:8px 0 12px;font-size:14.5px}.ok2-st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ok2-st div{background:#F6F1E9;border-radius:12px;padding:10px 6px}.ok2-st b{display:block;font-size:18px}.ok2-st span{font-size:11.5px;color:var(--stone)}
+.bk-conf{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.sheet{position:relative}
 </style>
 </head>
 <body>
@@ -691,16 +709,31 @@ section{padding:110px 0}
     $$('.sltype button',b).forEach(function(x){x.onclick=function(){callType=x.dataset.c;renderSlots()}});
     $$('.sltime',b).forEach(function(x){x.onclick=function(){pickTime=x.dataset.t;renderSlots()}});
     $('#slbook').onclick=bookIt}
-  function bookIt(){var btn=$('#slbook');btn.disabled=true;btn.textContent='Booking…';
+  var REVS=["Fantastic team to deal with! Highly recommend.", "Akiva is such a pleasant person to work with. Really felt in safe hands.", "An impeccable service, which is a hard thing to find in this industry!", "Excellent communication throughout, honest and transparent every step of the way.", "Professional team and delivered a fantastic property project! 5 stars all round!"];
+  function bookingScreen(){var b=$('#calbox');var i=0;try{$('#calstep h2').textContent='Hold tight, '+fv('name').split(' ')[0]+'.';var sb=$('#calstep .sub');if(sb)sb.style.display='none'}catch(x){}
+    b.innerHTML='<div class="bk"><p class="bk-k">Booking your free call</p><h3 class="bk-h" id="bkh">Checking the diary…</h3><div class="bk-bar"><i id="bkbar"></i></div><p class="bk-pc" id="bkpc">0%</p><div class="bk-rev"><div class="bk-st">★★★★★</div><p id="bkrev">“'+REVS[0]+'”</p><small>Google review · Lera is rated 5.0 on Google</small></div></div>';
+    var p=0,msgs=['Checking the diary…','Reserving your slot…','Setting up your call…','Sending your confirmation…'];
+    var t1=setInterval(function(){p=Math.min(92,p+(p<60?6:p<85?3:1));var bar=$('#bkbar');if(!bar){clearInterval(t1);return}bar.style.width=p+'%';$('#bkpc').textContent=p+'%';$('#bkh').textContent=msgs[Math.min(3,Math.floor(p/25))]},180);
+    var t2=setInterval(function(){var r=$('#bkrev');if(!r){clearInterval(t2);return}i=(i+1)%REVS.length;r.style.opacity=0;setTimeout(function(){r.textContent='“'+REVS[i]+'”';r.style.opacity=1},250)},2600);
+    return function(){clearInterval(t1);clearInterval(t2);var bar=$('#bkbar');if(bar){bar.style.width='100%';$('#bkpc').textContent='100%';$('#bkh').textContent='Booked!'}}}
+  function confetti(box){var c=document.createElement('canvas');c.className='bk-conf';box.appendChild(c);var W=c.width=box.clientWidth*2,H=c.height=box.clientHeight*2,x=c.getContext('2d');var cols=['#CFA864','#E8CB93','#15120E','#2F8F5B','#FBF6EE'];var ps=[];for(var k=0;k<140;k++)ps.push({x:W/2,y:H*0.25,vx:(Math.random()-0.5)*26,vy:-Math.random()*22-6,s:6+Math.random()*10,r:Math.random()*6,c:cols[k%5]});var n=0;(function f(){x.clearRect(0,0,W,H);ps.forEach(function(p){p.vy+=0.6;p.x+=p.vx;p.y+=p.vy;p.vx*=0.99;p.r+=0.15;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});if(++n<150)requestAnimationFrame(f);else c.remove()})()}
+  function gcal(start,video){var s=new Date(start),e=new Date(s.getTime()+15*60000);var f=function(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')};return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Free '+(video?'video':'phone')+' call with Lera Real Estate')+'&dates='+f(s)+'/'+f(e)+'&details='+encodeURIComponent('Free 15-minute call with a Lera property expert.')}
+  function bookedScreen(res){var first=fv('name').split(' ')[0],video=callType==='video';
+    $('#calstep h2').textContent='';var sub=$('#calstep .sub');if(sub)sub.style.display='none';
+    var b=$('#calbox');b.innerHTML='<div class="ok2"><div class="ok2-tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></div><p class="ok2-k">You\'re booked in</p><h3>Great choice, '+esc(first)+'.</h3><p class="ok2-s">Your free '+(video?'video':'phone')+' call with one of our property experts is confirmed.</p>'+
+    '<div class="ok2-when"><div class="ok2-cal"><small>'+new Date(pickTime).toLocaleDateString('en-GB',{timeZone:'Europe/London',month:'short'})+'</small><b>'+new Date(pickTime).toLocaleDateString('en-GB',{timeZone:'Europe/London',day:'numeric'})+'</b></div><div><b>'+fmtD(pickTime)+'</b><span>'+fmtT(pickTime)+' · 15 minutes · '+(video?'Google Meet video call':'We call you on '+esc(fv('phone')))+'</span></div></div>'+
+    '<a class="btn btn-ghost ok2-add" target="_blank" rel="noopener" href="'+gcal(pickTime,video)+'">+ Add to my calendar</a>'+
+    '<div class="ok2-next"><p class="ok2-nh">What happens next</p><ol><li><b>Check your inbox</b><span>Your confirmation'+(video?' and Google Meet link':'')+' is on its way from info@lera-realestate.com.</span></li><li><b>Reminders</b><span>We\'ll remind you 1 hour and 5 minutes before.</span></li><li><b>On the call</b><span>Tell us your budget, areas and goals. We\'ll show you how we\'d find you a property that fits'+(video?', with some of our projects on screen':'')+'.</span></li></ol></div>'+
+    '<div class="ok2-proof"><div class="ok2-stars">★★★★★ <span>5.0 on Google</span></div><p>“'+REVS[3]+'”</p><div class="ok2-st"><div><b>5–6 mo</b><span>purchase to fully let</span></div><div><b>100%</b><span>yours to own</span></div><div><b>0%</b><span>profit share</span></div></div></div></div>';
+    confetti($('.sheet',modal)||b)}
+  function bookIt(){var btn=$('#slbook');btn.disabled=true;btn.textContent='Booking…';var t0=Date.now();var done=bookingScreen();
     var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','book');sc.append('type',callType);sc.append('start',pickTime);sc.append('name',fv('name'));sc.append('email',fv('email'));sc.append('phone',fv('phone'));
     try{if(data&&data.budget)sc.append('budget',data.budget)}catch(x){}
     ["utm_source","utm_campaign","utm_content","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)sc.append(k,v)}catch(x){}});sc.append('page',location.pathname);
     fetch(EXEC,{method:'POST',body:sc}).then(function(r){return r.json()}).then(function(res){
-      if(res&&res.ok){var first=fv('name').split(' ')[0];track('Schedule',{content_name:location.pathname});trackC('CallBooked',{page:location.pathname});
-        $('#calbox').innerHTML='<div class="slok"><div class="tick">✓</div><h3>You\'re booked in, '+esc(first)+'.</h3><p><b>'+fmtD(pickTime)+' at '+fmtT(pickTime)+'</b></p><p>'+(callType==='video'?'Your video call link has been emailed to <b>'+esc(fv('email'))+'</b>. We\'ll show you some of our projects.':'One of our property experts will call you on <b>'+esc(fv('phone'))+'</b>.')+' We\'ll send reminders 1 hour and 5 minutes before.</p></div>';
-        $('#calstep h2').textContent='All booked.';var sub=$('#calstep .sub');if(sub)sub.style.display='none'}
+      if(res&&res.ok){track('Schedule',{content_name:location.pathname});trackC('CallBooked',{page:location.pathname});var wait=Math.max(0,2600-(Date.now()-t0));setTimeout(function(){done();setTimeout(function(){bookedScreen(res)},450)},wait)}
       else loadSlots('Sorry, that time has just gone. Please pick another.')})
-    .catch(function(){btn.disabled=false;btn.textContent='Confirm my free call';var s=$('#slsum');if(s)s.innerHTML='Something went wrong. Please try again.'})}
+    .catch(function(){renderSlots('Something went wrong. Please try again.')})}
   function open(m){mode=m;lastFocus=document.activeElement;modal.classList.add('open');document.body.style.overflow='hidden';$('.sheet',modal).classList.remove('wide');
     
     $('#s3h').textContent=m==='call'?'Last step: your details':'Last step: your details';
