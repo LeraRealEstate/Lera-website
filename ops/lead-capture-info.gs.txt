@@ -131,7 +131,6 @@ function callReminders() {
     if (mins <= 62 && mins > 50 && !ev.getTag('lera_r60')) {
       sendMail_(email, 'In one hour: your call with Akiva at ' + time,
         'Hi ' + first + ', your free call with Akiva is in one hour, at ' + time + '.' + (link ? ' Join: ' + link : ' Akiva will call you on ' + phone + '.'), reminderEmail_(first, time, !!link, link, phone, false));
-      sendWa_(phone, 'lera_call_reminder_hour', [first, time]);
       ev.setTag('lera_r60', '1');
     }
     if (mins <= 6 && mins > 0 && !ev.getTag('lera_r5')) {
@@ -175,7 +174,9 @@ function sendMail_(to, subject, body, html) {
 
 // WhatsApp needs approved message templates with these names (body variables {{1}}, {{2}}).
 function sendWa_(phone, template, vars) {
-  if (!WA_TOKEN || !WA_PHONE_ID || !phone) return;
+  var props = PropertiesService.getScriptProperties();
+  var tok = props.getProperty('WA_TOKEN') || WA_TOKEN, pid = props.getProperty('WA_PHONE_ID') || WA_PHONE_ID;
+  if (!tok || !pid || !phone) return;
   var n = String(phone).replace(/[^\d+]/g, '');
   if (/^07\d{9}$/.test(n)) n = '44' + n.slice(1);
   n = n.replace(/^\+/, '').replace(/^0044/, '44');
@@ -183,9 +184,9 @@ function sendWa_(phone, template, vars) {
     template: { name: template, language: { code: 'en_GB' },
       components: [{ type: 'body', parameters: vars.map(function (v) { return { type: 'text', text: String(v) }; }) }] } };
   try {
-    var r = UrlFetchApp.fetch('https://graph.facebook.com/v21.0/' + WA_PHONE_ID + '/messages', {
+    var r = UrlFetchApp.fetch('https://graph.facebook.com/v21.0/' + pid + '/messages', {
       method: 'post', contentType: 'application/json', muteHttpExceptions: true,
-      headers: { Authorization: 'Bearer ' + WA_TOKEN }, payload: JSON.stringify(payload) });
+      headers: { Authorization: 'Bearer ' + tok }, payload: JSON.stringify(payload) });
     if (r.getResponseCode() >= 300) console.error('WhatsApp ' + template + ' failed: ' + r.getContentText());
   } catch (e) { console.error('WhatsApp failed: ' + e); }
 }
