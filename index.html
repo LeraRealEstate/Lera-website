@@ -3392,6 +3392,34 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .a4-areas summary{display:flex;justify-content:space-between;padding:0;font:600 14px var(--body)}
 .a4-areas summary::after{content:"+";color:var(--muted)}.a4-areas[open] summary::after{content:"–"}
 .a4-key .k-fut{background:rgba(184,50,42,.16);border:2px dashed #7E1A14}.a4-key .k-apx{background:rgba(184,50,42,.3);border:2px dotted #7E1A14}
+/* Partners (agents) page */
+.pt-steps{grid-template-columns:repeat(4,1fr)}
+.pt-perks{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pt-perks>div{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:28px;display:grid;gap:8px;align-content:start}
+.pt-perks b{font:300 44px/1 var(--display);letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pt-perks h3{font-size:20px}.pt-perks p{font-size:15px;color:var(--muted);margin:0}
+[data-page="partners"] .rf-who{text-decoration:none}
+[data-page="partners"] .faq-layout{grid-template-columns:300px 1fr}
+.pt-step{display:none;gap:16px}.pt-step.on{display:grid}
+.pt-msg{color:var(--muted);text-align:center;padding:24px 6px}
+.pt-lab{font-weight:600;font-size:14px;margin:0 0 8px}.pt-lab span{font-weight:400;color:var(--muted)}
+.pt-type{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pt-type button,.pt-day,.pt-time{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.pt-type button{text-align:left;padding:12px 14px;display:grid;gap:2px}.pt-type small{color:var(--muted);font-size:13px}
+.pt-days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.pt-day{flex:none;width:66px;padding:10px 0;display:grid;gap:2px;text-align:center}.pt-day small{font-size:11.5px;color:var(--muted)}.pt-day b{font:500 20px var(--display)}
+.pt-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;max-height:240px;overflow:auto}
+.pt-time{padding:11px 0;font-weight:600}
+.pt-type button.on,.pt-day.on{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}.pt-day.on small{color:var(--gold)}
+.pt-time.on{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.pt-conf{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+.pt-conf p{margin:0;font-size:15px}.pt-conf .btn[disabled]{opacity:.45;cursor:not-allowed}
+.pt-warn{background:#FBEBD9;color:#7A4B12;padding:10px 14px;border-radius:12px;font-size:14px;margin:0}
+.pt-ok{text-align:center;display:grid;gap:10px;justify-items:center;padding:16px 0}
+.pt-ok i{width:58px;height:58px;border-radius:50%;background:var(--grad);display:grid;place-items:center;font-style:normal;font-size:26px;color:var(--gold-ink)}
+.pt-ok h3{font-size:24px}.pt-ok p{margin:0;color:var(--muted)}
+@media (max-width:980px){.pt-steps{grid-template-columns:1fr 1fr}.pt-steps li::after{display:none}.pt-perks{grid-template-columns:1fr 1fr}[data-page="partners"] .faq-layout{grid-template-columns:1fr}}
+@media (max-width:600px){.pt-steps,.pt-perks{grid-template-columns:1fr}}
 </style>
 
 <header class="site" id="site-header">
@@ -3406,6 +3434,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <li><a href="#about" data-link>About</a></li>
         <li><a href="#faqs" data-link>FAQs</a></li>
         <li><a href="#refer" data-link>Refer</a></li>
+        <li><a href="#partners" data-link>Partners</a></li>
         <li class="has-dd"><button type="button" class="dd-btn" aria-expanded="false" aria-controls="dd-res">Resources <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
           <div class="dd" id="dd-res"><div class="wrap dd-in"><div class="dd-grid">
             <a class="dd-item" href="#resources" data-link><span><b>All free resources</b><small>Everything in one place</small></span></a>
@@ -4275,6 +4304,113 @@ svg.leaflet-image-layer.leaflet-interactive path {
   </div></section>
 </section>
 
+<!-- ================= PARTNERS (agents) ================= -->
+<section class="page" data-page="partners" hidden>
+  <div class="band-ink page-hero rf-hero"><div class="wrap rf-hero-grid">
+    <div class="inner">
+      <span class="eyebrow">Partner programme for agents</span>
+      <h1>Your landlords want to grow. <em>Earn 12% when they do.</em></h1>
+      <p class="lede">For estate agents, letting agents and property management companies. Introduce clients who want to invest, and we'll find, buy and manage the buy-to-let or HMO for them. You earn 12% of our fee on every completed deal, typically £3,000.</p>
+      <div class="hero-actions"><a class="btn btn-gold" href="#pt-book" data-jump="pt-book">Book a partner call <span class="arr" aria-hidden="true">↓</span></a><a class="btn btn-ghost" href="#pt-how" data-jump="pt-how">How it works</a></div>
+    </div>
+    <div class="rf-badge" aria-hidden="true"><b>12%</b><span>of Lera's fees</span><small>about £3,000 a deal</small></div>
+  </div></div>
+
+  <section class="band"><div class="wrap">
+    <div class="sec-head center"><span class="eyebrow">Who it's for</span><h2>Built for the people landlords <em>already trust.</em></h2></div>
+    <div class="rf-whos">
+      <a class="rf-who" href="#pt-book" data-jump="pt-book" data-pt="Estate agent"><span class="rf-ic"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><b>Estate agents</b><span>Buyers and vendors who want to reinvest in property.</span><em class="rf-go">Become a partner <span aria-hidden="true">→</span></em></a>
+      <a class="rf-who" href="#pt-book" data-jump="pt-book" data-pt="Letting agent"><span class="rf-ic"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H21"/><path d="M17 12v3"/><path d="M20 12v2"/></svg></span><b>Letting agents</b><span>Landlords on your books ready to add to their portfolio.</span><em class="rf-go">Become a partner <span aria-hidden="true">→</span></em></a>
+      <a class="rf-who" href="#pt-book" data-jump="pt-book" data-pt="Property management company"><span class="rf-ic"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span><b>Property managers</b><span>Portfolio clients who want more, without more work.</span><em class="rf-go">Become a partner <span aria-hidden="true">→</span></em></a>
+      <a class="rf-who" href="#pt-book" data-jump="pt-book" data-pt="Other property business"><span class="rf-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span><b>Other property firms</b><span>Brokers, sourcers and advisers with investor clients.</span><em class="rf-go">Become a partner <span aria-hidden="true">→</span></em></a>
+    </div>
+  </div></section>
+
+  <section class="band band-sand" id="pt-how"><div class="wrap">
+    <div class="sec-head center"><span class="eyebrow">How it works</span><h2>One introduction. <em>We do the rest.</em></h2></div>
+    <ol class="rf-steps pt-steps">
+      <li><span class="rf-n">1</span><h3>Book a 15-minute call</h3><p>We walk you through the programme, our investors and how payments work. You get a written introducer agreement.</p></li>
+      <li><span class="rf-n">2</span><h3>Introduce clients</h3><p>Email or WhatsApp us an intro whenever a client wants to buy. No forms, no targets.</p></li>
+      <li><span class="rf-n">3</span><h3>We handle the deal</h3><p>We find the property, run the purchase and manage any works, and keep you updated on every intro.</p></li>
+      <li><span class="rf-n">4</span><h3>You get paid</h3><p>12% of our fee, paid within 14 days of completion. Your first completed deal earns an extra £200.</p></li>
+    </ol>
+  </div></section>
+
+  <section class="band"><div class="wrap rf-example">
+    <div class="rf-ex-copy">
+      <span class="eyebrow">What could you earn?</span>
+      <h2>A typical deal pays <em>about £3,000.</em></h2>
+      <p class="lede">Lera's fee on a typical deal is around £25,000. Partners earn 12% of it, rising to 15% once three of your introductions complete in a year. Your first completed deal also earns a one-off £200 bonus.</p>
+      <p class="rf-small">Partner payments come out of Lera's own fees, so your client pays nothing extra for being introduced. Payments are made only on completed deals and are set out in your written introducer agreement. Figures are illustrative.</p>
+    </div>
+    <div class="rf-ex-calc">
+      <div class="rf-ex-top"><label for="pt-n">Completed deals in a year</label><output id="pt-n-o">1</output></div>
+      <input type="range" id="pt-n" min="1" max="10" step="1" value="1">
+      <div class="rf-ex-houses" id="pt-houses" aria-hidden="true"></div>
+      <div class="rf-ex-total"><span>You could earn around</span><b id="pt-total">£3,200</b></div>
+    </div>
+  </div></section>
+
+  <section class="band band-sand"><div class="wrap">
+    <div class="sec-head center"><span class="eyebrow">What partners get</span><h2>More than a <em>referral fee.</em></h2></div>
+    <div class="pt-perks">
+      <div><b>12%</b><h3>Of our fee, every deal</h3><p>Typically £3,000 per completed deal, with no cap on introductions.</p></div>
+      <div><b>15%</b><h3>After 3 completions</h3><p>Your share rises once three of your introductions complete in a year.</p></div>
+      <div><b>£200</b><h3>First-deal bonus</h3><p>A one-off bonus when your first introduction completes.</p></div>
+      <div><b>1st</b><h3>Refusal on lettings</h3><p>When your client buys in your area, we offer you the lettings and management first.</p></div>
+      <div><b>2-way</b><h3>We look at your stock</h3><p>Our investors are active buyers. Partners' suitable listings go to them first.</p></div>
+      <div><b>14 days</b><h3>Fast payment</h3><p>Paid by bank transfer within 14 days of completion, with a statement for every deal.</p></div>
+    </div>
+  </div></section>
+
+  <section class="band"><div class="wrap faq-layout">
+    <div><span class="eyebrow">Questions</span><h2 style="margin-top:14px">What agents <em>ask us.</em></h2></div>
+    <div class="faq-group">
+      <details><summary>What do I need to do after the introduction?<span class="pm" aria-hidden="true">+</span></summary><div class="ans"><p>Nothing. We speak to your client, handle the deal and keep you posted. You get paid when it completes.</p></div></details>
+      <details><summary>How do I tell my client about the referral fee?<span class="pm" aria-hidden="true">+</span></summary><div class="ans"><p>Trading Standards guidance says agents should tell clients about any referral fee they receive. We give every partner simple wording to include in the introduction email. It doesn't change what the client pays.</p></div></details>
+      <details><summary>Is there a minimum number of introductions?<span class="pm" aria-hidden="true">+</span></summary><div class="ans"><p>No. Introduce one client a year or one a week. There are no targets.</p></div></details>
+      <details><summary>Do I have to join regular calls?<span class="pm" aria-hidden="true">+</span></summary><div class="ans"><p>No. After your onboarding call, send intros whenever you like. Partners who want one can have a monthly 15-minute catch-up with our team.</p></div></details>
+      <details><summary>Where do you work?<span class="pm" aria-hidden="true">+</span></summary><div class="ans"><p>We take introductions from agents anywhere in the UK. Our investors buy mainly in and around London.</p></div></details>
+      <details><summary>Will you take my client?<span class="pm" aria-hidden="true">+</span></summary><div class="ans"><p>No. We only work with your client on the purchase you introduced, and where they buy in your area we offer you the lettings and management first.</p></div></details>
+    </div>
+  </div></section>
+
+  <section class="band band-sand" id="pt-book"><div class="wrap rf-form-grid">
+    <div class="rf-cc">
+      <span class="eyebrow">Become a partner</span>
+      <h2>Book your 15-minute <em>partner call.</em></h2>
+      <p>Tell us a little about your business, then pick a time. We'll send your introducer agreement after the call.</p>
+      <div class="c-card"><div><span>Already have a client for us?</span><b>info@lera-realestate.com</b></div><button class="copy" type="button" data-copy="email">Copy</button></div>
+    </div>
+    <form class="enq" id="pt-form" novalidate>
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="pt-step on" data-s="1">
+        <div class="field">
+          <label id="pt-type-lbl">Your business</label>
+          <div class="pills" role="radiogroup" aria-labelledby="pt-type-lbl">
+            <input type="radio" name="ptype" id="pt1" value="Estate agent"><label for="pt1">Estate agent</label>
+            <input type="radio" name="ptype" id="pt2" value="Letting agent"><label for="pt2">Letting agent</label>
+            <input type="radio" name="ptype" id="pt3" value="Property management company"><label for="pt3">Property management</label>
+            <input type="radio" name="ptype" id="pt4" value="Other property business"><label for="pt4">Other</label>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="pt-name">Your name</label><input id="pt-name" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="pt-co">Company</label><input id="pt-co" name="company" autocomplete="organization" required></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="pt-email">Work email</label><input id="pt-email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="pt-phone">Phone</label><input id="pt-phone" name="phone" type="tel" autocomplete="tel" required></div>
+        </div>
+        <p class="err" id="pt-err" hidden></p>
+        <button class="btn btn-gold" type="submit" style="justify-self:start">Choose a time <span class="arr" aria-hidden="true">→</span></button>
+        <p class="rf-small">By continuing you agree that Lera Real Estate may contact you about the partner programme. We never share your details.</p>
+      </div>
+      <div class="pt-step" data-s="2"><div id="pt-cal"></div></div>
+    </form>
+  </div></section>
+</section>
+
 <!-- ================= BLOG ================= -->
 <section class="page" data-page="blog" hidden>
   <div class="band-ink page-hero"><div class="wrap"><div class="inner">
@@ -4820,7 +4956,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <a class="logo" href="#home" data-link><img src="data:image/png;base64,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" alt="Lera Real Estate"></a>
         <p style="max-width:38ch">Done-for-you HMO portfolios. We find, convert and let, so you don't have to.</p>
       </div>
-      <div><h4>Explore</h4><ul><li><a href="#how-it-works" data-link>How it works</a></li><li><a href="#hmos" data-link>HMOs</a></li><li><a href="#projects" data-link>Projects</a></li><li><a href="#about" data-link>About</a></li><li><a href="#faqs" data-link>FAQs</a></li><li><a href="/blog/">All articles by topic</a></li><li><a href="#refer" data-link>Refer a friend</a></li><li><a href="#resources" data-link>Free HMO resources</a></li><li><a href="#toolkit" data-link>HMO toolkit</a></li><li><a href="#article-4" data-link>Article 4 map</a></li><li><a href="#blog" data-link>HMO blog and articles</a></li><li><a href="#free-guide" data-link>Free HMO guide</a></li><li><a href="#contact" data-link>Contact</a></li></ul></div>
+      <div><h4>Explore</h4><ul><li><a href="#how-it-works" data-link>How it works</a></li><li><a href="#hmos" data-link>HMOs</a></li><li><a href="#projects" data-link>Projects</a></li><li><a href="#about" data-link>About</a></li><li><a href="#faqs" data-link>FAQs</a></li><li><a href="/blog/">All articles by topic</a></li><li><a href="#refer" data-link>Refer a friend</a></li><li><a href="#partners" data-link>Partner programme for agents</a></li><li><a href="#resources" data-link>Free HMO resources</a></li><li><a href="#toolkit" data-link>HMO toolkit</a></li><li><a href="#article-4" data-link>Article 4 map</a></li><li><a href="#blog" data-link>HMO blog and articles</a></li><li><a href="#free-guide" data-link>Free HMO guide</a></li><li><a href="#contact" data-link>Contact</a></li></ul></div>
       <div><h4>Get in touch</h4><ul><li data-f="email"></li><li><address data-f="address"></address></li></ul></div>
     </div>
     <div class="legal" id="pb-legal">
@@ -6941,7 +7077,7 @@ document.querySelectorAll("form[data-nl]").forEach(f => {
 });
 
 /* routing */
-const PAGES = ["home","how-it-works","hmos","projects","about","faqs","refer","blog","free-guide","resources","toolkit","quiz","checklists","glossary","newsletter","article-4","contact"];
+const PAGES = ["home","how-it-works","hmos","projects","about","faqs","refer","partners","blog","free-guide","resources","toolkit","quiz","checklists","glossary","newsletter","article-4","contact"];
 const menuBtn = $("#menu-btn"), links = $("#nav-links");
 function show(name, scroll=true){
   const proj = PROJECTS.find(p => p.id === name);
@@ -6955,7 +7091,7 @@ function show(name, scroll=true){
   if(page === "resources") drawHub();
   if(page === "article-4" && window.a4MapInit) setTimeout(window.a4MapInit, 50);
   if(art) renderArticle(art);
-  document.title = art ? art.title + " · Lera Real Estate" : BASE_TITLE;
+  document.title = art ? art.title + " · Lera Real Estate" : (page === "partners" ? "Partner programme for agents: earn 12% per deal · Lera Real Estate" : BASE_TITLE);
   if(gdThanks) document.getElementById("gd-form")?.classList.add("done");
   if(page === "free-guide") gdShownAt = Date.now();
   if(proj){ window._curProj = proj; renderProject(proj); }
@@ -7104,4 +7240,48 @@ var gdShownAt = Date.now();
 })();
 </script>
 
+<script>
+/* ===== Partners page: earnings slider + booking ===== */
+(function(){
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const EXEC='https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec',KEY='lera-7Qm4xV9pT2',FEE=25000;
+  const gbp=n=>'£'+Math.round(n).toLocaleString('en-GB');
+  const r=$('#pt-n');
+  if(r){const calc=()=>{const n=+r.value;let t=0;for(let i=1;i<=n;i++)t+=FEE*(i>3?.15:.12);t+=200;$('#pt-n-o').textContent=n;$('#pt-total').textContent=gbp(t);const h=$('#pt-houses');if(h)h.innerHTML=Array.from({length:n},()=>'<i><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v9H4z"/><path d="M10 20v-5h4v5"/></svg></i>').join('')};r.addEventListener('input',calc);calc()}
+  $$('[data-page="partners"] [data-pt]').forEach(a=>a.addEventListener('click',()=>{const i=$$('#pt-form input[name="ptype"]').find(x=>x.value===a.dataset.pt);if(i)i.checked=true}));
+  const f=$('#pt-form');if(!f)return;
+  const v=n=>String((f.elements[n]||{}).value||'').trim(),kind=()=>{const c=f.querySelector('input[name="ptype"]:checked');return c?c.value:''};
+  const tag=()=>'PARTNER: '+(kind()||'Not given')+' – '+v('company');
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const utm=p=>{const q=new URLSearchParams(location.search);['utm_source','utm_medium','utm_content'].forEach(k=>{if(q.get(k))p.append(k,q.get(k))});p.append('utm_campaign',q.get('utm_campaign')||'partner-programme');p.append('page','/#partners')};
+  const step=n=>$$('#pt-form .pt-step').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
+  let days=[],dI=0,pick='',type='video';
+  const fT=i=>new Date(i).toLocaleTimeString('en-GB',{timeZone:'Europe/London',hour:'numeric',minute:'2-digit',hour12:true}).replace(' ','').toLowerCase();
+  const fD=i=>new Date(i).toLocaleDateString('en-GB',{timeZone:'Europe/London',weekday:'long',day:'numeric',month:'long'});
+  f.addEventListener('submit',e=>{e.preventDefault();const err=$('#pt-err');let m='';
+    if(!kind())m='Choose your type of business.';else if(v('name').length<2)m='Enter your name.';else if(v('company').length<2)m='Enter your company name.';else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('email')))m='Enter a valid email address.';else if(v('phone').replace(/\D/g,'').length<10)m='Enter a phone number with at least 10 digits.';
+    if(m){err.textContent=m;err.hidden=false;return}err.hidden=true;if(v('_honey'))return;
+    try{const p=new URLSearchParams();p.append('key',KEY);p.append('action','call');p.append('name',v('name'));p.append('email',v('email'));p.append('phone',v('phone'));p.append('budget',tag());utm(p);fetch(EXEC,{method:'POST',mode:'no-cors',keepalive:true,body:p}).catch(()=>{})}catch(_){}
+    try{fetch('https://formsubmit.co/ajax/info@lera-realestate.com',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({name:v('name'),company:v('company'),type:kind(),email:v('email'),phone:v('phone'),page:location.href,_subject:'🤝 New partner sign-up – '+v('company')+' – '+kind(),_template:'table',_captcha:'false'})}).catch(()=>{})}catch(_){}
+    try{window.fbq&&fbq('track','Lead',{content_name:'partner'})}catch(_){}
+    step(2);load()});
+  function load(msg){const b=$('#pt-cal');b.innerHTML='<p class="pt-msg">'+(msg||'Finding available times…')+'</p>';pick='';
+    fetch(EXEC+'?action=slots&t='+Date.now()).then(r=>r.json()).then(d=>{days=d.days||[];dI=0;if(!days.length){b.innerHTML='<p class="pt-msg">No times are free right now. We\'ll call you on '+esc(v('phone'))+' to arrange one.</p>';return}draw(msg)}).catch(()=>{b.innerHTML='<p class="pt-msg">Sorry, the times didn\'t load. We\'ll call you on '+esc(v('phone'))+' to arrange one.</p>'})}
+  function draw(msg){const b=$('#pt-cal'),d=days[dI];
+    b.innerHTML='<div style="display:grid;gap:14px">'+(msg?'<p class="pt-warn">'+msg+'</p>':'')+'<h3 style="font-size:22px">Pick a time for your partner call</h3>'+
+    '<div><p class="pt-lab">How would you like to talk?</p><div class="pt-type"><button type="button" data-c="video" class="'+(type==='video'?'on':'')+'"><b>Video call</b><small>Google Meet</small></button><button type="button" data-c="phone" class="'+(type==='phone'?'on':'')+'"><b>Phone call</b><small>We call you</small></button></div></div>'+
+    '<div><p class="pt-lab">Choose a day</p><div class="pt-days">'+days.map((x,i)=>{const p=x.label.split(' ');return '<button type="button" class="pt-day'+(i===dI?' on':'')+'" data-d="'+i+'"><small>'+esc(p[0]||'')+'</small><b>'+esc(p[1]||'')+'</b><small>'+esc(p[2]||'')+'</small></button>'}).join('')+'</div></div>'+
+    '<div><p class="pt-lab">Choose a time <span>(15 minutes, UK time)</span></p><div class="pt-times">'+d.times.map(t=>'<button type="button" class="pt-time'+(t===pick?' on':'')+'" data-t="'+t+'">'+fT(t)+'</button>').join('')+'</div></div>'+
+    '<div class="pt-conf"><p>'+(pick?'<b>'+fD(pick)+' at '+fT(pick)+'</b>':'Pick a time above')+'</p><button type="button" class="btn btn-gold" id="pt-go"'+(pick?'':' disabled')+'>Confirm call</button></div></div>';
+    b.querySelectorAll('.pt-day').forEach(x=>x.onclick=()=>{dI=+x.dataset.d;pick='';draw()});
+    b.querySelectorAll('.pt-type button').forEach(x=>x.onclick=()=>{type=x.dataset.c;draw()});
+    b.querySelectorAll('.pt-time').forEach(x=>x.onclick=()=>{pick=x.dataset.t;draw()});
+    $('#pt-go').onclick=book}
+  function book(){const btn=$('#pt-go');btn.disabled=true;btn.textContent='Booking…';
+    const p=new URLSearchParams();p.append('key',KEY);p.append('action','book');p.append('type',type);p.append('start',pick);p.append('name',v('name'));p.append('email',v('email'));p.append('phone',v('phone'));p.append('budget',tag());utm(p);
+    fetch(EXEC,{method:'POST',body:p}).then(r=>r.json()).then(res=>{if(res&&res.ok){try{window.fbq&&fbq('track','Schedule',{content_name:'partner'})}catch(_){}
+      $('#pt-cal').innerHTML='<div class="pt-ok"><i>✓</i><h3>You\'re booked in, '+esc(v('name').split(' ')[0])+'.</h3><p><b>'+fD(pick)+' at '+fT(pick)+'</b></p><p>'+(type==='video'?'Your Google Meet link is on its way from info@lera-realestate.com.':'We\'ll call you on '+esc(v('phone'))+'.')+'</p><p>We\'ll send your partner agreement after the call.</p></div>'}
+      else load('Sorry, that time has just gone. Please pick another.')}).catch(()=>draw('Something went wrong. Please try again.'))}
+})();
+</script>
 </body></html>
