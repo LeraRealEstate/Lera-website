@@ -105,10 +105,8 @@ function notifyLead_(p) {
       '\n\nIt\'s 15 minutes with an HMO specialist. We\'ll go through what your budget could do and walk you through a real deal line by line.\n\nLera Real Estate\n' + REPLY_TO);
     sendWa_(p.phone, 'lera_call_request', [first]);
   } else {
-    if (email) sendMail_(email, 'Your free HMO guide from Lera',
-      'Hi ' + first + ',\n\nHere\'s your copy of the Lera HMO guide:\n' + GUIDE_URL +
-      '\n\nIt shows how an HMO project works from start to finish, with four of our completed projects and every number.\n\n' +
-      'Want to see what your budget could do? Book a free 15-minute call:\n' + BOOK_URL + '\n\nLera Real Estate\n' + REPLY_TO);
+    if (email) sendMail_(email, 'Your free HMO guide is here, ' + first,
+      'Hi ' + first + ',\n\nHere\'s your copy of the Lera HMO guide: ' + GUIDE_URL + '\n\nWant to talk it through? Book a free call with Akiva: ' + BOOK_URL + '\n\nLera Real Estate', guideEmail_(first));
     sendWa_(p.phone, 'lera_guide', [first]);
   }
 }
@@ -131,16 +129,14 @@ function callReminders() {
     if (!/^Free (video |phone )?call with Lera/.test(ev.getTitle())) return; // only Lera calls
     var link = meetLink_(ev);
     if (mins <= 62 && mins > 50 && !ev.getTag('lera_r60')) {
-      sendMail_(email, 'Reminder: your Lera call is at ' + time,
-        'Hi ' + first + ',\n\nJust a reminder that your call with Lera is in one hour, at ' + time + '.' +
-        (link ? '\n\nJoin here: ' + link : '\n\nWe\'ll call you on ' + phone + '.') + '\n\nSpeak soon,\nLera Real Estate');
+      sendMail_(email, 'In one hour: your call with Akiva at ' + time,
+        'Hi ' + first + ', your free call with Akiva is in one hour, at ' + time + '.' + (link ? ' Join: ' + link : ' Akiva will call you on ' + phone + '.'), reminderEmail_(first, time, !!link, link, phone, false));
       sendWa_(phone, 'lera_call_reminder_hour', [first, time]);
       ev.setTag('lera_r60', '1');
     }
     if (mins <= 6 && mins > 0 && !ev.getTag('lera_r5')) {
-      sendMail_(email, 'Your Lera call starts in 5 minutes',
-        'Hi ' + first + ',\n\nYour call with Lera starts in 5 minutes, at ' + time + '.' +
-        (link ? '\n\nJoin here: ' + link : '\n\nWe\'ll call you on ' + phone + '.') + '\n\nLera Real Estate');
+      sendMail_(email, 'Starting now: your call with Akiva',
+        'Hi ' + first + ', your call with Akiva starts in 5 minutes, at ' + time + '.' + (link ? ' Join: ' + link : ' Akiva will call you on ' + phone + '.'), reminderEmail_(first, time, !!link, link, phone, true));
       sendWa_(phone, 'lera_call_reminder_5min', [first, time]);
       ev.setTag('lera_r5', '1');
     }
@@ -167,11 +163,12 @@ function findLead_(email) {
 function phoneFrom_(text) { var m = String(text || '').match(/(\+?44|0)\s?7[\d\s]{9,12}/); return m ? m[0] : ''; }
 function meetLink_(ev) { var m = String(ev.getDescription() || '').match(/https:\/\/meet\.google\.com\/[a-z\-]+/); return m ? m[0] : ''; }
 
-function sendMail_(to, subject, body) {
+function sendMail_(to, subject, body, html) {
   // Only ever sends from info@lera-realestate.com
   try {
     if (Session.getEffectiveUser().getEmail().toLowerCase() !== REPLY_TO) { console.error('Not running as info@ - email NOT sent to ' + to); return; }
-    GmailApp.sendEmail(to, subject, body, { name: FROM_NAME, replyTo: REPLY_TO });
+    var o = { name: FROM_NAME, replyTo: REPLY_TO }; if (html) o.htmlBody = html;
+    GmailApp.sendEmail(to, subject, body, o);
   }
   catch (e) { console.error('email failed ' + to + ': ' + e); }
 }
@@ -265,7 +262,7 @@ function book_(p) {
     var cal = cal_();
     var clash = cal.getEvents(start, end).filter(blocks_).length > 0;
     if (clash) return { ok: false, taken: true };
-    var title = 'Free ' + (video ? 'video' : 'phone') + ' call with Lera Real Estate: ' + name;
+    var title = 'Free ' + (video ? 'video' : 'phone') + ' call with Lera Real Estate (Akiva): ' + name;
     var details = 'Name: ' + name + '\nPhone: ' + phone + '\nEmail: ' + email + '\nBudget: ' + (p.budget || '') +
         '\nCampaign: ' + (p.utm_campaign || '') + '\nAd: ' + (p.utm_content || '') + '\nPage: ' + (p.page || '');
     if (video) {
@@ -290,10 +287,8 @@ function book_(p) {
   var when = Utilities.formatDate(start, 'Europe/London', "EEEE d MMMM 'at' h:mm a");
   try { markBooked_(email, (video ? 'VIDEO' : 'PHONE') + ' call ' + Utilities.formatDate(start, 'Europe/London', 'dd/MM/yyyy HH:mm')); } catch (x) { console.error(x); }
   var first = name.split(/\s+/)[0];
-  sendMail_(email, 'Booked: your free call with Lera, ' + when,
-    'Hi ' + first + ',\n\nYou\'re booked in for a free 15-minute ' + (video ? 'video' : 'phone') + ' call with one of our property experts on ' + when + '.\n\n' +
-    (video ? 'Join the video call here: ' + (meet || 'the link is in your calendar invite') + '\nWe\'ll show you some of our projects. It\'s' : 'We\'ll call you on ' + phone + '. It\'s') + ' a chance to tell us what you\'re looking for: your budget, the areas you like and your timescale, so we can find you a property that fits.\n\n' +
-    'Need to change the time? Just reply to this email.\n\nLera Real Estate\n' + REPLY_TO);
+  sendMail_(email, 'You\'re booked in with Akiva: ' + when,
+    'Hi ' + first + ',\n\nYou\'re booked in for a free 15-minute ' + (video ? 'video' : 'phone') + ' call with Akiva Solomon, founder of Lera Real Estate, on ' + when + '.' + (video ? '\n\nJoin here: ' + meet : '\n\nAkiva will call you on ' + phone + '.') + '\n\nLera Real Estate', bookedEmail_(first, when, video, meet, phone));
   sendWa_(phone, 'lera_call_booked', [first, when]);
   return { ok: true, when: when, meet: meet };
 }
@@ -315,4 +310,86 @@ function markBooked_(email, whenTxt) {
       }
     }
   }
+}
+
+// ===================== BRANDED EMAILS =====================
+var SITE = 'https://lera-realestate.com';
+var HOST_NAME = 'Akiva Solomon';
+var HOST_ROLE = 'Founder, Lera Real Estate';
+var HOST_PHOTO = SITE + '/img/akiva-solomon-2.jpg';
+
+function esc_(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+function btn_(href, label, dark) {
+  return '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0 6px"><tr><td style="border-radius:999px;background:' + (dark ? '#15120E' : '#C49A55') + '">' +
+    '<a href="' + href + '" style="display:inline-block;padding:16px 34px;font:600 16px/1 Helvetica,Arial,sans-serif;letter-spacing:.04em;color:' + (dark ? '#FBF6EE' : '#15120E') + ';text-decoration:none;border-radius:999px">' + label + '</a></td></tr></table>';
+}
+
+function host_(line) {
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 0;background:#F6F1E9;border-radius:16px"><tr>' +
+    '<td width="84" style="padding:18px 0 18px 18px;vertical-align:middle"><img src="' + HOST_PHOTO + '" width="66" height="66" alt="' + HOST_NAME + '" style="display:block;width:66px;height:66px;border-radius:50%;object-fit:cover;border:2px solid #C49A55"></td>' +
+    '<td style="padding:18px;vertical-align:middle;font:14px/1.5 Helvetica,Arial,sans-serif;color:#5E554A">' +
+    '<div style="font:600 11px Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9B7330">' + (line || 'You\'ll be speaking with') + '</div>' +
+    '<div style="font:600 18px Helvetica,Arial,sans-serif;color:#15120E;margin-top:3px">' + HOST_NAME + '</div>' +
+    '<div>' + HOST_ROLE + '. Akiva has sourced, converted and let HMOs across London for our investors.</div></td></tr></table>';
+}
+
+function shell_(pre, inner) {
+  return '<!doctype html><html><body style="margin:0;padding:0;background:#EFE8DC">' +
+    '<div style="display:none;max-height:0;overflow:hidden">' + esc_(pre) + '</div>' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EFE8DC"><tr><td align="center" style="padding:28px 12px">' +
+    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:20px;overflow:hidden">' +
+    '<tr><td style="background:#15120E;padding:26px 36px"><img src="' + SITE + '/email/lera-logo.png" height="34" alt="Lera Real Estate" style="display:block;height:34px"></td></tr>' +
+    '<tr><td style="height:4px;background:#C49A55;line-height:4px;font-size:0">&nbsp;</td></tr>' +
+    '<tr><td style="padding:36px 36px 34px;font:16px/1.65 Helvetica,Arial,sans-serif;color:#2A241D">' + inner + '</td></tr>' +
+    '<tr><td style="padding:22px 36px;background:#F6F1E9;font:12.5px/1.6 Helvetica,Arial,sans-serif;color:#7A6F62">' +
+    '<span style="color:#C49A55;letter-spacing:2px">★★★★★</span> &nbsp;Rated 5.0 on Google<br>' +
+    'Lera Real Estate (AS London 4 Ltd) · 137–139 Brent Street, London NW4 4DJ<br>' +
+    '<a href="' + SITE + '" style="color:#9B7330">lera-realestate.com</a> · <a href="mailto:info@lera-realestate.com" style="color:#9B7330">info@lera-realestate.com</a></td></tr>' +
+    '</table></td></tr></table></body></html>';
+}
+
+function h1_(t) { return '<h1 style="margin:0 0 14px;font:400 30px/1.2 Georgia,\'Times New Roman\',serif;color:#15120E">' + t + '</h1>'; }
+function kick_(t) { return '<div style="font:600 12px Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#9B7330;margin-bottom:10px">' + t + '</div>'; }
+
+function whenCard_(whenTxt, video, meet, phone) {
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 0;background:#15120E;border-radius:16px"><tr><td style="padding:20px 22px;font:15px/1.5 Helvetica,Arial,sans-serif;color:#E9E0D2">' +
+    '<div style="font:600 11px Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#C49A55">Your free call</div>' +
+    '<div style="font:600 20px Helvetica,Arial,sans-serif;color:#FBF6EE;margin:6px 0 4px">' + esc_(whenTxt) + '</div>' +
+    '<div>15 minutes · ' + (video ? 'Google Meet video call' : 'Phone call. Akiva will call you on ' + esc_(phone)) + '</div>' +
+    (video && meet ? '<div style="margin-top:8px"><a href="' + meet + '" style="color:#E8CB93">' + meet.replace('https://', '') + '</a></div>' : '') +
+    '</td></tr></table>';
+}
+
+function guideEmail_(first) {
+  var inner = kick_('Your free guide') + h1_('Here\'s your HMO guide, ' + esc_(first) + '.') +
+    '<p style="margin:0">Thanks for downloading <b>HMOs In &amp; Out</b>. It walks you through exactly how we turn an ordinary house into a fully let HMO for our investors, with four real projects and every number shown.</p>' +
+    btn_(GUIDE_URL, 'Open the guide') +
+    '<p style="margin:26px 0 8px;font-weight:600;color:#15120E">Inside, you\'ll see:</p>' +
+    '<p style="margin:0">✓ How we find houses that work as HMOs<br>✓ What the build, licence and lettings really involve<br>✓ The full numbers on four completed projects<br>✓ Exactly what you decide, and what we handle</p>' +
+    host_('Want to talk it through?') +
+    '<p style="margin:20px 0 0">If you\'d like to see what your budget could do, book a free 15-minute call with Akiva. Video or phone, whichever suits you.</p>' +
+    btn_(BOOK_URL, 'Book a free call', true);
+  return shell_('Your copy of HMOs In & Out, with four real projects and every number.', inner);
+}
+
+function bookedEmail_(first, whenTxt, video, meet, phone) {
+  var inner = kick_('You\'re booked in') + h1_('See you soon, ' + esc_(first) + '.') +
+    '<p style="margin:0">Thanks for booking a free call with Lera. We\'re looking forward to hearing what you\'re looking for.</p>' +
+    whenCard_(whenTxt, video, meet, phone) +
+    (video && meet ? btn_(meet, 'Join the video call') : '') +
+    host_() +
+    '<p style="margin:26px 0 8px;font-weight:600;color:#15120E">What we\'ll cover</p>' +
+    '<p style="margin:0">1. Your budget, the areas you like and your timescale<br>2. How we\'d find, convert and let a property for you' + (video ? ', with some of our projects on screen' : '') + '<br>3. Any questions you have. No obligation.</p>' +
+    '<p style="margin:22px 0 0;color:#7A6F62;font-size:14px">We\'ll send you a reminder an hour before and again 5 minutes before. Need to change the time? Just reply to this email.</p>';
+  return shell_('Your free call with Akiva on ' + whenTxt + '.', inner);
+}
+
+function reminderEmail_(first, timeTxt, video, link, phone, soon) {
+  var inner = kick_(soon ? 'Starting in 5 minutes' : 'In one hour') +
+    h1_(soon ? 'Akiva is ready for you, ' + esc_(first) + '.' : 'See you at ' + esc_(timeTxt) + ', ' + esc_(first) + '.') +
+    '<p style="margin:0">' + (soon ? 'Your free call with Akiva starts at ' + esc_(timeTxt) + '.' : 'Just a reminder that your free call with Akiva is in one hour, at ' + esc_(timeTxt) + '.') + '</p>' +
+    (video && link ? btn_(link, soon ? 'Join now' : 'Join the video call') : '<p style="margin:18px 0 0;font-weight:600;color:#15120E">Akiva will call you on ' + esc_(phone) + '.</p>') +
+    host_();
+  return shell_(soon ? 'Your call with Akiva starts in 5 minutes.' : 'Your call with Akiva is in one hour.', inner);
 }
