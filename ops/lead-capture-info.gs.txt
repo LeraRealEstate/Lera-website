@@ -210,6 +210,11 @@ function setup() {
 
 // ===================== BOOKING (calls booked straight from the landing page) =====================
 var SLOT_DAYS = 10;           // working days shown
+// England & Wales bank holidays (gov.uk). No calls are offered on these days, or at weekends.
+var BANK_HOLIDAYS = ['2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28',
+  '2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28',
+  '2028-01-03','2028-04-14','2028-04-17','2028-05-01','2028-05-29','2028-08-28','2028-12-25','2028-12-26'];
+function closedDay_(d) { var tz = 'Europe/London'; return +Utilities.formatDate(d, tz, 'u') > 5 || BANK_HOLIDAYS.indexOf(Utilities.formatDate(d, tz, 'yyyy-MM-dd')) > -1; }
 var SLOT_FIRST_HOUR = 9;      // first call 9:00
 var SLOT_LAST_START = '16:30';// last call 16:30
 var CALL_MINS = 15;           // length of the call
@@ -234,7 +239,7 @@ function slotsResult_() {
   var days = [];
   for (var i = 0; i < 21 && days.length < SLOT_DAYS; i++) {
     var day = new Date(now.getTime() + i * 864e5);
-    if (+Utilities.formatDate(day, tz, 'u') > 5) continue; // Mon-Fri only
+    if (closedDay_(day)) continue; // weekdays only, no bank holidays
     var ymd = Utilities.formatDate(day, tz, 'yyyy-MM-dd'), times = [];
     for (var h = SLOT_FIRST_HOUR; h <= lastH; h++) {
       for (var m = 0; m < 60; m += 30) {
@@ -254,6 +259,7 @@ function slotsResult_() {
 function book_(p) {
   var start = new Date(String(p.start || ''));
   if (isNaN(start.getTime()) || start.getTime() < Date.now()) return { ok: false, taken: true };
+  if (closedDay_(start)) return { ok: false, taken: true };
   var end = new Date(start.getTime() + CALL_MINS * 60000);
   var name = String(p.name || '').trim(), email = String(p.email || '').trim(), phone = String(p.phone || '').trim();
   if (!name || !/@/.test(email)) return { ok: false };
