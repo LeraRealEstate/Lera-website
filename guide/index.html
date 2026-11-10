@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/img/94055a0d9241280e.jpg"><link rel="preload" as="image" href="/img/394e7ec9d4d7647b.jpg">
 <script>
-window.LERA={PIXEL_ID:"1448791074109307",EMAIL:"info@lera-realestate.com",BOOKING_URL:"https://calendar.google.com/calendar/appointments/schedules/AcZssZ1EUKmAkKU3gCOdi9LlVCpBkySQxklN_d_5arh9GlpfKpF6nnzHSb_otALH9JLdG3jWJgsWdToZ?gv=true",WHATSAPP:"__WHATSAPP__",MIN_BUDGET:100000};
+window.LERA={PIXEL_ID:"1448791074109307",EMAIL:"info@lera-realestate.com",BOOKING_URL:"https://calendar.google.com/calendar/appointments/schedules/AcZssZ1EUKmAkKU3gCOdi9LlVCpBkySQxklN_d_5arh9GlpfKpF6nnzHSb_otALH9JLdG3jWJgsWdToZ?gv=true",WHATSAPP:"__WHATSAPP__",MIN_BUDGET:50000};
 function set(v){return v&&v.indexOf("__")!==0}
 if(set(LERA.PIXEL_ID)){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',LERA.PIXEL_ID);fbq('track','PageView')}
 function track(e,p){try{window.fbq&&fbq('track',e,p||{})}catch(x){}}
@@ -367,6 +367,7 @@ section{padding:110px 0}
 .ok2-proof p{font-style:italic;margin:8px 0 12px;font-size:14.5px}.ok2-st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ok2-st div{background:#F6F1E9;border-radius:12px;padding:10px 6px}.ok2-st b{display:block;font-size:18px}.ok2-st span{font-size:11.5px;color:var(--stone)}
 .bk-conf{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
 .sheet{position:relative}
+.ok2-inv{display:flex;gap:10px;align-items:flex-start;justify-content:center;margin:18px auto 0;max-width:440px;font-size:15px;line-height:1.45;color:var(--paper)}.ok2-inv svg{flex:none;color:#7BD389;margin-top:1px}.ok2-also{margin:8px 0 0;font-size:13px;opacity:.7}.ok2-also a{color:#E8CB93;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -624,12 +625,12 @@ section{padding:110px 0}
   <div class="sheet">
     <button class="x" aria-label="Close" data-close>×</button>
     <div class="prog" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
-    <form id="lead" novalidate>
+    <form id="lead" novalidate autocomplete="on" method="post" action="#">
       <div class="step on" data-step="1">
         <h2 id="s1h">How much could you put into a project?</h2>
         <p class="sub">So we can show you projects that fit your budget.</p>
         <div class="tiles" data-name="budget">
-          <button type="button" class="tile" data-v="Under £100k" data-amt="50000">Under £100k<small>Starting out</small></button>
+          <button type="button" class="tile" data-v="£50k–£100k" data-amt="75000">£50k–£100k<small>Starting out</small></button>
           <button type="button" class="tile" data-v="£100k–£200k" data-amt="150000">£100k–£200k<small>Typical for one HMO</small></button>
           <button type="button" class="tile" data-v="£200k–£400k" data-amt="300000">£200k–£400k<small>One or two HMOs</small></button>
           <button type="button" class="tile" data-v="£400k+" data-amt="500000">£400k+<small>A small portfolio</small></button>
@@ -649,10 +650,10 @@ section{padding:110px 0}
       <div class="step" data-step="3">
         <h2 id="s3h">Last step: your details</h2>
         <p class="sub" id="s3s">Your guide starts downloading as soon as you tap the button.</p>
-        <div class="field"><label for="f-name">Full name</label><input id="f-name" name="name" autocomplete="name" required></div>
+        <div class="field"><label for="f-name">Full name</label><input id="f-name" name="name" type="text" autocomplete="name" autocapitalize="words" required></div>
         <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required></div>
         <div class="field"><label for="f-phone">Mobile number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="07…" required></div>
-        <input class="hp" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input class="hp" name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
         <p class="err" id="err" role="alert"></p>
         <button class="btn btn-gold" type="submit" id="go">Get the free guide</button>
         <button type="button" class="back" data-back>Back</button>
@@ -717,12 +718,13 @@ section{padding:110px 0}
     var t2=setInterval(function(){var r=$('#bkrev');if(!r){clearInterval(t2);return}i=(i+1)%REVS.length;r.style.opacity=0;setTimeout(function(){r.textContent='“'+REVS[i]+'”';r.style.opacity=1},250)},2600);
     return function(){clearInterval(t1);clearInterval(t2);var bar=$('#bkbar');if(bar){bar.style.width='100%';$('#bkpc').textContent='100%';$('#bkh').textContent='Booked!'}}}
   function confetti(box){var c=document.createElement('canvas');c.className='bk-conf';box.appendChild(c);var W=c.width=box.clientWidth*2,H=c.height=box.clientHeight*2,x=c.getContext('2d');var cols=['#CFA864','#E8CB93','#15120E','#2F8F5B','#FBF6EE'];var ps=[];for(var k=0;k<140;k++)ps.push({x:W/2,y:H*0.25,vx:(Math.random()-0.5)*26,vy:-Math.random()*22-6,s:6+Math.random()*10,r:Math.random()*6,c:cols[k%5]});var n=0;(function f(){x.clearRect(0,0,W,H);ps.forEach(function(p){p.vy+=0.6;p.x+=p.vx;p.y+=p.vy;p.vx*=0.99;p.r+=0.15;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});if(++n<150)requestAnimationFrame(f);else c.remove()})()}
+  function icsUrl(start,video){var s=new Date(start),e=new Date(s.getTime()+15*60000);var f=function(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')};var t='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Lera Real Estate//Call//EN\r\nBEGIN:VEVENT\r\nUID:'+f(s)+'-lera@lera-realestate.com\r\nDTSTAMP:'+f(new Date())+'\r\nDTSTART:'+f(s)+'\r\nDTEND:'+f(e)+'\r\nSUMMARY:Free '+(video?'video':'phone')+' call with Lera Real Estate (Akiva)\r\nDESCRIPTION:Free 15-minute call with Akiva Solomon\\, Lera Real Estate.'+(video?' The Google Meet link is in your confirmation email.':'')+'\r\nBEGIN:VALARM\r\nTRIGGER:-PT10M\r\nACTION:DISPLAY\r\nDESCRIPTION:Lera call\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR';return 'data:text/calendar;charset=utf-8,'+encodeURIComponent(t)}
   function gcal(start,video){var s=new Date(start),e=new Date(s.getTime()+15*60000);var f=function(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')};return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Free '+(video?'video':'phone')+' call with Lera Real Estate')+'&dates='+f(s)+'/'+f(e)+'&details='+encodeURIComponent('Free 15-minute call with Akiva Solomon, Lera Real Estate.')}
   function bookedScreen(res){var first=fv('name').split(' ')[0],video=callType==='video';
     $('#calstep h2').textContent='';var sub=$('#calstep .sub');if(sub)sub.style.display='none';
     var b=$('#calbox');b.innerHTML='<div class="ok2"><div class="ok2-tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></div><p class="ok2-k">You\'re booked in</p><h3>Great choice, '+esc(first)+'.</h3><p class="ok2-s">Your free '+(video?'video':'phone')+' call with <b>Akiva Solomon</b>, our founder, is confirmed.</p>'+
     '<div class="ok2-when"><div class="ok2-cal"><small>'+new Date(pickTime).toLocaleDateString('en-GB',{timeZone:'Europe/London',month:'short'})+'</small><b>'+new Date(pickTime).toLocaleDateString('en-GB',{timeZone:'Europe/London',day:'numeric'})+'</b></div><div><b>'+fmtD(pickTime)+'</b><span>'+fmtT(pickTime)+' · 15 minutes · '+(video?'Google Meet video call':'We call you on '+esc(fv('phone')))+'</span></div></div>'+
-    '<a class="btn btn-ghost ok2-add" target="_blank" rel="noopener" href="'+gcal(pickTime,video)+'">+ Add to my calendar</a>'+
+    '<p class="ok2-inv"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>We\'ve sent a calendar invite to <b>'+esc(fv('email'))+'</b>. It goes straight into your calendar.</p>'+'<p class="ok2-also">Not showing? Add it to <a target="_blank" rel="noopener" href="'+gcal(pickTime,video)+'">Google Calendar</a> or <a href="'+icsUrl(pickTime,video)+'" download="lera-call.ics">Apple / Outlook</a></p>'+
     '<div class="ok2-next"><p class="ok2-nh">What happens next</p><ol><li><b>Check your inbox</b><span>Your confirmation'+(video?' and Google Meet link':'')+' is on its way from info@lera-realestate.com.</span></li><li><b>Reminders</b><span>We\'ll remind you 1 hour and 5 minutes before.</span></li><li><b>On the call</b><span>Tell us your budget, areas and goals. Akiva will show you how we\'d find you a property that fits'+(video?', with some of our projects on screen':'')+'.</span></li></ol></div>'+
     '<div class="ok2-proof"><div class="ok2-stars">★★★★★ <span>5.0 on Google</span></div><p>“'+REVS[3]+'”</p><div class="ok2-st"><div><b>5–6 mo</b><span>purchase to fully let</span></div><div><b>100%</b><span>yours to own</span></div><div><b>0%</b><span>profit share</span></div></div></div></div>';
     confetti($('.sheet',modal)||b)}
@@ -760,14 +762,14 @@ section{padding:110px 0}
     err.textContent='';if(f._honey.value)return;
     var q=(data.amt||0)>=LERA.MIN_BUDGET,go=$('#go');
     if(mode==='call'){
-      var pc={name:name,email:email,phone:phone,budget:data.budget,timeline:data.timeline,wants:'A call',qualified:q?'Yes':'No',page:location.href,_subject:(q?'🔥 Call request – ':'Call request (under £100k) – ')+'guide – '+name+' – '+data.budget,_template:'table',_captcha:'false'};
+      var pc={name:name,email:email,phone:phone,budget:data.budget,timeline:data.timeline,wants:'A call',qualified:q?'Yes':'No',page:location.href,_subject:(q?'🔥 Call request – ':'Call request (under £50k) – ')+'guide – '+name+' – '+data.budget,_template:'table',_captcha:'false'};
       ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)pc[k]=v}catch(x){}});
       try{fetch('https://formsubmit.co/ajax/'+LERA.EMAIL,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(pc)}).catch(function(){})}catch(x){}
       try{var sc=new URLSearchParams();sc.append('key','lera-7Qm4xV9pT2');sc.append('action','call');sc.append('name',name);sc.append('email',email);sc.append('phone',phone);sc.append('budget',data.budget||'');['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){if(pc[k])sc.append(k,pc[k])});sc.append('page',location.pathname);fetch('https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec',{method:'POST',mode:'no-cors',keepalive:true,body:sc}).catch(function(){})}catch(x){}
       track('Lead',{content_name:'guide-call',value:q?1:0,currency:'GBP'});if(q)trackC('QualifiedLead',{budget:data.budget,type:'call'});
       openCal();return}
     var p={name:name,email:email,phone:phone,budget:data.budget,timeline:data.timeline,wants:'The guide',qualified:q?'Yes':'No',page:location.href,
-      _subject:(q?'🔥 Ad lead – ':'Ad lead (under £100k) – ')+'guide – '+name+' – '+data.budget,_template:'table',_captcha:'false'};
+      _subject:(q?'🔥 Ad lead – ':'Ad lead (under £50k) – ')+'guide – '+name+' – '+data.budget,_template:'table',_captcha:'false'};
     ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid"].forEach(function(k){try{var v=sessionStorage.getItem(k);if(v)p[k]=v}catch(x){}});
     try{fetch('https://formsubmit.co/ajax/'+LERA.EMAIL,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(p)}).catch(function(){})}catch(x){}
     try{var f=new FormData(),nm=name.trim().split(/\s+/);f.append('fields[email]',email);f.append('fields[name]',nm[0]||'');f.append('fields[last_name]',nm.slice(1).join(' '));f.append('fields[phone]',phone);f.append('fields[budget]',data.budget||'');f.append('fields[timeline]',data.timeline||'');f.append('fields[lead_source]',p.utm_source||'guide page');f.append('ml-submit','1');f.append('anticsrf','true');fetch('https://assets.mailerlite.com/jsonp/2765599/forms/203126641862378699/subscribe',{method:'POST',keepalive:true,body:f}).catch(function(){})}catch(x){}

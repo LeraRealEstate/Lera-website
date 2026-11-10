@@ -326,12 +326,35 @@ function btn_(href, label, dark) {
 }
 
 function host_(line) {
-  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 0;background:#F6F1E9;border-radius:16px"><tr>' +
-    '<td width="84" style="padding:18px 0 18px 18px;vertical-align:middle"><img src="' + HOST_PHOTO + '" width="66" height="66" alt="' + HOST_NAME + '" style="display:block;width:66px;height:66px;border-radius:50%;object-fit:cover;border:2px solid #C49A55"></td>' +
-    '<td style="padding:18px;vertical-align:middle;font:14px/1.5 Helvetica,Arial,sans-serif;color:#5E554A">' +
-    '<div style="font:600 11px Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9B7330">' + (line || 'You\'ll be speaking with') + '</div>' +
-    '<div style="font:600 18px Helvetica,Arial,sans-serif;color:#15120E;margin-top:3px">' + HOST_NAME + '</div>' +
-    '<div>' + HOST_ROLE + '. Akiva has sourced, converted and let HMOs across London for our investors.</div></td></tr></table>';
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:30px 0 0;background:#F6F1E9;border-radius:18px"><tr>' +
+    '<td style="padding:26px 26px 24px;font:15px/1.6 Helvetica,Arial,sans-serif;color:#5E554A">' +
+    '<div style="font:600 11px Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9B7330;margin-bottom:16px">' + (line || 'You\'ll be speaking with') + '</div>' +
+    '<table role="presentation" cellpadding="0" cellspacing="0"><tr>' +
+    '<td style="vertical-align:middle;padding-right:16px"><img src="' + HOST_PHOTO + '" width="76" height="76" alt="' + HOST_NAME + '" style="display:block;width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid #C49A55"></td>' +
+    '<td style="vertical-align:middle"><div style="font:600 20px/1.2 Helvetica,Arial,sans-serif;color:#15120E">' + HOST_NAME + '</div>' +
+    '<div style="font:14px/1.4 Helvetica,Arial,sans-serif;color:#9B7330;margin-top:4px">' + HOST_ROLE + '</div></td></tr></table>' +
+    '<div style="margin-top:16px">Akiva has sourced, converted and let HMOs across London for our investors, and will talk you through what could work for your budget.</div>' +
+    '</td></tr></table>';
+}
+
+function prep_() {
+  var u = function (path) { return SITE + path + (path.indexOf('?') > -1 ? '&' : '?') + 'utm_source=email&utm_medium=booking&utm_campaign=call_prep'; };
+  var tile = function (href, k, t) {
+    return '<tr><td style="padding:0 0 10px"><a href="' + href + '" style="display:block;text-decoration:none;background:#FFFFFF;border:1px solid #E6DCCB;border-radius:14px;padding:16px 18px">' +
+      '<span style="display:block;font:600 11px Helvetica,Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#9B7330">' + k + '</span>' +
+      '<span style="display:block;font:600 16px/1.4 Helvetica,Arial,sans-serif;color:#15120E;margin-top:4px">' + t + ' &rarr;</span></a></td></tr>';
+  };
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:30px 0 0;background:#15120E;border-radius:18px"><tr><td style="padding:26px 24px 16px">' +
+    '<div style="font:600 11px Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#C49A55">Before your call</div>' +
+    '<div style="font:400 24px/1.25 Georgia,\'Times New Roman\',serif;color:#FBF6EE;margin:8px 0 6px">Get a head start</div>' +
+    '<div style="font:15px/1.55 Helvetica,Arial,sans-serif;color:#CFC4B3;margin-bottom:18px">Have a look around our website so you can come to the call with your questions ready.</div>' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' +
+    tile(u('/#how'), 'How it works', 'From finding the house to the rent arriving') +
+    tile(u('/case-study/'), 'Case study', 'A family house turned into an en-suite HMO') +
+    tile(u('/#home-cases'), 'Our projects', 'Before and after photos from our projects') +
+    '</table>' +
+    '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 10px"><tr><td style="border-radius:999px;background:#C49A55"><a href="' + u('/') + '" style="display:inline-block;padding:14px 28px;font:600 15px/1 Helvetica,Arial,sans-serif;color:#15120E;text-decoration:none;border-radius:999px">Visit lera-realestate.com</a></td></tr></table>' +
+    '</td></tr></table>';
 }
 
 function shell_(pre, inner) {
@@ -381,7 +404,8 @@ function bookedEmail_(first, whenTxt, video, meet, phone) {
     host_() +
     '<p style="margin:26px 0 8px;font-weight:600;color:#15120E">What we\'ll cover</p>' +
     '<p style="margin:0">1. Your budget, the areas you like and your timescale<br>2. How we\'d find, convert and let a property for you' + (video ? ', with some of our projects on screen' : '') + '<br>3. Any questions you have. No obligation.</p>' +
-    '<p style="margin:22px 0 0;color:#7A6F62;font-size:14px">We\'ll send you a reminder an hour before and again 5 minutes before. Need to change the time? Just reply to this email.</p>';
+    prep_() +
+    '<p style="margin:22px 0 0;color:#7A6F62;font-size:14px">It\'s already in your calendar: we\'ve sent you a calendar invite. We\'ll also remind you an hour before and again 5 minutes before. Need to change the time? Just reply to this email.</p>';
   return shell_('Your free call with Akiva on ' + whenTxt + '.', inner);
 }
 
