@@ -96,7 +96,7 @@ var WA_PHONE_ID = '';        // WhatsApp phone number ID
 
 // Runs straight after a lead is saved
 function notifyLead_(p) {
-  var first = String(p.name || '').trim().split(/\s+/)[0] || 'there';
+  var first = cap_(String(p.name || '').trim().split(/\s+/)[0] || 'there');
   var email = String(p.email || '').trim();
   if (p.action === 'call') {
     return; // they pick a time on the page; booking sends the confirmation
@@ -123,7 +123,7 @@ function callReminders() {
     var g = guests[0], email = g.getEmail();
     var mins = (ev.getStartTime().getTime() - now.getTime()) / 60000;
     var lead = findLead_(email);
-    var first = (lead.first || g.getName() || '').split(/\s+/)[0] || 'there';
+    var first = cap_((lead.first || g.getName() || '').split(/\s+/)[0] || 'there');
     var phone = lead.phone || phoneFrom_(ev.getDescription());
     var time = Utilities.formatDate(ev.getStartTime(), 'Europe/London', 'h:mm a');
     if (!/^Free (video |phone )?call with Lera/.test(ev.getTitle())) return; // only Lera calls
@@ -286,7 +286,7 @@ function book_(p) {
   } finally { lock.releaseLock(); }
   var when = Utilities.formatDate(start, 'Europe/London', "EEEE d MMMM 'at' h:mm a");
   try { markBooked_(email, (video ? 'VIDEO' : 'PHONE') + ' call ' + Utilities.formatDate(start, 'Europe/London', 'dd/MM/yyyy HH:mm')); } catch (x) { console.error(x); }
-  var first = name.split(/\s+/)[0];
+  var first = cap_(name.split(/\s+/)[0]);
   sendMail_(email, 'You\'re booked in with Akiva: ' + when,
     'Hi ' + first + ',\n\nYou\'re booked in for a free 15-minute ' + (video ? 'video' : 'phone') + ' call with Akiva Solomon, founder of Lera Real Estate, on ' + when + '.' + (video ? '\n\nJoin here: ' + meet : '\n\nAkiva will call you on ' + phone + '.') + '\n\nLera Real Estate', bookedEmail_(first, when, video, meet, phone));
   sendWa_(phone, 'lera_call_booked', [first, when]);
@@ -393,3 +393,5 @@ function reminderEmail_(first, timeTxt, video, link, phone, soon) {
     host_();
   return shell_(soon ? 'Your call with Akiva starts in 5 minutes.' : 'Your call with Akiva is in one hour.', inner);
 }
+
+function cap_(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
