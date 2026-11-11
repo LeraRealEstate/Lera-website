@@ -4340,7 +4340,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div class="rf-ex-copy">
       <span class="eyebrow">What could you earn?</span>
       <h2>A typical deal pays <em>about £3,000.</em></h2>
-      <p class="lede">Lera's fee on a typical deal is around £25,000. Partners earn 12% of it, rising to 15% once three of your introductions complete in a year. Your first completed deal also earns a one-off £200 bonus.</p>
+      <p class="lede">Lera's fee on a typical deal is around £25,000. Partners earn 12% of it, rising to 12.5% once three of your introductions complete in a year. Your first completed deal also earns a one-off £200 bonus.</p>
       <p class="rf-small">Partner payments come out of Lera's own fees, so your client pays nothing extra for being introduced. Payments are made only on completed deals and are set out in your written introducer agreement. Figures are illustrative.</p>
     </div>
     <div class="rf-ex-calc">
@@ -4355,7 +4355,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div class="sec-head center"><span class="eyebrow">What partners get</span><h2>More than a <em>referral fee.</em></h2></div>
     <div class="pt-perks">
       <div><b>12%</b><h3>Of our fee, every deal</h3><p>Typically £3,000 per completed deal, with no cap on introductions.</p></div>
-      <div><b>15%</b><h3>After 3 completions</h3><p>Your share rises once three of your introductions complete in a year.</p></div>
+      <div><b>12.5%</b><h3>After 3 completions</h3><p>Your share rises once three of your introductions complete in a year.</p></div>
       <div><b>£200</b><h3>First-deal bonus</h3><p>A one-off bonus when your first introduction completes.</p></div>
       <div><b>1st</b><h3>Refusal on lettings</h3><p>When your client buys in your area, we offer you the lettings and management first.</p></div>
       <div><b>2-way</b><h3>We look at your stock</h3><p>Our investors are active buyers. Partners' suitable listings go to them first.</p></div>
@@ -7247,7 +7247,7 @@ var gdShownAt = Date.now();
   const EXEC='https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec',KEY='lera-7Qm4xV9pT2',FEE=25000;
   const gbp=n=>'£'+Math.round(n).toLocaleString('en-GB');
   const r=$('#pt-n');
-  if(r){const calc=()=>{const n=+r.value;let t=0;for(let i=1;i<=n;i++)t+=FEE*(i>3?.15:.12);t+=200;$('#pt-n-o').textContent=n;$('#pt-total').textContent=gbp(t);const h=$('#pt-houses');if(h)h.innerHTML=Array.from({length:n},()=>'<i><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v9H4z"/><path d="M10 20v-5h4v5"/></svg></i>').join('')};r.addEventListener('input',calc);calc()}
+  if(r){const calc=()=>{const n=+r.value;let t=0;for(let i=1;i<=n;i++)t+=FEE*(i>3?.125:.12);t+=200;$('#pt-n-o').textContent=n;$('#pt-total').textContent=gbp(t);const h=$('#pt-houses');if(h)h.innerHTML=Array.from({length:n},()=>'<i><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v9H4z"/><path d="M10 20v-5h4v5"/></svg></i>').join('')};r.addEventListener('input',calc);calc()}
   $$('[data-page="partners"] [data-pt]').forEach(a=>a.addEventListener('click',()=>{const i=$$('#pt-form input[name="ptype"]').find(x=>x.value===a.dataset.pt);if(i)i.checked=true}));
   const f=$('#pt-form');if(!f)return;
   const v=n=>String((f.elements[n]||{}).value||'').trim(),kind=()=>{const c=f.querySelector('input[name="ptype"]:checked');return c?c.value:''};
