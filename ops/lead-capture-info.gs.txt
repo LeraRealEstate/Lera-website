@@ -426,3 +426,90 @@ function reminderEmail_(first, timeTxt, video, link, phone, soon) {
 }
 
 function cap_(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
+
+/* ===================== Zoom Phone call logging =====================
+   Every 15 min: reads Zoom Phone call history and notes each call to/from a lead in the Sheet.
+   Script properties needed (Project Settings > Script properties): ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET
+   Then run setupZoom() once. */
+function setupZoom() {
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'syncZoomCalls') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('syncZoomCalls').timeBased().everyMinutes(15).create();
+  syncZoomCalls();
+}
+
+function zoomToken_() {
+  var c = CacheService.getScriptCache(), t = c.get('zoom_tok'); if (t) return t;
+  var p = PropertiesService.getScriptProperties();
+  var r = UrlFetchApp.fetch('https://zoom.us/oauth/token?grant_type=account_credentials&account_id=' + encodeURIComponent(p.getProperty('ZOOM_ACCOUNT_ID')), {
+    method: 'post', muteHttpExceptions: true,
+    headers: { Authorization: 'Basic ' + Utilities.base64Encode(p.getProperty('ZOOM_CLIENT_ID') + ':' + p.getProperty('ZOOM_CLIENT_SECRET')) } });
+  var j = JSON.parse(r.getContentText());
+  if (!j.access_token) throw new Error('Zoom auth failed: ' + r.getContentText());
+  c.put('zoom_tok', j.access_token, 3000);
+  return j.access_token;
+}
+
+function zoomCalls_(fromDay, toDay) {
+  var tok = zoomToken_(), out = [];
+  var tries = [['https://api.zoom.us/v2/phone/call_history', 'call_logs'], ['https://api.zoom.us/v2/phone/call_logs', 'call_logs']];
+  for (var i = 0; i < tries.length; i++) {
+    var next = '', ok = true, got = [];
+    do {
+      var r = UrlFetchApp.fetch(tries[i][0] + '?from=' + fromDay + '&to=' + toDay + '&page_size=300' + (next ? '&next_page_token=' + encodeURIComponent(next) : ''),
+        { headers: { Authorization: 'Bearer ' + tok }, muteHttpExceptions: true });
+      if (r.getResponseCode() !== 200) { ok = false; console.warn(tries[i][0] + ' ' + r.getResponseCode() + ' ' + r.getContentText()); break; }
+      var j = JSON.parse(r.getContentText());
+      got = got.concat(j[tries[i][1]] || []); next = j.next_page_token || '';
+    } while (next);
+    if (ok) { out = got; break; }
+  }
+  return out;
+}
+
+function last10_(s) { var d = String(s || '').replace(/\D/g, ''); return d.length >= 10 ? d.slice(-10) : ''; }
+
+function syncZoomCalls() {
+  var tz = 'Europe/London', now = new Date();
+  var calls = zoomCalls_(Utilities.formatDate(new Date(now.getTime() - 2 * 864e5), tz, 'yyyy-MM-dd'), Utilities.formatDate(now, tz, 'yyyy-MM-dd'));
+  var props = PropertiesService.getScriptProperties();
+  var seen = JSON.parse(props.getProperty('ZOOM_SEEN') || '[]');
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var tabs = [FB_TAB, WEB_TAB].map(function (n) {
+    var sh = ss.getSheetByName(n); if (!sh) return null;
+    var data = sh.getDataRange().getValues(), h = data[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, ''); });
+    var cp = h.indexOf('phone number') > -1 ? h.indexOf('phone number') : h.indexOf('phone');
+    return { sh: sh, data: data, cp: cp, cn: h.indexOf('notes'), cs: h.indexOf('status') };
+  }).filter(function (t) { return t && t.cp > -1; });
+  calls.sort(function (a, b) { return String(a.start_time || a.date_time).localeCompare(String(b.start_time || b.date_time)); });
+  calls.forEach(function (c) {
+    var id = String(c.id || c.call_id || ''); if (!id || seen.indexOf(id) > -1) return;
+    var out = String(c.direction || '').toLowerCase() !== 'inbound';
+    var other = out ? (c.callee_did_number || c.callee_number || c.callee_ext_number) : (c.caller_did_number || c.caller_number || c.caller_ext_number);
+    var key = last10_(other); if (!key) return;
+    var dur = +c.duration || 0, res = String(c.call_result || c.result || '').toLowerCase().replace(/_/g, ' ');
+    var answered = /answer|connect|success/.test(res) && !/no answer|not answer|unanswer/.test(res) || (!res && dur > 0);
+    var when = Utilities.formatDate(new Date(c.start_time || c.date_time), tz, 'dd/MM HH:mm');
+    var mins = dur >= 60 ? Math.floor(dur / 60) + 'm ' + (dur % 60) + 's' : dur + 's';
+    var txt = when + ' ' + (out ? 'called them' : 'they called us') + ' - ' + (answered ? 'answered (' + mins + ')' : (res || 'no answer'));
+    var hit = false;
+    tabs.forEach(function (t) {
+      if (hit) return;
+      for (var r = t.data.length - 1; r > 0; r--) {
+        if (last10_(t.data[r][t.cp]) !== key) continue;
+        hit = true;
+        if (t.cn > -1) { var n = String(t.data[r][t.cn] || ''); n = (n ? n + ' | ' : '') + 'CALL: ' + txt; t.sh.getRange(r + 1, t.cn + 1).setValue(n); t.data[r][t.cn] = n; }
+        if (t.cs > -1) {
+          var st = String(t.data[r][t.cs] || '');
+          if (!/call booked/i.test(st)) {
+            var tries = (String(t.data[r][t.cn] || '').match(/CALL: [^|]*called them - (?!answered)/g) || []).length;
+            st = answered ? 'Spoke on phone' : (out ? 'Tried calling (' + tries + ')' : 'Missed their call - call back');
+            t.sh.getRange(r + 1, t.cs + 1).setValue(st); t.data[r][t.cs] = st;
+          }
+        }
+        break;
+      }
+    });
+    seen.push(id);
+  });
+  props.setProperty('ZOOM_SEEN', JSON.stringify(seen.slice(-800)));
+}
