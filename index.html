@@ -6410,7 +6410,7 @@ async function pjPDF(d, r, name){
     const f = lon.lad.find(x => x.properties.n === name);
     if(f) selLayer = L.geoJSON(f, {interactive:false, style:{color:"#17110A", weight:3.5, fill:false}}).addTo(map);
   }
-  function resetView(){ seq++; userView = false; if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; } select(null); map.flyToBounds(ENG, {padding:[6,6], duration:.7}); overview(); }
+  function resetView(){ seq++; userView = false; if(areaLayer){ map.removeLayer(areaLayer); areaLayer = null; } if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; } select(null); map.flyToBounds(ENG, {padding:[6,6], duration:.7}); overview(); }
   window.a4Locate = function(){
     if(!navigator.geolocation){ msg("<b>Your browser can't share your location.</b><span>Search a postcode instead.</span>"); return; }
     msg("<b>Finding your location…</b>");
@@ -6520,7 +6520,9 @@ async function pjPDF(d, r, name){
         try{ const r = (await j(`https://api.postcodes.io/postcodes/${pc}`)).result; return {lat:r.latitude, lon:r.longitude, label:r.postcode, pin:true, country:r.country}; }
         catch(e){ const t = e.body && e.body.terminated; if(t && t.latitude) return {lat:t.latitude, lon:t.longitude, label:`${m[1]} ${m[2]} (old postcode)`, pin:true, country:null}; }
       }
-      try{ const r = (await j(`https://api.postcodes.io/outcodes/${m[1]}`)).result; return {lat:r.latitude, lon:r.longitude, label:m[1], pin:false, country:[].concat(r.country)[0]}; }catch(e){}
+      // "LS6 1" style (a postcode sector)
+      const sec = up.replace(/\s+/g, " ").trim().match(/^([A-Z]{1,2}\d[A-Z\d]?)\s(\d)$/);
+      try{ const r = (await j(`https://api.postcodes.io/outcodes/${m[1]}`)).result; return {lat:r.latitude, lon:r.longitude, label:sec ? `${m[1]} ${sec[2]}` : m[1], pin:false, area:true, outcode:m[1], sector:sec ? sec[2] : null, country:[].concat(r.country)[0]}; }catch(e){}
       if(m[2]) throw new Error("bad postcode");
     }
     const cn = councilByName(raw); if(cn) return {council:cn, label:cn, pin:false, country:"England"};
@@ -6529,6 +6531,57 @@ async function pjPDF(d, r, name){
     const k = placeKey(raw), rank = p => (placeKey(p.name_1) === k ? 0 : 4) + (p.country === "England" ? 0 : 2) + ({City:0, Town:0, Village:1, Suburban:1, Hamlet:2}[p.local_type] ?? 2);
     const b = r.slice().sort((a, c) => rank(a) - rank(c))[0];
     return {lat:b.latitude, lon:b.longitude, label:b.name_1 + (b.county_unitary ? `, ${b.county_unitary}` : ""), pin:false, country:b.country};
+  }
+  // sample real postcodes inside a postcode district or sector, so "LS6" gets an answer for LS6 itself
+  async function areaPoints(loc){
+    let pcs = [];
+    if(loc.sector){
+      const ac = (await j(`https://api.postcodes.io/postcodes/${loc.outcode}${loc.sector}/autocomplete?limit=100`, 8000)).result || [];
+      if(ac.length){ const r = await fetch("https://api.postcodes.io/postcodes", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({postcodes:ac})}).then(r => r.json());
+        pcs = (r.result || []).map(x => x.result).filter(x => x && x.latitude != null); }
+    } else {
+      const seen = new Set();
+      const grab = async (la, lo) => { const r = (await j(`https://api.postcodes.io/postcodes?lon=${lo}&lat=${la}&radius=2000&limit=100`, 8000).catch(() => ({}))).result || [];
+        r.forEach(x => { if(x.outcode === loc.outcode && !seen.has(x.postcode)){ seen.add(x.postcode); pcs.push(x); } }); };
+      await grab(loc.lat, loc.lon);
+      // spread out a little for big districts
+      const d = .018; await Promise.all([[d,0],[-d,0],[0,d*1.6],[0,-d*1.6]].map(([a,b]) => grab(loc.lat + a, loc.lon + b)));
+    }
+    return pcs.map(x => ({pc:x.postcode, lat:x.latitude, lon:x.longitude}));
+  }
+  let areaLayer = null;
+  async function checkArea(loc, my){
+    if(areaLayer){ map.removeLayer(areaLayer); areaLayer = null; }
+    panel(`<div class="a4-load"><i></i><b>Checking postcodes in ${esc(loc.label)}…</b></div>`);
+    let pts = [];
+    try{ pts = await areaPoints(loc); }catch(e){ pts = []; }
+    if(my !== seq) return;
+    const today = new Date().toISOString().slice(0,10);
+    const res = pts.map(p => { const pt = [p.lon, p.lat]; let f = lon.lad.find(f => inGeom(pt, f.geometry)); const name = f ? f.properties.n : null;
+      const row = name ? listRow(name) : null, st = row ? row[2] : (name && hasAreas(name) ? "p" : "n");
+      const hit = name ? lon.a4.filter(a => a.properties.b === name && inGeom(pt, a.geometry)) : [];
+      const now = hit.some(a => !(a.properties.s && a.properties.s > today)), soon = !now && hit.length > 0;
+      const k = st === "w" || now ? "r" : soon || st === "c" || st === "x" || (st === "p" && !hasAreas(name)) ? "a" : "g";
+      return {...p, name, st, k}; }).filter(x => x.name);
+    if(!res.length){ const c = await councilAt(loc.lat, loc.lon).catch(() => null); if(my !== seq) return;
+      if(c){ const bb = councilBounds(c); if(bb && bb.isValid()) map.flyToBounds(bb, {padding:[20,20], duration:.8}); select(c.name); panel(councilInfo(c.name, c.row, c.areas) + `<p class="a4-hint">Search a full postcode, or tap a road, to check an exact spot.</p>`); }
+      return; }
+    const COL = {r:"#B8322A", a:"#E8A33A", g:"#2E7D4F"};
+    areaLayer = L.layerGroup(res.map(p => L.circleMarker([p.lat, p.lon], {radius:4.5, weight:1, color:"#fff", fillColor:COL[p.k], fillOpacity:.95}).bindTooltip(`<b>${p.pc}</b><br>${p.k === "r" ? "Planning needed for any HMO" : p.k === "a" ? "Check with the council" : "Small HMO usually allowed"}`))).addTo(map);
+    const b = L.latLngBounds(res.map(p => [p.lat, p.lon])); if(b.isValid()) map.flyToBounds(b, {padding:[30,30], maxZoom:15, duration:.8});
+    if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; }
+    const n = res.length, cnt = {r:0, a:0, g:0}; res.forEach(p => cnt[p.k]++);
+    const councils = [...new Set(res.map(p => p.name))], main = councils.sort((a, b) => res.filter(p => p.name === b).length - res.filter(p => p.name === a).length)[0];
+    const cn = x => x.replace(/, (City|County) of$/, ""), L4 = esc(loc.label), pct = x => Math.round(100 * x / n);
+    const ban = (cls, icon, title, text) => `<div class="a4-ban ${cls}"><i aria-hidden="true">${icon}</i><div><small>${L4} · ${councils.map(cn).join(", ")}</small><b>${title}</b><p>${text}</p></div></div>`;
+    let h;
+    if(cnt.r === n) h = ban("red", "!", `Planning permission needed across ${L4}`, `Every one of the ${n} postcodes we checked in ${L4} is under Article 4, so any HMO here needs planning permission, even a small one.`);
+    else if(cnt.g === n) h = ban("green", "✓", `No Article 4 in ${L4}`, `None of the ${n} postcodes we checked in ${L4} is in an HMO Article 4 area, so a small HMO (3 to 6 people) is usually allowed without planning. 7 or more people always needs planning.`);
+    else if(cnt.a === n) h = ban("amber", "?", `Check ${L4} with the council`, `${cn(main)} has Article 4 in parts${res.some(p => p.st === "c" || p.st === "x") ? " (or coming soon)" : ""} but hasn't published the exact roads in a form we can map. Check the address with the council.`);
+    else h = ban("amber", "!", `Parts of ${L4} need planning`, `Of the ${n} postcodes we checked: <b>${cnt.r}</b> (${pct(cnt.r)}%) are under Article 4${cnt.a ? `, <b>${cnt.a}</b> need checking with the council` : ""} and <b>${cnt.g}</b> (${pct(cnt.g)}%) are outside it. The dots on the map show which. Search the full postcode to be sure.`);
+    select(main);
+    const row = listRow(main);
+    panel(h + councilInfo(main, row, lon.a4.filter(a => a.properties.b === main).map(a => ({n:a.properties.n, s:a.properties.s, apx:isApx(a)}))) + `<p class="a4-hint">Each dot is a real postcode: red needs planning, green usually doesn't${cnt.a ? ", amber means check with the council" : ""}. Tap a dot or a road for that exact spot.</p>`);
   }
   window.a4MapShow = async function(q){
     const my = ++seq;
@@ -6547,7 +6600,9 @@ async function pjPDF(d, r, name){
       panel(`<span class="v grey">${loc.country}</span><b>${esc(loc.label)}</b><p>Article 4 directions for HMOs are an English planning tool. ${loc.country === "Wales" ? "In Wales, turning a house into an HMO usually needs planning permission everywhere." : loc.country === "Scotland" ? "In Scotland every HMO needs a licence, and some councils also need planning permission." : "Northern Ireland has its own planning and licensing rules."}</p>`);
       return true;
     }
+    if(areaLayer && !loc.area){ map.removeLayer(areaLayer); areaLayer = null; }
     if(loc.pin){ map.flyTo([loc.lat, loc.lon], 16, {duration:.8}); seq--; await checkSpot(loc.lat, loc.lon, loc.label, false); return true; }
+    if(loc.area && lon){ await checkArea(loc, my); return true; }
     try{
       let c;
       if(loc.council){ const name = loc.council; c = {name, row:listRow(name), areas:lon.a4.filter(a => a.properties.b === name).map(a => ({n:a.properties.n, s:a.properties.s, apx:isApx(a)})), london:true}; }
