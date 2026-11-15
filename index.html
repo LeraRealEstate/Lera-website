@@ -6388,16 +6388,19 @@ async function pjPDF(d, r, name){
     if(!loading) loading = new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = LEAF; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
     return loading;
   }
+  let drawP = null, userView = false;
+  const drawOnce = () => drawP || (drawP = drawLondon().then(ok => { if(!ok) drawP = null; return ok; }));
   async function drawLondon(){
-    try{ lon = await j("data/uk-a4.json"); }catch(e){ return; }
+    try{ lon = await j("data/uk-a4.json", 20000); }catch(e){ return false; }
     lonLayer = L.geoJSON(lon.lad, {style: f => { const n = f.properties.n, s = STY[statusOf(n)], dash = noRoads(n); return {color:s.c, weight:dash ? 1.8 : 1.1, dashArray:dash ? "5 4" : null, fillColor:s.f, fillOpacity:dash ? s.o * .6 : s.o}; },
       onEachFeature: (f, l) => { l.bindTooltip(`<b>${f.properties.n}</b><br>${LBL[statusOf(f.properties.n)]}${noRoads(f.properties.n) ? "<br><i>Roads not drawn yet, see the council map</i>" : ""}`, {sticky:true, className:"a4-tip"});
         l.on("mouseover", () => l.setStyle({weight:2.6, fillOpacity:Math.min(.5, (l.options.fillOpacity || .2) + .14)})); l.on("mouseout", () => lonLayer.resetStyle(l)); }}).addTo(map);
     const TODAY = new Date().toISOString().slice(0,10);
     L.geoJSON(lon.a4, {style: f => f.properties.s && f.properties.s > TODAY ? {color:"#7E1A14", weight:2, dashArray:"6 5", fillColor:"#B8322A", fillOpacity:.16} : isApx(f) ? {color:"#7E1A14", weight:1.6, dashArray:"2 4", fillColor:"#B8322A", fillOpacity:.3} : {color:"#7E1A14", weight:2, fillColor:"#B8322A", fillOpacity:.38},
       onEachFeature: (f, l) => l.bindTooltip(`<b>${f.properties.b}</b><br>${clean(f.properties.n)}${f.properties.s ? `<br>In force from ${fmt(f.properties.s)}` : ""}${isApx(f) ? `<br><i>Approximate boundary, traced from the council map</i>` : ""}`, {sticky:true})}).addTo(map);
-    map.fitBounds(ENG, {padding:[6,6]});
+    if(!userView) map.fitBounds(ENG, {padding:[6,6]});   // don't undo a search that finished while the data was loading
     overview();
+    return true;
   }
   let selLayer = null;
   const ENG = [[49.9,-5.8],[55.85,1.8]];
@@ -6407,7 +6410,7 @@ async function pjPDF(d, r, name){
     const f = lon.lad.find(x => x.properties.n === name);
     if(f) selLayer = L.geoJSON(f, {interactive:false, style:{color:"#17110A", weight:3.5, fill:false}}).addTo(map);
   }
-  function resetView(){ seq++; if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; } select(null); map.flyToBounds(ENG, {padding:[6,6], duration:.7}); overview(); }
+  function resetView(){ seq++; userView = false; if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; } select(null); map.flyToBounds(ENG, {padding:[6,6], duration:.7}); overview(); }
   window.a4Locate = function(){
     if(!navigator.geolocation){ msg("<b>Your browser can't share your location.</b><span>Search a postcode instead.</span>"); return; }
     msg("<b>Finding your location…</b>");
@@ -6427,7 +6430,7 @@ async function pjPDF(d, r, name){
     $id("a4-reset").addEventListener("click", resetView);
     if(innerWidth < 700) $id("a4-legend").removeAttribute("open");
     msg(null);
-    await drawLondon();
+    await drawOnce();
     return true;
   }
   window.a4MapInit = () => { init(); };
@@ -6461,7 +6464,7 @@ async function pjPDF(d, r, name){
   }
   // verdict for one exact spot (a searched postcode or a click on the map)
   async function checkSpot(lat, lon_, label, zoomIn){
-    const my = ++seq;
+    const my = ++seq; userView = true;
     if(pinLayer) map.removeLayer(pinLayer);
     pinLayer = L.marker([lat, lon_], {icon:L.divIcon({className:"a4-pin"}), keyboard:false}).addTo(map);
     panel(`<div class="a4-load"><i></i><b>Checking this spot…</b></div>`);
@@ -6530,7 +6533,7 @@ async function pjPDF(d, r, name){
   window.a4MapShow = async function(q){
     const my = ++seq;
     if(!(await init())) return false;
-    if(!lon){ try{ await drawLondon(); }catch(e){} }
+    await drawOnce(); userView = true;
     msg("<b>Finding it on the map…</b>");
     let loc;
     try{ loc = await locate(q); }catch(e){
