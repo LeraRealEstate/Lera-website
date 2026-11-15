@@ -6328,7 +6328,8 @@ async function pjPDF(d, r, name){
   const $id = id => document.getElementById(id);
   const msg = h => { const m = $id("a4-geo-msg"); if(h){ m.innerHTML = h; m.hidden = false; } else m.hidden = true; };
   const panel = h => { $id("a4-verdict").innerHTML = String(h).replace(/([A-Za-z][A-Za-z ]*), City of\b/g, "$1"); };
-  const j = async u => { const r = await fetch(u); if(!r.ok) throw new Error(r.status); return r.json(); };
+  const j = async (u, ms = 9000) => { const ac = window.AbortController ? new AbortController() : null, t = ac && setTimeout(() => ac.abort(), ms);
+    try{ const r = await fetch(u, ac ? {signal:ac.signal} : undefined); if(!r.ok){ const e = new Error(r.status); e.status = r.status; try{ e.body = await r.json(); }catch(_){} throw e; } return r.json(); } finally{ if(t) clearTimeout(t); } };
   const has3L = f => String((f.properties||f)["permitted-development-rights"]||"").split(/[;,\s]+/).includes("3L");
   const nz = t => String(t).toLowerCase().replace(/\(.*?\)/g,"").replace(/,.*$/,"").replace(/city of|county|borough of|royal borough of|london borough of/g,"").replace(/[^a-z]/g,"");
   const listRow = name => { if(typeof A4_UK === "undefined" || !name) return null; const c = nz(name);
@@ -6342,7 +6343,8 @@ async function pjPDF(d, r, name){
     n:"There's no HMO Article 4 direction, so a small HMO is usually allowed without planning."};
   const isApx = a => a && a.properties && (a.properties.acc === "traced" || a.properties.acc === "approx");
   function edgeDist(pt, g){ const P = g.type === "Polygon" ? [g.coordinates] : g.coordinates, k = Math.cos(pt[1]*Math.PI/180); let m = 1e9; P.forEach(poly => poly.forEach(r => { for(let i = 1; i < r.length; i++){ const ax=(r[i-1][0]-pt[0])*k*111320, ay=(r[i-1][1]-pt[1])*111320, bx=(r[i][0]-pt[0])*k*111320, by=(r[i][1]-pt[1])*111320, dx=bx-ax, dy=by-ay, L=dx*dx+dy*dy, t=L ? Math.max(0, Math.min(1, -(ax*dx+ay*dy)/L)) : 0; m = Math.min(m, Math.hypot(ax+t*dx, ay+t*dy)); } })); return m; }
-  const clean = n => n && !/^[A-Z]*\d+[A-Z\d]*$/.test(String(n).trim()) ? n : "HMO Article 4 area";
+  const tc = n => { n = String(n).trim(); return n === n.toUpperCase() && /[A-Z]{3}/.test(n) ? n.toLowerCase().replace(/\b([a-z])/g, c => c.toUpperCase()).replace(/\bHmo\b/g, "HMO").replace(/\b(Of|And|The|In)\b/g, w => w.toLowerCase()).replace(/^./, c => c.toUpperCase()) : n; };
+  const clean = n => n && !/^[A-Z]*\d+[A-Z\d]*$/.test(String(n).trim()) ? tc(n) : "HMO Article 4 area";
   const fmt = d => { const t = new Date(d); return isNaN(t) ? d : t.toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"}); };
   const cameIn = row => { if(!row) return null; const m = row[3].match(/\d{1,2} [A-Z][a-z]{2,8} \d{4}|[A-Z][a-z]{2,8} \d{4}|\b(?:19|20)\d{2}\b/); return m ? m[0] : null; };
   const hasAreas = name => !!(lon && lon.a4.some(a => a.properties.b === name));
@@ -6367,7 +6369,7 @@ async function pjPDF(d, r, name){
       <div class="a4-facts"><div><span>Whole area covered?</span><p>${SHORT[st]}</p></div>${since ? `<div><span>When it came in</span><p>${since}</p></div>` : ""}</div>`;
     if(areas.length) h += `<details class="a4-areas"${areas.length <= 3 ? " open" : ""}><summary>${areas.length} Article 4 ${areas.length === 1 ? "area" : "areas"} shown on the map</summary><ul>${areas.map(a => `<li>${clean(a.n)}${a.apx ? ` <em class="a4-apx">approximate</em>` : ""}${a.s ? `<small>from ${fmt(a.s)}</small>` : ""}</li>`).join("")}</ul></details>`;
     if(areas.some(a => a.apx)) h += `<p class="a4-apx-note">Boundaries marked <em class="a4-apx">approximate</em> were traced by us from the council's own Article 4 map. They can be out by a few metres, so check the council map below for any address near an edge.</p>`;
-    else if(st === "p" || st === "c" || st === "x") h += `<div class="a4-warn"><b>Roads not drawn on our map yet</b><p>${name}'s Article 4 area is only published as a scanned plan. Open the council's Article 4 map below to check an exact address.</p></div>`;
+    else if(!areas.length && (st === "p" || st === "c" || st === "x")) h += `<div class="a4-warn"><b>Roads not drawn on our map yet</b><p>${name}'s Article 4 area is only published as a scanned plan. Open the council's Article 4 map below to check an exact address.</p></div>`;
     return h + linkBtns(name, row) + `</div>`;
   }
 
@@ -6432,8 +6434,12 @@ async function pjPDF(d, r, name){
   // which council is this point in? London is answered locally; elsewhere we ask the planning data service
   async function councilAt(lat, lon_){
     const pt = [lon_, lat];
-    if(lon){ const f = lon.lad.find(f => inGeom(pt, f.geometry)); if(f){ const name = f.properties.n;
+    if(lon){ let f = lon.lad.find(f => inGeom(pt, f.geometry));
+      // our boundaries are simplified, so a point right on the coast or a border can fall just outside every shape: take the nearest council within 1.5 km
+      if(!f){ let best = null, bd = 1500; lon.lad.forEach(x => { const d = edgeDist(pt, x.geometry); if(d < bd){ bd = d; best = x; } }); f = best; }
+      if(f){ const name = f.properties.n;
       return {name, row:listRow(name), areas:lon.a4.filter(a => a.properties.b === name).map(a => ({n:a.properties.n, s:a.properties.s, apx:isApx(a)})), london:true}; } }
+    if(lon) return null;   // our file covers every council in England, so a miss means the spot is outside England
     const lad = await j(`${PD}.geojson?dataset=local-authority-district&latitude=${lat}&longitude=${lon_}`);
     const f = lad.features && lad.features[0]; if(!f) return null;
     if(dyn.entity === f.properties.entity) return dyn.info;
@@ -6459,61 +6465,94 @@ async function pjPDF(d, r, name){
     if(pinLayer) map.removeLayer(pinLayer);
     pinLayer = L.marker([lat, lon_], {icon:L.divIcon({className:"a4-pin"}), keyboard:false}).addTo(map);
     panel(`<div class="a4-load"><i></i><b>Checking this spot…</b></div>`);
-    let c, here, near = label;
-    try{
-      [c, here] = await Promise.all([councilAt(lat, lon_), j(`${PD}.json?dataset=article-4-direction-area&latitude=${lat}&longitude=${lon_}&exclude_field=geometry`)]);
-      if(!near){ try{ const r = (await j(`https://api.postcodes.io/postcodes?lon=${lon_}&lat=${lat}&limit=1&radius=300`)).result; near = r && r[0] ? `Near ${r[0].postcode}` : "This spot"; }catch(e){ near = "This spot"; } }
-    }catch(e){ if(my === seq) panel(`<b>The planning data service didn't answer.</b><p>Please try again in a moment.</p>`); return; }
-    if(my !== seq) return;
     if(zoomIn) map.setView([lat, lon_], Math.max(map.getZoom(), 16));
-    if(!c){ panel(`<span class="v grey">Outside England</span><b>${near}</b><p>Article 4 directions for HMOs are an English planning tool. Wales, Scotland and Northern Ireland have their own rules.</p>`); return; }
+    // our own map data answers on its own; the government planning data service is only a cross-check, so if it is slow or down we carry on without it
+    const remote = j(`${PD}.json?dataset=article-4-direction-area&latitude=${lat}&longitude=${lon_}&exclude_field=geometry`, 6000).then(r => r.entities || []).catch(() => null);
+    const nearP = label ? Promise.resolve(label) : j(`https://api.postcodes.io/postcodes?lon=${lon_}&lat=${lat}&limit=1&radius=500`, 6000).then(r => r.result && r.result[0] ? `Near ${r.result[0].postcode}` : "This spot").catch(() => "This spot");
+    let c;
+    try{ c = await councilAt(lat, lon_); }catch(e){ c = undefined; }
+    const [ents, near] = await Promise.all([remote, nearP]);
+    if(my !== seq) return;
+    if(c === undefined){ panel(`<b>We couldn't check this spot just now.</b><p>Please try again in a moment, or use the council list below.</p>`); return; }
+    if(!c){ select(null); panel(`<span class="v grey">Outside England</span><b>${near}</b><p>Article 4 directions for HMOs are an English planning tool. Wales, Scotland and Northern Ireland have their own rules.</p>`); return; }
     const today = new Date().toISOString().slice(0,10), ptL = [lon_, lat];
     const local = lon ? lon.a4.filter(a => a.properties.b === c.name && inGeom(ptL, a.geometry)) : [];
     const future = local.filter(a => a.properties.s && a.properties.s > today);
-    const inside = (here.entities||[]).filter(has3L).map(e => ({name:e.name, "start-date":e["start-date"]}));
-    local.filter(a => !(a.properties.s && a.properties.s > today)).forEach(a => { if(!inside.some(x => x.name === a.properties.n)) inside.push({name:a.properties.n, "start-date":a.properties.s}); });
+    const inside = (ents || []).filter(has3L).filter(e => !(e["start-date"] && e["start-date"] > today)).map(e => ({name:e.name, "start-date":e["start-date"]}));
+    local.filter(a => !(a.properties.s && a.properties.s > today)).forEach(a => { if(!inside.some(x => nz(x.name) === nz(a.properties.n))) inside.push({name:a.properties.n, "start-date":a.properties.s}); });
     const st = c.row ? c.row[2] : (c.areas.length ? "p" : "n");
-    const ban = (cls, icon, title, text) => `<div class="a4-ban ${cls}"><i aria-hidden="true">${icon}</i><div><small>${near}</small><b>${title}</b><p>${text}</p></div></div>`;
+    const ban = (cls, icon, title, text) => `<div class="a4-ban ${cls}"><i aria-hidden="true">${icon}</i><div><small>${near}${c.name ? ` · ${c.name.replace(/, (City|County) of$/, "")}` : ""}</small><b>${title}</b><p>${text}</p></div></div>`;
     const apxIn = local.some(isApx), apxNear = !local.length && lon ? lon.a4.filter(a => a.properties.b === c.name && isApx(a)).some(a => edgeDist(ptL, a.geometry) < 150) : false;
     let spot;
-    if(inside.length) spot = ban("red", "!", "Planning permission needed", `This spot is inside ${clean(inside[0].name) === "HMO Article 4 area" ? "an HMO Article 4 area" : `the "${inside[0].name}" Article 4 area`}${inside[0]["start-date"] ? `, in force from ${fmt(inside[0]["start-date"])}` : ""}. Any HMO here needs planning permission.${apxIn ? " This boundary is approximate, so check the council map if you are near its edge." : ""}`);
-    else if(st === "w") spot = ban("red", "!", "Planning permission needed", `${c.name}'s Article 4 covers the whole area, so any HMO here needs planning permission.`);
+    if(inside.length) spot = ban("red", "!", "Planning permission needed", `This spot is inside ${clean(inside[0].name) === "HMO Article 4 area" ? "an HMO Article 4 area" : `the "${clean(inside[0].name)}" Article 4 area`}${inside[0]["start-date"] ? `, in force since ${fmt(inside[0]["start-date"])}` : ""}. Any HMO here needs planning permission, even a small one.${apxIn ? " This boundary is approximate, so check the council map if you are near its edge." : ""}`);
+    else if(st === "w") spot = ban("red", "!", "Planning permission needed", `${c.name.replace(/, (City|County) of$/, "")}'s Article 4 covers the whole area, so any HMO here needs planning permission, even a small one.`);
     else if(future.length) spot = ban("amber", "!", `Planning needed from ${fmt(future[0].properties.s)}`, `This spot is inside "${clean(future[0].properties.n)}", a new Article 4 area that comes into force on ${fmt(future[0].properties.s)}. After that date any HMO here needs planning permission.`);
+    else if(st === "c" || st === "x") spot = ban("amber", "?", st === "c" ? "Article 4 coming soon, check this road" : "Article 4 proposed, check this road", `${c.name} ${st === "c" ? "has made an Article 4 direction that isn't in force yet" : "has proposed an Article 4 direction"}${c.row && c.row[3] ? ` (${c.row[3]})` : ""}. Check with the council whether this road will be covered before you commit.`);
     else if(apxNear) spot = ban("amber", "?", "Right on the edge, check with the council", `This spot is within about 150 metres of an Article 4 boundary that we traced from ${c.name}'s map. Check the council map below to be sure which side it falls.`);
-    else if(c.areas.length) spot = ban("green", "✓", "Small HMO usually allowed", `This spot is outside the Article 4 areas ${c.name} has published. A small HMO (3 to 6 people) is usually allowed without planning.`);
-    else if(st === "p" || st === "c" || st === "x") spot = ban("amber", "?", "Check this road with the council", `${c.name} has Article 4 in parts but hasn't published the exact roads. Use the council link below to check.`);
-    else spot = ban("green", "✓", "Small HMO usually allowed", `There's no HMO Article 4 direction here, so a small HMO (3 to 6 people) is usually allowed without planning.`);
+    else if(c.areas.length) spot = ban("green", "✓", "Small HMO usually allowed", `This spot is outside the Article 4 areas ${c.name.replace(/, (City|County) of$/, "")} has published. A small HMO (3 to 6 people) is usually allowed without planning. 7 or more people always needs planning.`);
+    else if(st === "p") spot = ban("amber", "?", "Check this road with the council", `${c.name} has Article 4 in parts but hasn't published the exact roads in a form we can map. Use the council link below to check this address.`);
+    else spot = ban("green", "✓", "Small HMO usually allowed", `There's no HMO Article 4 direction here, so a small HMO (3 to 6 people) is usually allowed without planning. 7 or more people always needs planning.`);
     select(c.name);
-    panel(spot + councilInfo(c.name, c.row, c.areas) + `<p class="a4-hint">Tap any other road to check it.</p>`);
+    panel(spot + councilInfo(c.name, c.row, c.areas) + `<p class="a4-hint">${ents === null ? "Checked against our own Article 4 map (the government planning data service isn't answering right now). " : ""}Tap any other road to check it.</p>`);
+  }
+  const PC_RE = /\b([A-Z]{1,2}\d[A-Z\d]?)\s*(\d[A-Z]{2})?\b/i;
+  const placeKey = t => String(t).toLowerCase().replace(/, (city|county) of$/, "").replace(/^(city of|royal borough of|london borough of)\s+/, "").replace(/\(.*?\)/g, "").replace(/[^a-z ]/g, " ").replace(/\s+/g, " ").trim();
+  // a council we already have on the map, by name (e.g. "Leeds", "Bristol", "Kingston upon Hull")
+  function councilByName(q){
+    if(!lon) return null; const k = placeKey(q); if(k.length < 3) return null;
+    const lads = lon.lad.map(f => f.properties.n);
+    let n = lads.find(x => placeKey(x) === k);
+    if(!n && typeof A4_UK !== "undefined"){ const r = A4_UK.find(x => placeKey(x[0]) === k || placeKey(x[0].replace(/^.*\((.*)\)$/, "$1")) === k); if(r){ const rk = placeKey(r[0]); n = lads.find(x => placeKey(x) === rk || placeKey(x).startsWith(rk) || rk.startsWith(placeKey(x))); } }
+    if(!n && k === "hull") n = lads.find(x => /Kingston upon Hull/.test(x));
+    return n || null;
   }
   async function locate(q){
-    const c = q.replace(/\s+/g,"").toUpperCase();
-    if(/^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/.test(c)){ const r = (await j(`https://api.postcodes.io/postcodes/${c}`)).result; return {lat:r.latitude, lon:r.longitude, label:r.postcode, pin:true, country:r.country}; }
-    if(/^[A-Z]{1,2}\d[A-Z\d]?$/.test(c)){ const r = (await j(`https://api.postcodes.io/outcodes/${c}`)).result; return {lat:r.latitude, lon:r.longitude, label:c, pin:false, country:[].concat(r.country)[0]}; }
-    const r = (await j(`https://api.postcodes.io/places?q=${encodeURIComponent(q)}&limit=1`)).result;
-    if(!r || !r.length) throw new Error("no place");
-    return {lat:r[0].latitude, lon:r[0].longitude, label:r[0].name_1, pin:false, country:r[0].country};
+    const raw = q.trim(), up = raw.toUpperCase(), m = up.match(PC_RE);
+    // a full or partial postcode anywhere in what they typed ("Leeds LS6 1AA", "ls61aa", "LS6")
+    if(m && (m[2] || /^\s*[A-Z]{1,2}\d[A-Z\d]?\s*$/.test(up) || /\d/.test(raw))){
+      if(m[2]){ const pc = m[1] + m[2];
+        try{ const r = (await j(`https://api.postcodes.io/postcodes/${pc}`)).result; return {lat:r.latitude, lon:r.longitude, label:r.postcode, pin:true, country:r.country}; }
+        catch(e){ const t = e.body && e.body.terminated; if(t && t.latitude) return {lat:t.latitude, lon:t.longitude, label:`${m[1]} ${m[2]} (old postcode)`, pin:true, country:null}; }
+      }
+      try{ const r = (await j(`https://api.postcodes.io/outcodes/${m[1]}`)).result; return {lat:r.latitude, lon:r.longitude, label:m[1], pin:false, country:[].concat(r.country)[0]}; }catch(e){}
+      if(m[2]) throw new Error("bad postcode");
+    }
+    const cn = councilByName(raw); if(cn) return {council:cn, label:cn, pin:false, country:"England"};
+    const r = (await j(`https://api.postcodes.io/places?q=${encodeURIComponent(raw)}&limit=20`)).result || [];
+    if(!r.length) throw new Error("no place");
+    const k = placeKey(raw), rank = p => (placeKey(p.name_1) === k ? 0 : 4) + (p.country === "England" ? 0 : 2) + ({City:0, Town:0, Village:1, Suburban:1, Hamlet:2}[p.local_type] ?? 2);
+    const b = r.slice().sort((a, c) => rank(a) - rank(c))[0];
+    return {lat:b.latitude, lon:b.longitude, label:b.name_1 + (b.county_unitary ? `, ${b.county_unitary}` : ""), pin:false, country:b.country};
   }
   window.a4MapShow = async function(q){
     const my = ++seq;
-    if(!(await init())) return;
+    if(!(await init())) return false;
+    if(!lon){ try{ await drawLondon(); }catch(e){} }
     msg("<b>Finding it on the map…</b>");
     let loc;
-    try{ loc = await locate(q); }catch(e){ if(my === seq) msg("<b>We couldn't place that on the map.</b><span>Try a full postcode, like HA2 0AA.</span>"); return; }
-    if(my !== seq) return;
+    try{ loc = await locate(q); }catch(e){
+      if(my !== seq) return true; msg(null);
+      panel(`<span class="v grey">Not found</span><b>${esc(q)}</b><p>We couldn't find that postcode or place. Check the spelling, or try a full postcode like LS6 1AA, a town, or a council name.</p>`);
+      return true; }
+    if(my !== seq) return true;
     msg(null);
     if(loc.country && loc.country !== "England"){
-      if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; } map.setView([loc.lat, loc.lon], 12);
-      panel(`<span class="v grey">${loc.country}</span><b>${loc.label}</b><p>Article 4 directions for HMOs are an English planning tool. ${loc.country === "Wales" ? "In Wales, turning a house into an HMO usually needs planning permission everywhere." : loc.country === "Scotland" ? "In Scotland every HMO needs a licence, and some councils also need planning permission." : "Northern Ireland has its own planning and licensing rules."}</p>`);
-      return;
+      if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; } select(null); map.setView([loc.lat, loc.lon], 12);
+      panel(`<span class="v grey">${loc.country}</span><b>${esc(loc.label)}</b><p>Article 4 directions for HMOs are an English planning tool. ${loc.country === "Wales" ? "In Wales, turning a house into an HMO usually needs planning permission everywhere." : loc.country === "Scotland" ? "In Scotland every HMO needs a licence, and some councils also need planning permission." : "Northern Ireland has its own planning and licensing rules."}</p>`);
+      return true;
     }
-    if(loc.pin){ map.flyTo([loc.lat, loc.lon], 16, {duration:.8}); seq--; await checkSpot(loc.lat, loc.lon, loc.label, false); return; }
-    try{ const c = await councilAt(loc.lat, loc.lon); if(my !== seq) return;
+    if(loc.pin){ map.flyTo([loc.lat, loc.lon], 16, {duration:.8}); seq--; await checkSpot(loc.lat, loc.lon, loc.label, false); return true; }
+    try{
+      let c;
+      if(loc.council){ const name = loc.council; c = {name, row:listRow(name), areas:lon.a4.filter(a => a.properties.b === name).map(a => ({n:a.properties.n, s:a.properties.s, apx:isApx(a)})), london:true}; }
+      else c = await councilAt(loc.lat, loc.lon);
+      if(my !== seq) return true;
       if(pinLayer){ map.removeLayer(pinLayer); pinLayer = null; }
-      if(!c){ map.setView([loc.lat, loc.lon], 13); return; }
+      if(!c){ map.setView([loc.lat, loc.lon], 12); select(null); panel(`<span class="v grey">Outside England</span><b>${esc(loc.label)}</b><p>Article 4 directions for HMOs are an English planning tool.</p>`); return true; }
       const bb = councilBounds(c); if(bb && bb.isValid()) map.flyToBounds(bb, {padding:[20,20], duration:.8}); else map.setView([loc.lat, loc.lon], 13);
-      select(c.name); panel(councilInfo(c.name, c.row, c.areas) + `<p class="a4-hint">Tap any road in ${c.name}, or search a full postcode, to check an exact spot.</p>`);
-    }catch(e){ panel(`<b>The planning data service didn't answer.</b><p>Please try again in a moment.</p>`); }
+      select(c.name); panel(councilInfo(c.name, c.row, c.areas) + `<p class="a4-hint">This is the council-wide picture. Search a full postcode, or tap any road in ${c.name.replace(/, (City|County) of$/, "")}, to check an exact spot.</p>`);
+    }catch(e){ panel(`<b>We couldn't check that just now.</b><p>Please try again in a moment, or use the council list below.</p>`); }
+    return true;
   };
 })();
 
@@ -6629,12 +6668,16 @@ async function pjPDF(d, r, name){
   function start(){
     v.removeAttribute("autoplay"); v.autoplay = false;
     if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){ v.pause(); ui(); return; }
+    const home = v.closest(".page");
+    if(home && home.hidden){ v.pause(); ui(); return; }   // opened straight onto another page: don't play behind it
     v.muted = false;
     play().then(ui).catch(() => { blocked = true; v.muted = true; play().catch(() => {}).finally(ui); });
   }
   // the first tap or key press anywhere on the page turns the sound on
   const firstTouch = e => {
     if(e.target.closest && e.target.closest("#hero-vid-btn,#hero-vid-snd,#hero-vid")) return;
+    const home = v.closest(".page"); if(home && home.hidden) return;
+    if(e.target.closest && e.target.closest("a[href], [data-link]")) return;
     if(v.muted && !userMuted && !v.paused){ v.muted = false; blocked = false; ui(); }
     off();
   };
@@ -6653,7 +6696,12 @@ async function pjPDF(d, r, name){
   // plays once, then goes back to the start and waits
   v.addEventListener("ended", () => { v.removeAttribute("autoplay"); v.autoplay = false; v.load(); ui(); });
   ["play","pause","volumechange"].forEach(t => v.addEventListener(t, ui));
-  start();
+  // leaving the home page (or the tab) stops the film, so its sound never plays behind another page
+  window.heroVidStop = () => { if(!v.paused) v.pause(); };
+  document.addEventListener("visibilitychange", () => { if(document.hidden) window.heroVidStop(); });
+  window.addEventListener("pagehide", () => window.heroVidStop());
+  v.pause();
+  setTimeout(start, 0);   // after the router has shown the right page
 })();
 
 /* ---------- quick deal (hub) ---------- */
@@ -7096,6 +7144,8 @@ function show(name, scroll=true){
   if(page === "free-guide") gdShownAt = Date.now();
   if(proj){ window._curProj = proj; renderProject(proj); }
   document.querySelectorAll(".page").forEach(p => p.hidden = p.dataset.page !== page);
+  // stop any video (and its sound) on pages that are now hidden
+  document.querySelectorAll(".page[hidden] video").forEach(v => { if(!v.paused) v.pause(); });
   const navName = proj ? "projects" : (art ? "blog" : page);
   document.querySelectorAll(".nav-links a:not(.btn)").forEach(a => { if(a.getAttribute("href") === "#"+navName) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
   document.querySelector(".dd-btn")?.classList.toggle("active", RES_PAGES.includes(navName));
