@@ -6504,6 +6504,9 @@ async function pjPDF(d, r, name){
     let n = lads.find(x => placeKey(x) === k);
     if(!n && typeof A4_UK !== "undefined"){ const r = A4_UK.find(x => placeKey(x[0]) === k || placeKey(x[0].replace(/^.*\((.*)\)$/, "$1")) === k); if(r){ const rk = placeKey(r[0]); n = lads.find(x => placeKey(x) === rk || placeKey(x).startsWith(rk) || rk.startsWith(placeKey(x))); } }
     if(!n && k === "hull") n = lads.find(x => /Kingston upon Hull/.test(x));
+    // well-known towns and districts inside a council (Kingston, Wembley, Headingley...)
+    const al = window.A4_ALIAS && (window.A4_ALIAS[k] || (k.length > 4 && Object.keys(window.A4_ALIAS).filter(a => a.length > 4 && (k === a || k.startsWith(a + " "))).map(a => window.A4_ALIAS[a])[0]));
+    if(!n && al){ const ak = placeKey(al); n = lads.find(x => placeKey(x) === ak); }
     return n || null;
   }
   async function locate(q){
@@ -6585,7 +6588,16 @@ async function pjPDF(d, r, name){
     "harrow on the hill":"Harrow",pinner:"Harrow",stanmore:"Harrow",wealdstone:"Harrow",edmonton:"Enfield",palmers:"Enfield",
     hackney:"Hackney",islington:"Islington",camden:"Camden",holloway:"Islington",shoreditch:"Hackney",bow:"Tower Hamlets",poplar:"Tower Hamlets",
     "salford quays":"Salford",headingley:"Leeds",fallowfield:"Manchester",selly:"Birmingham",edgbaston:"Birmingham",clifton:"Bristol",
-    jesmond:"Newcastle upon Tyne",hove:"Brighton and Hove",brighton:"Brighton and Hove",luton:"Luton",slough:"Slough",reading:"Reading"};
+    jesmond:"Newcastle upon Tyne",hove:"Brighton and Hove",brighton:"Brighton and Hove",luton:"Luton",slough:"Slough",reading:"Reading",
+    hull:"Kingston upon Hull, City of",loughborough:"Charnwood",huddersfield:"Kirklees",high_wycombe:"Buckinghamshire","high wycombe":"Buckinghamshire",
+    salisbury:"Wiltshire",truro:"Cornwall",carlisle:"Cumberland",ely:"East Cambridgeshire",richmond:"Richmond upon Thames",twickenham:"Richmond upon Thames",
+    streatham:"Lambeth",clapham:"Lambeth",battersea:"Wandsworth",putney:"Wandsworth",tooting:"Wandsworth",hammersmith:"Hammersmith and Fulham",fulham:"Hammersmith and Fulham",
+    chelsea:"Kensington and Chelsea",kensington:"Kensington and Chelsea",greenwich:"Greenwich",eltham:"Greenwich",plumstead:"Greenwich",thamesmead:"Greenwich",
+    hendon:"Barnet","mill hill":"Barnet",enfield:"Enfield",harrow:"Harrow",brent:"Brent",newham:"Newham",forest_gate:"Newham","forest gate":"Newham",
+    kingston:"Kingston upon Thames",surbiton:"Kingston upon Thames",morden:"Merton",croydon:"Croydon",thornton:"Croydon",norwood:"Croydon",
+    longsight:"Manchester",rusholme:"Manchester",withington:"Manchester",didsbury:"Manchester",hyde_park:"Leeds",kirkstall:"Leeds",armley:"Leeds",
+    lenton:"Nottingham",beeston:"Broxtowe",heaton:"Newcastle upon Tyne",portswood:"Southampton",cowley:"Oxford",kenilworth:"Warwick",leamington:"Warwick"};
+  window.A4_ALIAS = A4_ALIAS;
   const A4_NATION = {cardiff:"Wales",swansea:"Wales",newport:"Wales",wrexham:"Wales",bangor:"Wales",aberystwyth:"Wales",wales:"Wales",
     glasgow:"Scotland",edinburgh:"Scotland",aberdeen:"Scotland",dundee:"Scotland","st andrews":"Scotland",stirling:"Scotland",inverness:"Scotland",scotland:"Scotland",
     belfast:"Northern Ireland",derry:"Northern Ireland",londonderry:"Northern Ireland",lisburn:"Northern Ireland","northern ireland":"Northern Ireland"};
