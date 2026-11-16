@@ -13,6 +13,16 @@ function doPost(e) {
   if (p.key !== LEAD_KEY) return out_({ ok: false });
   if (p.action === 'book') return out_(book_(p));
 
+  // Ad tags: fall back to the full page address if the page couldn't pass them separately
+  if (!p.utm_source && p.url) {
+    var qs = String(p.url).split('?')[1] || '';
+    qs.split('#')[0].split('&').forEach(function (kv) {
+      var i = kv.indexOf('='); if (i < 1) return;
+      var k = decodeURIComponent(kv.slice(0, i)), v = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' '));
+      if (/^(utm_source|utm_campaign|utm_content|fbclid)$/.test(k) && !p[k]) p[k] = v;
+    });
+  }
+
   var src = String(p.utm_source || p.source || '').toLowerCase();
   var isAd = /facebook|instagram|^fb|^ig|meta/.test(src) || !!p.fbclid;
   var ss = SpreadsheetApp.openById(SHEET_ID);
@@ -22,8 +32,8 @@ function doPost(e) {
   var first = p.first_name || name.split(/\s+/)[0] || '';
   var last = p.last_name || name.split(/\s+/).slice(1).join(' ');
   var when = Utilities.formatDate(new Date(), 'Europe/London', 'dd/MM/yyyy HH:mm');
-  var action = p.action === 'call' ? 'Booked / requested a call' : 'Downloaded HMO guide';
-  var note = when + ' - ' + action +
+  var action = p.action === 'call' ? 'Booked / requested a call' : p.action === 'enquiry' ? 'Website enquiry' : 'Downloaded HMO guide';
+  var note = when + ' - ' + action + (p.message ? ': ' + p.message : '') +
     (p.utm_campaign ? ' (campaign: ' + p.utm_campaign + ')' : '') +
     (p.utm_content ? ' (ad: ' + p.utm_content + ')' : '');
 
@@ -40,7 +50,14 @@ function doPost(e) {
     'status': 'New',
     'campaign': p.utm_campaign || '',
     'ad': p.utm_content || '',
-    'landing page': p.page || ''
+    'landing page': p.page || '',
+    // Website leads tab uses its own column names
+    'signed up': new Date(),
+    'name': name,
+    'budget': p.budget || '',
+    'requested': p.action === 'call' ? 'Call' : p.action === 'enquiry' ? 'Enquiry' : 'Guide',
+    'ad source': p.utm_content || 'No ad tags',
+    'came from': p.referrer || ''
   };
 
   var lock = LockService.getScriptLock();
@@ -98,6 +115,7 @@ var WA_PHONE_ID = '';        // WhatsApp phone number ID
 function notifyLead_(p) {
   var first = cap_(String(p.name || '').trim().split(/\s+/)[0] || 'there');
   var email = String(p.email || '').trim();
+  if (p.action === 'enquiry') return; // a personal reply follows; no automatic guide email
   if (p.action === 'call') {
     return; // they pick a time on the page; booking sends the confirmation
     if (email) sendMail_(email, 'Your call with Lera: pick a time',

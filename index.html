@@ -7277,6 +7277,17 @@ function formDone(form, title, text){
   ok.hidden = false;
 }
 
+/* copy each home page lead into the lead Sheet (Website leads tab) */
+function toSheet(action, d){
+  try{
+    const b=new URLSearchParams();b.append('key','lera-7Qm4xV9pT2');b.append('action',action);
+    Object.keys(d).forEach(k=>{ if(d[k]) b.append(k,d[k]); });
+    const q=new URLSearchParams(location.search);["utm_source","utm_campaign","utm_content","fbclid"].forEach(k=>{ let v=null; try{v=sessionStorage.getItem(k)}catch(_){} v=v||q.get(k); if(v) b.append(k,v); });
+    b.append('page',location.pathname);b.append('url',location.href);b.append('referrer',document.referrer||'');
+    fetch('https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec',{method:'POST',mode:'no-cors',keepalive:true,body:b});
+  }catch(_){}
+}
+
 /* enquiry form */
 $("#enq").addEventListener("submit", e => {
   e.preventDefault();
@@ -7288,6 +7299,7 @@ $("#enq").addEventListener("submit", e => {
   const phone = f.phone.value.trim()||"Not given", msg = f.message.value.trim()||"Not given";
   const body = `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nBudget: ${budget}\n\n${msg}`;
   const subject = "Website enquiry – "+name;
+  if(!f.querySelector('input[name="_honey"]')?.value) toSheet('enquiry',{name, email, phone:phone==="Not given"?"":phone, budget:budget==="Not given"?"":budget, message:msg==="Not given"?"":msg});
   sendForm(f, subject, {Name:name, Email:email, Phone:phone, Budget:budget, Message:msg, _replyto:email}).then(sent=>{
     if(sent){ $("#f-out").hidden = true; formDone(f, "Thank you for submitting.", "Our team will reach out to you as soon as possible."); f.reset(); return; }
     err.textContent = "Sorry, your message didn't send. Please try again in a moment, or email us at "+CONTACT.email+"."; err.hidden = false;
@@ -7315,6 +7327,7 @@ var gdShownAt = Date.now();
     const btn = f.querySelector('button[type="submit"]'), label = btn.innerHTML;
     btn.disabled = true; btn.textContent = "Just a moment…";
     let ok = !!honey;
+    if(!honey) toSheet('guide',{name, email});
     if(!honey){
       try{
         const res = await fetch("https://formsubmit.co/ajax/"+CONTACT.email, { method:"POST",
