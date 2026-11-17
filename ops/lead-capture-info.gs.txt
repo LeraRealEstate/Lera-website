@@ -51,6 +51,7 @@ function doPost(e) {
     'campaign': p.utm_campaign || '',
     'ad': p.utm_content || '',
     'landing page': p.page || '',
+    'meta click id': p.fbclid || '',
     // Website leads tab uses its own column names
     'signed up': new Date(),
     'name': name,
@@ -93,7 +94,7 @@ function out_(obj) {
 
 function ensureCols_(sh) {
   var h = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim().toLowerCase(); });
-  ['Campaign', 'Ad', 'Landing page'].forEach(function (c) {
+  ['Campaign', 'Ad', 'Landing page', 'Meta click ID'].forEach(function (c) {
     if (h.indexOf(c.toLowerCase()) === -1) { sh.getRange(1, sh.getLastColumn() + 1).setValue(c); h.push(c.toLowerCase()); }
   });
 }
@@ -331,6 +332,7 @@ function markBooked_(email, whenTxt) {
       if (String(data[r][ce]).trim().toLowerCase() === email.toLowerCase()) {
         if (cn > -1) sh.getRange(r + 1, cn + 1).setValue(String(data[r][cn]) + ' | CALL BOOKED: ' + whenTxt);
         if (cs > -1) sh.getRange(r + 1, cs + 1).setValue('Call booked');
+        try { metaStage_(sh, r + 1, 'Call booked'); } catch (x) { console.error(x); }
         return;
       }
     }
@@ -522,6 +524,7 @@ function syncZoomCalls() {
             var tries = (String(t.data[r][t.cn] || '').match(/CALL: [^|]*called them - (?!answered)/g) || []).length;
             st = answered ? 'Spoke on phone' : (out ? 'Tried calling (' + tries + ')' : 'Missed their call - call back');
             t.sh.getRange(r + 1, t.cs + 1).setValue(st); t.data[r][t.cs] = st;
+            try { metaStage_(t.sh, r + 1, st); } catch (x) { console.error(x); }
           }
         }
         break;
@@ -530,4 +533,104 @@ function syncZoomCalls() {
     seen.push(id);
   });
   props.setProperty('ZOOM_SEEN', JSON.stringify(seen.slice(-800)));
+}
+
+
+/* ===================== GOOGLE SHEET (CRM) -> META =====================
+   When a lead's Status moves forward, tell Meta (Conversions API) so ads can find more people like the leads that convert.
+   Status -> event sent:  Call booked -> CallBooked | Spoke on phone -> SpokeOnPhone | Qualified -> QualifiedLead | Client -> Client
+   Script property needed: META_TOKEN (Events Manager > Lera pixel > Settings > Conversions API > Generate access token).
+   Optional: META_TEST_CODE (from Events Manager > Test events) to check events arrive without affecting the ads.
+   Then run setupMeta() once. */
+var META_PIXEL = '1448791074109307';
+var STATUS_LIST = ['New', 'Tried calling', 'Spoke on phone', 'Call booked', 'Qualified', 'Client', 'Nurture', 'Not interested'];
+
+function setupMeta() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'onSheetEdit') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('onSheetEdit').forSpreadsheet(ss).onEdit().create();
+  [FB_TAB, WEB_TAB].forEach(function (n) {
+    var sh = ss.getSheetByName(n); if (!sh) return;
+    ensureCols_(sh);
+    var cs = headers_(sh).indexOf('status'); if (cs < 0) return;
+    var rule = SpreadsheetApp.newDataValidation().requireValueInList(STATUS_LIST, true).setAllowInvalid(true).build();
+    sh.getRange(2, cs + 1, Math.max(sh.getMaxRows() - 1, 1), 1).setDataValidation(rule);
+  });
+  console.log('Meta link ready. Token set: ' + !!PropertiesService.getScriptProperties().getProperty('META_TOKEN'));
+}
+
+function headers_(sh) {
+  return sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, '').trim(); });
+}
+
+// Fires when anyone edits the Sheet by hand
+function onSheetEdit(e) {
+  try {
+    var sh = e.range.getSheet(); if ([FB_TAB, WEB_TAB].indexOf(sh.getName()) < 0) return;
+    var cs = headers_(sh).indexOf('status');
+    if (cs < 0 || e.range.getColumn() > cs + 1 || e.range.getLastColumn() < cs + 1) return;
+    for (var r = e.range.getRow(); r <= e.range.getLastRow(); r++) {
+      if (r < 2) continue;
+      metaStage_(sh, r, String(sh.getRange(r, cs + 1).getValue()));
+    }
+  } catch (x) { console.error(x); }
+}
+
+function metaEvent_(status) {
+  var s = String(status || '').toLowerCase();
+  if (/not interested|unqualified|not qualified/.test(s)) return '';
+  if (/call booked/.test(s)) return 'CallBooked';
+  if (/spoke/.test(s)) return 'SpokeOnPhone';
+  if (/qualified/.test(s)) return 'QualifiedLead';
+  if (/client|won/.test(s)) return 'Client';
+  return '';
+}
+
+function sha_(v) {
+  v = String(v || '').trim().toLowerCase(); if (!v) return '';
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, v, Utilities.Charset.UTF_8)
+    .map(function (b) { return ('0' + (b & 255).toString(16)).slice(-2); }).join('');
+}
+
+function metaStage_(sh, row, status) {
+  var ev = metaEvent_(status); if (!ev) return;
+  var props = PropertiesService.getScriptProperties(), token = props.getProperty('META_TOKEN'); if (!token) return;
+  var h = headers_(sh), v = sh.getRange(row, 1, 1, h.length).getValues()[0];
+  var g = function () { for (var i = 0; i < arguments.length; i++) { var k = h.indexOf(arguments[i]); if (k > -1 && v[k] !== '') return String(v[k]); } return ''; };
+  var email = g('email', 'email address').trim().toLowerCase();
+  var phone = g('phone number', 'phone').replace(/\D/g, '');
+  if (/^0/.test(phone)) phone = '44' + phone.slice(1);
+  if (!email && !phone) return;
+  if (/@lera-realestate\.com$|^asolomon1703@/.test(email) || /^test\b/i.test(g('first name', 'name'))) return; // skip our own test rows
+  var key = 'meta:' + sha_(email || phone) + ':' + ev;
+  if (props.getProperty(key)) return; // already sent for this lead
+  var first = g('first name') || g('name').split(/\s+/)[0] || '';
+  var last = g('last name') || g('name').split(/\s+/).slice(1).join(' ');
+  var ud = {};
+  if (email) ud.em = [sha_(email)];
+  if (phone) ud.ph = [sha_(phone)];
+  if (first) ud.fn = [sha_(first)];
+  if (last) ud.ln = [sha_(last)];
+  var fbclid = g('meta click id'); if (fbclid) ud.fbc = 'fb.1.' + Date.now() + '.' + fbclid;
+  var body = { data: [{
+    event_name: ev, event_time: Math.floor(Date.now() / 1000), action_source: 'system_generated',
+    event_id: key.slice(5), user_data: ud,
+    custom_data: { event_source: 'crm', lead_event_source: 'Google Sheets', lead_status: String(status), campaign: g('campaign'), ad: g('ad') }
+  }] };
+  var test = props.getProperty('META_TEST_CODE'); if (test) body.test_event_code = test;
+  var r = UrlFetchApp.fetch('https://graph.facebook.com/v21.0/' + META_PIXEL + '/events?access_token=' + encodeURIComponent(token),
+    { method: 'post', contentType: 'application/json', payload: JSON.stringify(body), muteHttpExceptions: true });
+  if (r.getResponseCode() === 200) props.setProperty(key, new Date().toISOString());
+  else console.error('Meta ' + r.getResponseCode() + ' ' + r.getContentText());
+}
+
+// Run once after adding the token: sends the stage for every lead already past "New"
+function metaBackfill() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  [FB_TAB, WEB_TAB].forEach(function (n) {
+    var sh = ss.getSheetByName(n); if (!sh) return;
+    var cs = headers_(sh).indexOf('status'); if (cs < 0) return;
+    var vals = sh.getRange(2, cs + 1, Math.max(sh.getLastRow() - 1, 1), 1).getValues();
+    vals.forEach(function (x, i) { if (metaEvent_(x[0])) metaStage_(sh, i + 2, String(x[0])); });
+  });
 }
