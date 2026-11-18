@@ -1,0 +1,47 @@
+// ONE-OFF: tidy every tab of the Lera Sheet in the Pipeline tab's style (remove after running)
+function formatLeraSheet() {
+  var cfg = JSON.parse(UrlFetchApp.fetch('https://raw.githubusercontent.com/LeraRealEstate/Lera-website/main/ops/sheet-format.json').getContentText());
+  var ss = SpreadsheetApp.openById('1_uUz0BLJT80qdkv2A_wfQEVqvDkeH4QXMyo2CBVooq4');
+  var byId = {}; ss.getSheets().forEach(function (s) { byId[s.getSheetId()] = s; });
+  var DARK = '#1a130d', GOLD = '#9a732f', CREAM = '#faf5ed', LINE = '#e7ddcc';
+  cfg.tabs.forEach(function (t) {
+    var sh = byId[t.id]; if (!sh) return;
+    var hr = t.hr + 1, rows = sh.getMaxRows() - hr + 1, nc = t.nc;
+    if (t.name) sh.setName(t.name);
+    sh.setTabColor(t.tab); sh.setHiddenGridlines(true);
+    sh.setFrozenRows(hr); sh.setFrozenColumns(t.fc);
+    sh.getBandings().forEach(function (b) { b.remove(); });
+    var all = sh.getRange(hr, 1, rows, nc);
+    var body = sh.getRange(hr + 1, 1, rows - 1, nc);
+    body.setFontFamily('Figtree').setFontSize(10).setFontColor(DARK).setVerticalAlignment('middle')
+        .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+        .setBorder(null, null, true, null, null, true, LINE, SpreadsheetApp.BorderStyle.SOLID);
+    var head = sh.getRange(hr, 1, 1, nc);
+    head.trimWhitespace();
+    head.setBackground(DARK).setFontFamily('Jost').setFontSize(10).setFontWeight('bold').setFontColor(CREAM)
+        .setHorizontalAlignment('center').setVerticalAlignment('middle').setWrap(true)
+        .setBorder(null, null, true, null, null, null, GOLD, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    sh.setRowHeight(hr, 44);
+    all.applyRowBanding().setHeaderRowColor(DARK).setFirstRowColor('#ffffff').setSecondRowColor('#f5f5f3');
+    if (sh.getFilter()) sh.getFilter().remove();
+    all.createFilter();
+    t.w.forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+  });
+  // Today: title row
+  var today = byId[1659847521];
+  if (today) { today.getRange(1, 1, 1, 4).setFontFamily('Jost').setFontSize(16).setFontWeight('bold').setFontColor(DARK).setVerticalAlignment('middle'); today.setRowHeight(1, 48); }
+  // Status colours on the lead tabs
+  cfg.chipCols.forEach(function (sc) {
+    var sh = byId[sc[0]]; if (!sh) return;
+    var rng = sh.getRange(2, sc[1], sh.getMaxRows() - 1, 1);
+    rng.setHorizontalAlignment('center');
+    var rules = sh.getConditionalFormatRules();
+    cfg.chips.forEach(function (c) {
+      rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextStartsWith(c[0]).setBackground(c[1]).setBold(true).setRanges([rng]).build());
+    });
+    sh.setConditionalFormatRules(rules);
+  });
+  // Tab order
+  cfg.order.forEach(function (id, i) { var sh = byId[id]; if (sh) { ss.setActiveSheet(sh); ss.moveActiveSheet(i + 1); } });
+  console.log('Formatted ' + cfg.tabs.length + ' tabs');
+}
