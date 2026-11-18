@@ -145,7 +145,7 @@ function callReminders() {
     var first = cap_((lead.first || g.getName() || '').split(/\s+/)[0] || 'there');
     var phone = lead.phone || phoneFrom_(ev.getDescription());
     var time = Utilities.formatDate(ev.getStartTime(), 'Europe/London', 'h:mm a');
-    if (!/^(Free (video |phone )?call with Lera|Lera Real Estate [–-] (video |phone )?call with)/.test(ev.getTitle())) return; // only Lera calls
+    if (!/^(Free (video |phone )?call with Lera|Lera Real Estate [–-] (video|phone) call with)/.test(ev.getTitle())) return; // only Lera calls
     var link = meetLink_(ev);
     if (mins <= 62 && mins > 50 && !ev.getTag('lera_r60')) {
       sendMail_(email, 'In one hour: your call with Akiva at ' + time,
