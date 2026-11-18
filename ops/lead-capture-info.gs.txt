@@ -145,16 +145,16 @@ function callReminders() {
     var first = cap_((lead.first || g.getName() || '').split(/\s+/)[0] || 'there');
     var phone = lead.phone || phoneFrom_(ev.getDescription());
     var time = Utilities.formatDate(ev.getStartTime(), 'Europe/London', 'h:mm a');
-    if (!/^Free (video |phone )?call with Lera/.test(ev.getTitle())) return; // only Lera calls
+    if (!/^(Free (video |phone )?call with Lera|Lera Real Estate [–-] (video |phone )?call with)/.test(ev.getTitle())) return; // only Lera calls
     var link = meetLink_(ev);
     if (mins <= 62 && mins > 50 && !ev.getTag('lera_r60')) {
       sendMail_(email, 'In one hour: your call with Akiva at ' + time,
-        'Hi ' + first + ', your free call with Akiva is in one hour, at ' + time + '.' + (link ? ' Join: ' + link : ' Akiva will call you on ' + phone + '.'), reminderEmail_(first, time, !!link, link, phone, false));
+        'Hi ' + first + ', your call with Akiva is in one hour, at ' + time + '.' + (link ? ' Join: ' + link : ' Akiva will call you on ' + phone + '.'), reminderEmail_(first, time, !!link, link, phone, false));
       ev.setTag('lera_r60', '1');
     }
-    if (mins <= 6 && mins > 0 && !ev.getTag('lera_r5')) {
+    if (mins <= 11 && mins > 0 && !ev.getTag('lera_r5')) {
       sendMail_(email, 'Starting now: your call with Akiva',
-        'Hi ' + first + ', your call with Akiva starts in 5 minutes, at ' + time + '.' + (link ? ' Join: ' + link : ' Akiva will call you on ' + phone + '.'), reminderEmail_(first, time, !!link, link, phone, true));
+        'Hi ' + first + ', your call with Akiva starts in 10 minutes, at ' + time + '.' + (link ? ' Join: ' + link : ' Akiva will call you on ' + phone + '.'), reminderEmail_(first, time, !!link, link, phone, true));
       sendWa_(phone, 'lera_call_reminder_5min', [first, time]);
       ev.setTag('lera_r5', '1');
     }
@@ -437,12 +437,12 @@ function bookedEmail_(first, whenTxt, video, meet, phone) {
 }
 
 function reminderEmail_(first, timeTxt, video, link, phone, soon) {
-  var inner = kick_(soon ? 'Starting in 5 minutes' : 'In one hour') +
+  var inner = kick_(soon ? 'Starting in 10 minutes' : 'In one hour') +
     h1_(soon ? 'Akiva is ready for you, ' + esc_(first) + '.' : 'See you at ' + esc_(timeTxt) + ', ' + esc_(first) + '.') +
-    '<p style="margin:0">' + (soon ? 'Your free call with Akiva starts at ' + esc_(timeTxt) + '.' : 'Just a reminder that your free call with Akiva is in one hour, at ' + esc_(timeTxt) + '.') + '</p>' +
+    '<p style="margin:0">' + (soon ? 'Your call with Akiva starts at ' + esc_(timeTxt) + '.' : 'Just a reminder that your call with Akiva is in one hour, at ' + esc_(timeTxt) + '.') + '</p>' +
     (video && link ? btn_(link, soon ? 'Join now' : 'Join the video call') : '<p style="margin:18px 0 0;font-weight:600;color:#15120E">Akiva will call you on ' + esc_(phone) + '.</p>') +
     host_();
-  return shell_(soon ? 'Your call with Akiva starts in 5 minutes.' : 'Your call with Akiva is in one hour.', inner);
+  return shell_(soon ? 'Your call with Akiva starts in 10 minutes.' : 'Your call with Akiva is in one hour.', inner);
 }
 
 function cap_(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
