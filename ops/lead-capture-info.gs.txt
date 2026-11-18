@@ -1,12 +1,139 @@
-// Lera lead capture (runs as info@lera-realestate.com)
-// Landing pages post each lead here; it lands as a new row in the Google Sheet.
-// Facebook / Instagram ad leads go to "Facebook leads"; everything else to "Website leads".
+// Lera lead capture + CRM (runs as info@lera-realestate.com)
+// Landing pages post each lead here; it lands as a new row on the "Leads" tab of the Google Sheet.
+// The Sheet has four contact tabs. A contact's Status decides which tab they sit on, and the row moves by itself
+// whenever the Status changes (typed by hand, or set by this script from calls, bookings and emails).
 
 var SHEET_ID = '1_uUz0BLJT80qdkv2A_wfQEVqvDkeH4QXMyo2CBVooq4';
-var FB_TAB = 'Facebook leads';
-var WEB_TAB = 'Website leads';
+var TAB_LEADS = 'Leads', TAB_QUAL = 'Qualified contacts', TAB_ACTIVE = 'Active investors with us', TAB_DONE = 'Done a deal with us';
+var CRM_TABS = [TAB_LEADS, TAB_QUAL, TAB_ACTIVE, TAB_DONE];
+var CRM_HEADERS = ['Added', 'Name', 'Phone', 'Email', 'Source', 'Status', 'Budget', 'Looking for', 'Area', 'Deal / property',
+  'Next step', 'Last contacted', 'Notes', 'Communication log', 'Campaign', 'Ad', 'Landing page', 'Meta click ID', 'Deal plan link'];
+var CRM_WIDTHS = [90, 170, 125, 210, 150, 130, 150, 220, 170, 240, 240, 105, 320, 360, 170, 170, 100, 120, 120];
+// Status -> tab. Anything not listed stays where it is.
+var STATUS_TAB = {
+  'new': TAB_LEADS, 'contacted': TAB_LEADS, 'tried calling': TAB_LEADS, 'nurture': TAB_LEADS, 'not interested': TAB_LEADS, 'invalid details': TAB_LEADS,
+  'call booked': TAB_QUAL, 'spoke on phone': TAB_QUAL, 'qualified': TAB_QUAL, 'deal presented': TAB_QUAL, 'negotiating': TAB_QUAL, 'not proceeding': TAB_QUAL,
+  'active deal': TAB_ACTIVE, 'deal done': TAB_DONE
+};
+var STATUS_LIST = ['New', 'Contacted', 'Tried calling', 'Nurture', 'Not interested', 'Invalid details', 'Call booked', 'Spoke on phone',
+  'Qualified', 'Deal presented', 'Negotiating', 'Not proceeding', 'Active deal', 'Deal done'];
+// How far along each status is. The script only ever moves someone forward, never back.
+var STATUS_RANK = { 'new': 0, 'contacted': 1, 'tried calling': 1, 'nurture': 2, 'not interested': 2, 'invalid details': 2, 'call booked': 3,
+  'spoke on phone': 4, 'qualified': 5, 'deal presented': 6, 'negotiating': 7, 'not proceeding': 7, 'active deal': 8, 'deal done': 9 };
 var LEAD_KEY = 'lera-7Qm4xV9pT2'; // must match the key sent by the landing page
+var ME = 'info@lera-realestate.com';
 
+/* Run once: styles the four tabs, adds the Status dropdown, and starts the automatic jobs
+   (row moves on Status edits, Gmail logging every 10 minutes). Safe to run again. */
+function setupCrm() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var colours = ['#9a732f', '#2f6b4f', '#1f4e79', '#6b3fa0'];
+  CRM_TABS.forEach(function (n, i) {
+    var sh = ss.getSheetByName(n) || ss.insertSheet(n, i);
+    if (!String(sh.getRange(1, 1).getValue())) sh.getRange(1, 1, 1, CRM_HEADERS.length).setValues([CRM_HEADERS]);
+    styleTab_(sh, colours[i]);
+  });
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (['onSheetEdit', 'syncGmail'].indexOf(t.getHandlerFunction()) > -1) ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('onSheetEdit').forSpreadsheet(ss).onEdit().create();
+  ScriptApp.newTrigger('syncGmail').timeBased().everyMinutes(10).create();
+  var p = PropertiesService.getScriptProperties();
+  if (!p.getProperty('GMAIL_LAST')) p.setProperty('GMAIL_LAST', String(Math.floor(Date.now() / 1000)));
+  console.log('CRM ready: ' + CRM_TABS.map(function (n) { return n + ' (' + Math.max(ss.getSheetByName(n).getLastRow() - 1, 0) + ')'; }).join(', '));
+}
+
+function styleTab_(sh, colour) {
+  var nc = CRM_HEADERS.length, nr = Math.max(sh.getMaxRows(), 200);
+  if (sh.getMaxRows() < nr) sh.insertRowsAfter(sh.getMaxRows(), nr - sh.getMaxRows());
+  if (sh.getMaxColumns() > nc) sh.deleteColumns(nc + 1, sh.getMaxColumns() - nc);
+  sh.setFrozenRows(1); sh.setFrozenColumns(2); sh.setHiddenGridlines(true); sh.setTabColor(colour);
+  sh.getBandings().forEach(function (b) { b.remove(); });
+  sh.getRange(1, 1, nr, nc).applyRowBanding().setHeaderRowColor('#1a130d').setFirstRowColor('#ffffff').setSecondRowColor('#f5f5f3');
+  sh.getRange(1, 1, 1, nc).setFontFamily('Jost').setFontSize(10).setFontWeight('bold').setFontColor('#faf5ed')
+    .setHorizontalAlignment('center').setVerticalAlignment('middle').setWrap(true)
+    .setBorder(null, null, true, null, null, null, '#9a732f', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  sh.setRowHeight(1, 44);
+  var body = sh.getRange(2, 1, nr - 1, nc);
+  body.setFontFamily('Figtree').setFontSize(10).setFontColor('#1a130d').setFontWeight('normal').setVerticalAlignment('middle')
+    .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setNumberFormat('@')
+    .setBorder(null, null, true, null, null, true, '#e7ddcc', SpreadsheetApp.BorderStyle.SOLID);
+  sh.getRange(2, 2, nr - 1, 1).setFontWeight('bold');
+  sh.getRange(2, 6, nr - 1, 1).setHorizontalAlignment('center');
+  sh.setRowHeightsForced(2, nr - 1, 30);
+  CRM_WIDTHS.forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+  sh.getRange(2, 6, nr - 1, 1).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(STATUS_LIST, true).setAllowInvalid(true).build());
+  var st = sh.getRange(2, 6, nr - 1, 1), rule = function (txt, bg, fg) {
+    return SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(txt).setBackground(bg).setFontColor(fg).setRanges([st]).build(); };
+  sh.setConditionalFormatRules([
+    rule('Active deal', '#dcefe3', '#1d5b3a'), rule('Deal done', '#e9e0f5', '#4b2c7a'), rule('Deal presented', '#f6ead2', '#7a5516'),
+    rule('Negotiating', '#f6ead2', '#7a5516'), rule('Call booked', '#e3edf7', '#1f4e79'), rule('Spoke on phone', '#e3edf7', '#1f4e79'),
+    rule('Qualified', '#e3edf7', '#1f4e79'), rule('Not interested', '#eeeeee', '#777777'), rule('Invalid details', '#eeeeee', '#777777'),
+    rule('Not proceeding', '#eeeeee', '#777777')]);
+  if (sh.getFilter()) sh.getFilter().remove();
+  sh.getRange(1, 1, nr, nc).createFilter();
+}
+
+/* ---------- finding contacts and moving them between tabs ---------- */
+function headers_(sh) {
+  return sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, '').trim(); });
+}
+function last10_(s) { var d = String(s || '').replace(/\D/g, ''); return d.length >= 10 ? d.slice(-10) : ''; }
+function today_() { return Utilities.formatDate(new Date(), 'Europe/London', 'dd/MM/yyyy'); }
+
+// Finds a contact on any of the four tabs by email and/or phone. Returns {sh, row, h, v} or null.
+function findContact_(email, phone) {
+  var ss = SpreadsheetApp.openById(SHEET_ID), em = String(email || '').trim().toLowerCase(), ph = last10_(phone);
+  if (!em && !ph) return null;
+  for (var t = 0; t < CRM_TABS.length; t++) {
+    var sh = ss.getSheetByName(CRM_TABS[t]); if (!sh || sh.getLastRow() < 2) continue;
+    var data = sh.getDataRange().getValues(), h = data[0].map(function (x) { return String(x).trim().toLowerCase(); });
+    var ce = h.indexOf('email'), cp = h.indexOf('phone');
+    for (var r = data.length - 1; r > 0; r--) {
+      if ((em && String(data[r][ce]).trim().toLowerCase() === em) || (ph && last10_(data[r][cp]) === ph))
+        return { sh: sh, row: r + 1, h: h, v: data[r] };
+    }
+  }
+  return null;
+}
+
+function setCell_(c, col, val) {
+  var k = c.h.indexOf(col); if (k < 0) return;
+  c.sh.getRange(c.row, k + 1).setValue(val); c.v[k] = val;
+}
+function getCell_(c, col) { var k = c.h.indexOf(col); return k < 0 ? '' : String(c.v[k] || ''); }
+
+// Adds a line to the contact's Communication log and stamps Last contacted
+function logComm_(c, line, contacted) {
+  var log = getCell_(c, 'communication log');
+  setCell_(c, 'communication log', (log ? log + ' | ' : '') + line);
+  if (contacted !== false) setCell_(c, 'last contacted', today_());
+}
+
+// Moves a contact forward to `status` (never backwards), then puts the row on the right tab
+function advance_(c, status) {
+  var cur = getCell_(c, 'status').toLowerCase().replace(/\s*\(.*$/, '').trim();
+  var a = STATUS_RANK.hasOwnProperty(cur) ? STATUS_RANK[cur] : 0, b = STATUS_RANK[String(status).toLowerCase()];
+  if (b === undefined || b <= a) return c;
+  setCell_(c, 'status', status);
+  try { metaStage_(c.sh, c.row, status); } catch (x) { console.error(x); }
+  return moveRow_(c.sh, c.row) || c;
+}
+
+// Puts a row on the tab its Status belongs to. Returns the contact at its new place (or null if it didn't move).
+function moveRow_(sh, row) {
+  var h = headers_(sh), v = sh.getRange(row, 1, 1, h.length).getValues()[0];
+  var target = STATUS_TAB[String(v[h.indexOf('status')] || '').toLowerCase().replace(/\s*\(.*$/, '').trim()];
+  if (!target || target === sh.getName() || !String(v[h.indexOf('name')] || v[h.indexOf('email')] || v[h.indexOf('phone')])) return null;
+  var to = sh.getParent().getSheetByName(target); if (!to) return null;
+  var th = headers_(to), out = th.map(function (x) { var k = h.indexOf(x); return k < 0 ? '' : v[k]; });
+  var r = to.getLastRow() + 1;
+  to.getRange(r, 1, 1, out.length).setNumberFormat('@').setValues([out]);
+  sh.deleteRow(row);
+  return { sh: to, row: r, h: th, v: out };
+}
+
+/* ---------- leads from the website ---------- */
 function doPost(e) {
   var p = (e && e.parameter) || {};
   if (p._honey) return out_({ ok: true });
@@ -25,56 +152,34 @@ function doPost(e) {
 
   var src = String(p.utm_source || p.source || '').toLowerCase();
   var isAd = /facebook|instagram|^fb|^ig|meta/.test(src) || !!p.fbclid;
-  var ss = SpreadsheetApp.openById(SHEET_ID);
-  var sh = ss.getSheetByName(isAd ? FB_TAB : WEB_TAB) || ss.getSheetByName(FB_TAB);
-
-  var name = String(p.name || '').trim();
-  var first = p.first_name || name.split(/\s+/)[0] || '';
-  var last = p.last_name || name.split(/\s+/).slice(1).join(' ');
-  var when = Utilities.formatDate(new Date(), 'Europe/London', 'dd/MM/yyyy HH:mm');
+  var name = String(p.name || [p.first_name, p.last_name].filter(String).join(' ') || '').trim();
+  var when = Utilities.formatDate(new Date(), 'Europe/London', 'dd/MM HH:mm');
   var action = p.action === 'call' ? 'Booked / requested a call' : p.action === 'enquiry' ? 'Website enquiry' : 'Downloaded HMO guide';
-  var note = when + ' - ' + action + (p.message ? ': ' + p.message : '') +
-    (p.utm_campaign ? ' (campaign: ' + p.utm_campaign + ')' : '') +
-    (p.utm_content ? ' (ad: ' + p.utm_content + ')' : '');
-
-  var values = {
-    'where from': isAd ? (src.indexOf('insta') > -1 ? 'Instagram' : 'Facebook') : 'Website',
-    'first name': first,
-    'last name': last,
-    'phone number': p.phone ? "'" + p.phone : '',
-    'phone': p.phone ? "'" + p.phone : '',
-    'email': p.email || '',
-    'email address': p.email || '',
-    'amount of money': p.budget || '',
-    'notes': note,
-    'status': 'New',
-    'campaign': p.utm_campaign || '',
-    'ad': p.utm_content || '',
-    'landing page': p.page || '',
-    'meta click id': p.fbclid || '',
-    // Website leads tab uses its own column names
-    'signed up': new Date(),
-    'name': name,
-    'budget': p.budget || '',
-    'requested': p.action === 'call' ? 'Call' : p.action === 'enquiry' ? 'Enquiry' : 'Guide',
-    'ad source': p.utm_content || 'No ad tags',
-    'came from': p.referrer || ''
-  };
+  var line = when + ' ' + action + (p.message ? ': ' + p.message : '') + (p.page ? ' (' + p.page + ')' : '');
 
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    ensureCols_(sh);
-    var lastCol = sh.getLastColumn();
-    var headers = sh.getRange(1, 1, 1, lastCol).getValues()[0];
-    var row = [], used = {};
-    for (var i = 0; i < headers.length; i++) {
-      var h = String(headers[i]).trim().toLowerCase().replace(/:$/, '').trim();
-      var v = '';
-      if (values.hasOwnProperty(h) && !used[h]) { v = values[h]; used[h] = true; }
-      row.push(v);
+    var c = findContact_(p.email, p.phone);
+    if (c) {                                    // already on the Sheet: add to their record instead of a duplicate row
+      logComm_(c, line, false);
+      if (!getCell_(c, 'budget') && p.budget) setCell_(c, 'budget', p.budget);
+      if (!getCell_(c, 'phone') && p.phone) setCell_(c, 'phone', String(p.phone));
+      if (!getCell_(c, 'meta click id') && p.fbclid) setCell_(c, 'meta click id', p.fbclid);
+    } else {
+      var sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB_LEADS);
+      var values = {
+        'added': Utilities.formatDate(new Date(), 'Europe/London', 'dd/MM/yyyy'),
+        'name': name, 'phone': String(p.phone || ''), 'email': String(p.email || ''),
+        'source': isAd ? (src.indexOf('insta') > -1 ? 'Instagram ad' : 'Facebook ad') : 'Website' + (p.referrer ? ' (came from ' + p.referrer + ')' : ''),
+        'status': 'New', 'budget': p.budget || '',
+        'looking for': p.action === 'call' ? 'Asked for a call' : p.action === 'enquiry' ? 'Website enquiry' : 'Downloaded HMO guide',
+        'notes': p.message || '', 'communication log': line, 'last contacted': '',
+        'campaign': p.utm_campaign || '', 'ad': p.utm_content || '', 'landing page': p.page || '', 'meta click id': p.fbclid || ''
+      };
+      var h = headers_(sh), r = sh.getLastRow() + 1;
+      sh.getRange(r, 1, 1, h.length).setNumberFormat('@').setValues([h.map(function (x) { return values.hasOwnProperty(x) ? values[x] : ''; })]);
     }
-    sh.appendRow(row);
   } finally {
     lock.releaseLock();
   }
@@ -92,11 +197,66 @@ function out_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-function ensureCols_(sh) {
-  var h = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim().toLowerCase(); });
-  ['Campaign', 'Ad', 'Landing page', 'Meta click ID'].forEach(function (c) {
-    if (h.indexOf(c.toLowerCase()) === -1) { sh.getRange(1, sh.getLastColumn() + 1).setValue(c); h.push(c.toLowerCase()); }
+/* ---------- Gmail -> Sheet (every 10 minutes) ----------
+   Every email to or from a contact on the Sheet is added to their Communication log, with Last contacted updated.
+   Google Meet notes (Gemini) for a call are added to that contact's Notes, and the call moves them to "Spoke on phone".
+   An email from us to a "New" lead moves them to "Contacted". */
+function syncGmail() {
+  var props = PropertiesService.getScriptProperties();
+  var since = +(props.getProperty('GMAIL_LAST') || Math.floor(Date.now() / 1000) - 86400);
+  var seen = JSON.parse(props.getProperty('GMAIL_SEEN') || '[]');
+  var startedAt = Math.floor(Date.now() / 1000);
+  var threads = GmailApp.search('after:' + (since - 120) + ' -in:spam -in:trash -from:submissions@formsubmit.co', 0, 100);
+  var msgs = [];
+  threads.forEach(function (t) { t.getMessages().forEach(function (m) { if (m.getDate().getTime() / 1000 >= since - 120 && seen.indexOf(m.getId()) < 0) msgs.push(m); }); });
+  msgs.sort(function (a, b) { return a.getDate() - b.getDate(); });
+  var addr = function (s) { return (String(s || '').match(/[\w.+'-]+@[\w-]+(\.[\w-]+)+/g) || []).map(function (x) { return x.toLowerCase(); }); };
+  msgs.forEach(function (m) {
+    seen.push(m.getId());
+    var from = addr(m.getFrom())[0] || '', subj = m.getSubject() || '(no subject)', when = Utilities.formatDate(m.getDate(), 'Europe/London', 'dd/MM HH:mm');
+    try {
+      if (from === 'gemini-notes@google.com') return meetNotes_(m, subj, when);
+      if (/^mailer-daemon|^postmaster/.test(from)) return;
+      var out = from === ME, people = out ? addr(m.getTo() + ',' + m.getCc() + ',' + m.getBcc()) : [from];
+      people = people.filter(function (x) { return x !== ME && !/@lera-realestate\.com$/.test(x); });
+      if (out && people.length > 5) return;      // newsletters / group sends
+      var snip = m.getPlainBody().replace(/\r/g, '').split(/\nOn .{5,80}wrote:|\n>|\nKind regards|\n-- ?\n/)[0].replace(/\s+/g, ' ').trim().slice(0, 140);
+      people.forEach(function (who) {
+        var c = findContact_(who); if (!c) return;
+        logComm_(c, when + ' EMAIL ' + (out ? 'to them' : 'from them') + ': ' + subj + (snip ? ' - ' + snip : ''));
+        if (out) advance_(c, 'Contacted');
+      });
+    } catch (x) { console.error('Gmail sync ' + m.getId() + ': ' + x); }
   });
+  props.setProperty('GMAIL_SEEN', JSON.stringify(seen.slice(-1500)));
+  props.setProperty('GMAIL_LAST', String(startedAt));
+}
+
+// "Notes: 'Lera Real Estate – video call with Aman' 18 Nov 2026" -> Aman's row
+function meetNotes_(m, subj, when) {
+  var who = (subj.match(/call with ([^'’(]+)/i) || [])[1]; if (!who) return;
+  who = who.trim().toLowerCase();
+  var c = findByName_(who); if (!c) return;
+  var body = m.getPlainBody().replace(/\r/g, '');
+  var notes = (body.split(/Quick Notes|Summary/)[1] || body).split(/Meeting records|Is the content of this email helpful/)[0]
+    .replace(/\n{2,}/g, '\n').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 2500);
+  var n = getCell_(c, 'notes');
+  setCell_(c, 'notes', (n ? n + '\n\n' : '') + 'CALL NOTES ' + when + ' (Gemini): ' + notes);
+  logComm_(c, when + ' VIDEO/CALL: notes added (Gemini)');
+  advance_(c, 'Spoke on phone');
+}
+
+function findByName_(who) {
+  var ss = SpreadsheetApp.openById(SHEET_ID), hits = [];
+  CRM_TABS.forEach(function (n) {
+    var sh = ss.getSheetByName(n); if (!sh || sh.getLastRow() < 2) return;
+    var data = sh.getDataRange().getValues(), h = data[0].map(function (x) { return String(x).trim().toLowerCase(); }), cn = h.indexOf('name');
+    for (var r = 1; r < data.length; r++) {
+      var nm = String(data[r][cn] || '').toLowerCase().replace(/\(.*?\)/g, ' ').replace(/\s+/g, ' ').trim();
+      if (nm && (nm === who || nm.indexOf(who + ' ') === 0 || who.indexOf(nm) === 0)) hits.push({ sh: sh, row: r + 1, h: h, v: data[r] });
+    }
+  });
+  return hits.length === 1 ? hits[0] : null;   // only when it's clearly one person
 }
 
 // ===================== MESSAGES TO LEADS =====================
@@ -162,20 +322,8 @@ function callReminders() {
 }
 
 function findLead_(email) {
-  var ss = SpreadsheetApp.openById(SHEET_ID), out = {};
-  [FB_TAB, WEB_TAB].forEach(function (t) {
-    var sh = ss.getSheetByName(t); if (!sh || out.phone) return;
-    var data = sh.getDataRange().getValues(), h = data[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, ''); });
-    var ce = h.indexOf('email') > -1 ? h.indexOf('email') : h.indexOf('email address');
-    var cp = h.indexOf('phone number') > -1 ? h.indexOf('phone number') : h.indexOf('phone');
-    var cf = h.indexOf('first name');
-    for (var r = data.length - 1; r > 0; r--) {
-      if (String(data[r][ce]).trim().toLowerCase() === email.toLowerCase()) {
-        out.phone = cp > -1 ? String(data[r][cp]).replace(/^'/, '') : ''; out.first = cf > -1 ? String(data[r][cf]) : ''; break;
-      }
-    }
-  });
-  return out;
+  var c = findContact_(email);
+  return c ? { phone: getCell_(c, 'phone').replace(/^'/, ''), first: getCell_(c, 'name').replace(/\(.*?\)/g, '').trim() } : {};
 }
 
 function phoneFrom_(text) { var m = String(text || '').match(/(\+?44|0)\s?7[\d\s]{9,12}/); return m ? m[0] : ''; }
@@ -210,21 +358,10 @@ function sendWa_(phone, template, vars) {
   } catch (e) { console.error('WhatsApp failed: ' + e); }
 }
 
-// Run once: adds Campaign / Ad / Landing page columns and starts the reminder clock
+// Run once: starts the reminder clock
 function setup() {
-  var ss = SpreadsheetApp.openById(SHEET_ID);
-  [FB_TAB, WEB_TAB].forEach(function (t) {
-    var sh = ss.getSheetByName(t); if (!sh) return;
-    var h = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim().toLowerCase(); });
-    ['Campaign', 'Ad', 'Landing page'].forEach(function (c) {
-      if (h.indexOf(c.toLowerCase()) === -1) { sh.getRange(1, sh.getLastColumn() + 1).setValue(c); h.push(c.toLowerCase()); }
-    });
-  });
   ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'callReminders') ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('callReminders').timeBased().everyMinutes(1).create();
-  var cal = CalendarApp.getCalendarById(CAL_ID) || CalendarApp.getDefaultCalendar();
-  console.log('Reminders running on calendar: ' + cal.getName() + '. Upcoming booked calls: ' +
-    cal.getEvents(new Date(), new Date(Date.now() + 14 * 864e5)).filter(function (e) { return e.getGuestList().length; }).length);
 }
 
 // ===================== BOOKING (calls booked straight from the landing page) =====================
@@ -320,23 +457,10 @@ function book_(p) {
 }
 
 function markBooked_(email, whenTxt) {
-  var ss = SpreadsheetApp.openById(SHEET_ID);
-  var tabs = [FB_TAB, WEB_TAB];
-  for (var t = 0; t < tabs.length; t++) {
-    var sh = ss.getSheetByName(tabs[t]); if (!sh) continue;
-    var data = sh.getDataRange().getValues();
-    var h = data[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, ''); });
-    var ce = h.indexOf('email') > -1 ? h.indexOf('email') : h.indexOf('email address');
-    var cn = h.indexOf('notes'), cs = h.indexOf('status');
-    for (var r = data.length - 1; r > 0; r--) {
-      if (String(data[r][ce]).trim().toLowerCase() === email.toLowerCase()) {
-        if (cn > -1) sh.getRange(r + 1, cn + 1).setValue(String(data[r][cn]) + ' | CALL BOOKED: ' + whenTxt);
-        if (cs > -1) sh.getRange(r + 1, cs + 1).setValue('Call booked');
-        try { metaStage_(sh, r + 1, 'Call booked'); } catch (x) { console.error(x); }
-        return;
-      }
-    }
-  }
+  var c = findContact_(email); if (!c) return;
+  logComm_(c, Utilities.formatDate(new Date(), 'Europe/London', 'dd/MM HH:mm') + ' CALL BOOKED: ' + whenTxt, false);
+  setCell_(c, 'next step', 'Call: ' + whenTxt);
+  advance_(c, 'Call booked');
 }
 
 // ===================== BRANDED EMAILS =====================
@@ -486,103 +610,61 @@ function zoomCalls_(fromDay, toDay) {
   return out;
 }
 
-function last10_(s) { var d = String(s || '').replace(/\D/g, ''); return d.length >= 10 ? d.slice(-10) : ''; }
-
 function syncZoomCalls() {
   var tz = 'Europe/London', now = new Date();
   var calls = zoomCalls_(Utilities.formatDate(new Date(now.getTime() - 2 * 864e5), tz, 'yyyy-MM-dd'), Utilities.formatDate(now, tz, 'yyyy-MM-dd'));
   var props = PropertiesService.getScriptProperties();
   var seen = JSON.parse(props.getProperty('ZOOM_SEEN') || '[]');
-  var ss = SpreadsheetApp.openById(SHEET_ID);
-  var tabs = [FB_TAB, WEB_TAB].map(function (n) {
-    var sh = ss.getSheetByName(n); if (!sh) return null;
-    var data = sh.getDataRange().getValues(), h = data[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, ''); });
-    var cp = h.indexOf('phone number') > -1 ? h.indexOf('phone number') : h.indexOf('phone');
-    return { sh: sh, data: data, cp: cp, cn: h.indexOf('notes'), cs: h.indexOf('status') };
-  }).filter(function (t) { return t && t.cp > -1; });
   calls.sort(function (a, b) { return String(a.start_time || a.date_time).localeCompare(String(b.start_time || b.date_time)); });
   calls.forEach(function (c) {
     var id = String(c.id || c.call_id || ''); if (!id || seen.indexOf(id) > -1) return;
+    seen.push(id);
     var out = String(c.direction || '').toLowerCase() !== 'inbound';
     var other = out ? (c.callee_did_number || c.callee_number || c.callee_ext_number) : (c.caller_did_number || c.caller_number || c.caller_ext_number);
-    var key = last10_(other); if (!key) return;
+    if (!last10_(other)) return;
     var dur = +c.duration || 0, res = String(c.call_result || c.result || '').toLowerCase().replace(/_/g, ' ');
     var answered = /answer|connect|success/.test(res) && !/no answer|not answer|unanswer/.test(res) || (!res && dur > 0);
     var when = Utilities.formatDate(new Date(c.start_time || c.date_time), tz, 'dd/MM HH:mm');
     var mins = dur >= 60 ? Math.floor(dur / 60) + 'm ' + (dur % 60) + 's' : dur + 's';
-    var txt = when + ' ' + (out ? 'called them' : 'they called us') + ' - ' + (answered ? 'answered (' + mins + ')' : (res || 'no answer'));
-    var hit = false;
-    tabs.forEach(function (t) {
-      if (hit) return;
-      for (var r = t.data.length - 1; r > 0; r--) {
-        if (last10_(t.data[r][t.cp]) !== key) continue;
-        hit = true;
-        if (t.cn > -1) { var n = String(t.data[r][t.cn] || ''); n = (n ? n + ' | ' : '') + 'CALL: ' + txt; t.sh.getRange(r + 1, t.cn + 1).setValue(n); t.data[r][t.cn] = n; }
-        if (t.cs > -1) {
-          var st = String(t.data[r][t.cs] || '');
-          if (!/call booked/i.test(st)) {
-            var tries = (String(t.data[r][t.cn] || '').match(/CALL: [^|]*called them - (?!answered)/g) || []).length;
-            st = answered ? 'Spoke on phone' : (out ? 'Tried calling (' + tries + ')' : 'Missed their call - call back');
-            t.sh.getRange(r + 1, t.cs + 1).setValue(st); t.data[r][t.cs] = st;
-            try { metaStage_(t.sh, r + 1, st); } catch (x) { console.error(x); }
-          }
-        }
-        break;
-      }
-    });
-    seen.push(id);
+    var k = findContact_('', other); if (!k) return;
+    logComm_(k, when + ' CALL ' + (out ? 'we called' : 'they called') + ': ' + (answered ? 'answered (' + mins + ')' : (res || 'no answer')));
+    if (answered) advance_(k, 'Spoke on phone');
+    else if (out) advance_(k, 'Tried calling');
+    else setCell_(k, 'next step', 'Call them back (missed their call ' + when + ')');
   });
   props.setProperty('ZOOM_SEEN', JSON.stringify(seen.slice(-800)));
 }
 
-
 /* ===================== GOOGLE SHEET (CRM) -> META =====================
    When a lead's Status moves forward, tell Meta (Conversions API) so ads can find more people like the leads that convert.
-   Status -> event sent:  Call booked -> CallBooked | Spoke on phone -> SpokeOnPhone | Qualified -> QualifiedLead | Client -> Client
+   Status -> event sent:  Call booked -> CallBooked | Spoke on phone -> SpokeOnPhone | Qualified / Deal presented / Negotiating -> QualifiedLead | Active deal / Deal done -> Client
    Script property needed: META_TOKEN (Events Manager > Lera pixel > Settings > Conversions API > Generate access token).
    Optional: META_TEST_CODE (from Events Manager > Test events) to check events arrive without affecting the ads.
-   Then run setupMeta() once. */
+   Then run setupCrm() once. */
 var META_PIXEL = '1448791074109307';
-var STATUS_LIST = ['New', 'Tried calling', 'Spoke on phone', 'Call booked', 'Qualified', 'Client', 'Nurture', 'Not interested'];
+function setupMeta() { setupCrm(); console.log('Meta link ready. Token set: ' + !!PropertiesService.getScriptProperties().getProperty('META_TOKEN')); }
 
-function setupMeta() {
-  var ss = SpreadsheetApp.openById(SHEET_ID);
-  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'onSheetEdit') ScriptApp.deleteTrigger(t); });
-  ScriptApp.newTrigger('onSheetEdit').forSpreadsheet(ss).onEdit().create();
-  [FB_TAB, WEB_TAB].forEach(function (n) {
-    var sh = ss.getSheetByName(n); if (!sh) return;
-    ensureCols_(sh);
-    var cs = headers_(sh).indexOf('status'); if (cs < 0) return;
-    var rule = SpreadsheetApp.newDataValidation().requireValueInList(STATUS_LIST, true).setAllowInvalid(true).build();
-    sh.getRange(2, cs + 1, Math.max(sh.getMaxRows() - 1, 1), 1).setDataValidation(rule);
-  });
-  console.log('Meta link ready. Token set: ' + !!PropertiesService.getScriptProperties().getProperty('META_TOKEN'));
-}
-
-function headers_(sh) {
-  return sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim().toLowerCase().replace(/:$/, '').trim(); });
-}
-
-// Fires when anyone edits the Sheet by hand
+// Fires when anyone edits the Sheet by hand: tells Meta about the new stage and moves the row to its tab
 function onSheetEdit(e) {
   try {
-    var sh = e.range.getSheet(); if ([FB_TAB, WEB_TAB].indexOf(sh.getName()) < 0) return;
+    var sh = e.range.getSheet(); if (CRM_TABS.indexOf(sh.getName()) < 0) return;
     var cs = headers_(sh).indexOf('status');
     if (cs < 0 || e.range.getColumn() > cs + 1 || e.range.getLastColumn() < cs + 1) return;
-    for (var r = e.range.getRow(); r <= e.range.getLastRow(); r++) {
-      if (r < 2) continue;
-      metaStage_(sh, r, String(sh.getRange(r, cs + 1).getValue()));
+    for (var r = e.range.getLastRow(); r >= Math.max(e.range.getRow(), 2); r--) {
+      var st = String(sh.getRange(r, cs + 1).getValue());
+      try { metaStage_(sh, r, st); } catch (x) { console.error(x); }
+      moveRow_(sh, r);
     }
   } catch (x) { console.error(x); }
 }
 
 function metaEvent_(status) {
   var s = String(status || '').toLowerCase();
-  if (/not interested|unqualified|not qualified/.test(s)) return '';
+  if (/not interested|not proceeding|invalid|unqualified|not qualified/.test(s)) return '';
   if (/call booked/.test(s)) return 'CallBooked';
   if (/spoke/.test(s)) return 'SpokeOnPhone';
-  if (/qualified/.test(s)) return 'QualifiedLead';
-  if (/client|won/.test(s)) return 'Client';
+  if (/qualified|deal presented|negotiating/.test(s)) return 'QualifiedLead';
+  if (/active deal|deal done|client|won/.test(s)) return 'Client';
   return '';
 }
 
@@ -627,10 +709,10 @@ function metaStage_(sh, row, status) {
 // Run once after adding the token: sends the stage for every lead already past "New"
 function metaBackfill() {
   var ss = SpreadsheetApp.openById(SHEET_ID);
-  [FB_TAB, WEB_TAB].forEach(function (n) {
-    var sh = ss.getSheetByName(n); if (!sh) return;
+  CRM_TABS.forEach(function (n) {
+    var sh = ss.getSheetByName(n); if (!sh || sh.getLastRow() < 2) return;
     var cs = headers_(sh).indexOf('status'); if (cs < 0) return;
-    var vals = sh.getRange(2, cs + 1, Math.max(sh.getLastRow() - 1, 1), 1).getValues();
+    var vals = sh.getRange(2, cs + 1, sh.getLastRow() - 1, 1).getValues();
     vals.forEach(function (x, i) { if (metaEvent_(x[0])) metaStage_(sh, i + 2, String(x[0])); });
   });
 }
