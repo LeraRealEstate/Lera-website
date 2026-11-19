@@ -183,8 +183,23 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+  try { if (p.alert) alertLead_(p, c); } catch (err) { console.error(err); }
   try { notifyLead_(p); } catch (err) { console.error(err); }
   return out_({ ok: true });
+}
+
+// New-lead alert to info@ (sent from Google's servers, so it can't be lost the way FormSubmit alerts were)
+function alertLead_(p, existing) {
+  var rows = [['Name', p.name], ['Email', p.email], ['Phone', p.phone], ['Budget', p.budget], ['Timeline', p.timeline],
+    ['Wants', p.action === 'call' ? 'A call' : p.action === 'enquiry' ? 'Enquiry' : 'The guide'], ['Page', p.page],
+    ['Campaign', p.utm_campaign], ['Ad', p.utm_content], ['Message', p.message],
+    ['On the Sheet', existing ? 'Already a contact - added to their record (' + existing.sh.getName() + ')' : 'New row on the Leads tab']]
+    .filter(function (r) { return r[1]; });
+  var sheet = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit';
+  var html = '<table cellpadding="8" style="border-collapse:collapse;font:14px Helvetica,Arial,sans-serif">' +
+    rows.map(function (r) { return '<tr><td style="border:1px solid #e7ddcc;background:#f6f1e9;font-weight:600">' + esc_(r[0]) + '</td><td style="border:1px solid #e7ddcc">' + esc_(r[1]) + '</td></tr>'; }).join('') +
+    '</table><p style="font:14px Helvetica,Arial,sans-serif"><a href="' + sheet + '">Open the lead Sheet</a></p>';
+  sendMail_(ME, String(p.alert).slice(0, 180), rows.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n') + '\n\n' + sheet, html);
 }
 
 function doGet(e) {
