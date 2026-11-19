@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Buy to Lets: how buy, refurb, refinance, rent works | Lera Real Estate</title>
+<meta name="description" content="A simple, real example of how a buy-to-let works: buy a flat, refresh it, refinance to get your money back out, then rent it out. Watch the 40-second walkthrough.">
+<meta name="theme-color" content="#15120E">
+<link rel="canonical" href="https://lera-realestate.com/buy-to-let/">
+<meta property="og:title" content="Buy to Lets: how it works, in one simple example">
+<meta property="og:description" content="Buy, refurb, refinance, rent. Watch a real example and see how your money comes back out.">
+<meta property="og:url" content="https://lera-realestate.com/buy-to-let/">
+<meta property="og:image" content="https://lera-realestate.com/email/lera-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+try{fbq('init','1448791074109307');fbq('track','PageView')}catch(x){}
+</script>
+<style>
+:root{
+  --ink:#15120E; --ink-2:#221D17; --paper:#F5EFE4; --paper-2:#EDE4D4;
+  --gold:#CFA864; --gold-deep:#A9833F; --stone:#857B6D; --line:rgba(21,18,14,.14); --line-d:rgba(245,239,228,.16);
+  --green:#7FB08A; --display:"Jost",system-ui,sans-serif; --body:"Figtree",system-ui,sans-serif; --wrap:1120px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:-.02em;line-height:1.08;margin:0}
+p{margin:0}
+.btn{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;font:600 16px/1 var(--body);padding:18px 26px;border-radius:999px;text-decoration:none;transition:transform .15s ease,background .15s ease}
+.btn:active{transform:scale(.98)}
+.btn-gold{background:var(--gold);color:var(--ink)}
+.btn-gold:hover{background:#DDB978}
+.btn-ghost{background:transparent;color:var(--paper);box-shadow:inset 0 0 0 1.5px var(--line-d)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--paper)}
+
+/* hero */
+.hero{background:var(--ink);color:var(--paper);padding-bottom:72px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+.top img{height:32px;width:auto}
+.top a.small{font-size:14px;color:rgba(245,239,228,.7);text-decoration:none}
+.kick{font:600 12px/1 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:36px 0 14px}
+.hero h1{font-size:clamp(38px,5.4vw,66px);font-weight:300;max-width:16em}
+.hero h1 b{font-weight:500}
+.lede{margin-top:18px;font-size:19px;color:rgba(245,239,228,.78);max-width:36em}
+
+/* player */
+.player{margin-top:40px;background:var(--ink-2);border:1px solid var(--line-d);border-radius:24px;overflow:hidden;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)}
+.stage{position:relative;aspect-ratio:16/9;min-height:420px;display:grid;grid-template-columns:1.05fr .95fr;gap:24px;padding:28px 32px 20px;overflow:hidden}
+.chips{position:absolute;top:22px;left:32px;right:32px;display:flex;gap:8px;flex-wrap:wrap;z-index:2}
+.chip{font:500 13px/1 var(--body);padding:8px 13px;border-radius:999px;background:rgba(245,239,228,.06);color:rgba(245,239,228,.55);border:0;cursor:pointer;transition:all .3s}
+.chip.on{background:var(--gold);color:var(--ink)}
+.chip.done{color:var(--gold)}
+.scene-l{display:flex;flex-direction:column;justify-content:center;padding-top:44px}
+.step-n{font:500 15px/1 var(--display);color:var(--gold);letter-spacing:.06em}
+.cap h2{font-size:clamp(28px,3.4vw,44px);font-weight:400;margin-top:10px;color:var(--paper)}
+.cap p{margin-top:14px;font-size:clamp(16px,1.6vw,19px);color:rgba(245,239,228,.8);max-width:28em}
+.cap p b{color:var(--paper);font-weight:600}
+.cap{transition:opacity .45s ease,transform .45s ease}
+.cap.out{opacity:0;transform:translateY(10px)}
+.scene-r{display:flex;flex-direction:column;justify-content:center;gap:18px;padding-top:44px}
+.house{position:relative;height:190px;display:grid;place-items:center}
+.house svg{height:190px;width:auto;max-width:100%;overflow:visible}
+.meters{display:grid;gap:14px}
+.meter .lab{display:flex;justify-content:space-between;font-size:14px;color:rgba(245,239,228,.7)}
+.meter .lab b{font:500 20px/1 var(--display);color:var(--paper)}
+.track{height:12px;border-radius:999px;background:rgba(245,239,228,.08);margin-top:8px;overflow:hidden}
+.fill{height:100%;width:0;border-radius:999px;background:var(--gold);transition:width 1.4s cubic-bezier(.3,.7,.2,1)}
+.fill.v{background:var(--green)}
+.badge{position:absolute;right:6px;top:4px;font:600 14px/1 var(--body);padding:9px 13px;border-radius:999px;background:var(--green);color:var(--ink);opacity:0;transform:scale(.8);transition:all .5s}
+.badge.on{opacity:1;transform:scale(1)}
+.bar{display:flex;align-items:center;gap:14px;padding:14px 20px;border-top:1px solid var(--line-d)}
+.ctl{appearance:none;border:0;background:rgba(245,239,228,.08);color:var(--paper);width:42px;height:42px;border-radius:50%;cursor:pointer;display:grid;place-items:center;flex:none}
+.ctl:hover{background:rgba(245,239,228,.16)}
+.ctl svg{width:18px;height:18px;fill:currentColor}
+.prog{flex:1;height:4px;border-radius:999px;background:rgba(245,239,228,.12);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--gold)}
+.time{font-size:13px;color:rgba(245,239,228,.55);min-width:72px;text-align:right}
+/* house states */
+.h-wall{transition:fill 1.2s}
+.h-door{transition:fill 1.2s}
+.h-crack,.h-dust{transition:opacity 1s}
+.h-sign,.h-key,.h-coins{transition:opacity .8s, transform .8s}
+.st-0 .h-sign,.st-0 .h-key,.st-0 .h-coins,.st-1 .h-sign,.st-1 .h-key,.st-1 .h-coins,.st-2 .h-key,.st-2 .h-coins{opacity:0}
+.st-1 .h-crack,.st-2 .h-crack,.st-3 .h-crack,.st-4 .h-crack,.st-1 .h-dust,.st-2 .h-dust,.st-3 .h-dust,.st-4 .h-dust{opacity:0}
+.st-0 .h-wall{fill:#7d7264}.st-0 .h-door{fill:#5a5046}
+.h-coins{animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+
+/* sections */
+section.s{padding:84px 0}
+.s h2{font-size:clamp(30px,3.6vw,46px)}
+.s .intro{margin-top:14px;font-size:18px;color:#4a4238;max-width:40em}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.card .n{font:500 14px/1 var(--display);color:var(--gold-deep);letter-spacing:.08em}
+.card h3{font-size:24px;margin-top:10px}
+.card p{margin-top:10px;font-size:16px;color:#4a4238}
+.card .num{margin-top:16px;font:500 22px/1.1 var(--display)}
+.card .num small{display:block;font:400 13px/1.3 var(--body);color:var(--stone);margin-top:4px}
+.sum{margin-top:40px;background:var(--ink);color:var(--paper);border-radius:20px;padding:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.sum div b{display:block;font:500 clamp(26px,3vw,36px)/1 var(--display);color:var(--gold)}
+.sum div span{display:block;margin-top:8px;font-size:14px;color:rgba(245,239,228,.7)}
+.faq{margin-top:34px;display:grid;gap:12px;max-width:820px}
+details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px}
+summary{cursor:pointer;font:500 19px/1.3 var(--display);list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--gold-deep);font-size:24px;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin-top:10px;color:#4a4238}
+.cta{background:var(--ink);color:var(--paper);text-align:center;padding:84px 0}
+.cta h2{font-size:clamp(30px,3.8vw,48px);font-weight:300}
+.cta p{margin:14px auto 0;max-width:34em;color:rgba(245,239,228,.75)}
+.cta .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.legal{background:var(--ink);color:rgba(245,239,228,.5);font-size:13px;padding:0 0 40px}
+.legal p+p{margin-top:8px}
+
+@media (max-width:860px){
+  .stage{grid-template-columns:1fr;aspect-ratio:auto;min-height:0;padding:22px 20px 18px;gap:6px}
+  .chips{position:static;margin-bottom:6px}
+  .scene-l,.scene-r{padding-top:0}
+  .house{height:140px}
+  .house svg{height:140px}
+  .steps{grid-template-columns:1fr 1fr}
+  .sum{grid-template-columns:1fr 1fr}
+}
+@media (max-width:520px){.steps,.sum{grid-template-columns:1fr}.top a.small{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="top">
+      <a href="/"><img src="/email/lera-logo.png" alt="Lera Real Estate" width="640" height="244"></a>
+      <a class="small" href="/guide/?book=1">Book a free call</a>
+    </div>
+    <p class="kick">Buy to Lets</p>
+    <h1>How a buy-to-let works, <b>in one simple example</b></h1>
+    <p class="lede">Buy, refurb, refinance, rent. Four steps, one real flat, and how your money comes back out at the end. Press play: it takes about 40 seconds.</p>
+
+    <div class="player" id="player" aria-label="Animated walkthrough of a buy-to-let example">
+      <div class="stage st-0" id="stage">
+        <div class="chips" role="tablist">
+          <button class="chip on" data-go="0">1 Buy</button>
+          <button class="chip" data-go="1">2 Refurb</button>
+          <button class="chip" data-go="2">3 Refinance</button>
+          <button class="chip" data-go="3">4 Rent</button>
+          <button class="chip" data-go="4">Then repeat</button>
+        </div>
+        <div class="scene-l">
+          <div class="cap" id="cap" aria-live="polite"></div>
+        </div>
+        <div class="scene-r">
+          <div class="house">
+            <span class="badge" id="badge"></span>
+            <svg viewBox="0 0 240 190" aria-hidden="true">
+              <rect x="30" y="70" width="180" height="110" rx="4" class="h-wall" fill="#E9DFCC"/>
+              <path d="M18 76 L120 14 L222 76 Z" fill="#A4513A"/>
+              <rect x="56" y="96" width="38" height="30" rx="2" fill="#2b3b4a"/><rect x="146" y="96" width="38" height="30" rx="2" fill="#2b3b4a"/>
+              <rect x="56" y="140" width="38" height="30" rx="2" fill="#2b3b4a"/>
+              <rect x="104" y="128" width="32" height="52" rx="2" class="h-door" fill="#15120E"/>
+              <circle cx="129" cy="155" r="2.5" fill="#CFA864"/>
+              <path class="h-crack" d="M160 132 l8 10 -6 8 9 12" stroke="#3a322a" stroke-width="2" fill="none"/>
+              <g class="h-dust" fill="#5a5046" opacity=".55"><circle cx="70" cy="178" r="5"/><circle cx="182" cy="176" r="7"/><circle cx="196" cy="179" r="4"/></g>
+              <g class="h-sign"><rect x="182" y="134" width="4" height="46" fill="#3a322a"/><rect x="160" y="118" width="58" height="26" rx="4" fill="#CFA864"/><text x="189" y="136" text-anchor="middle" font-family="Jost,sans-serif" font-size="13" font-weight="600" fill="#15120E">TO LET</text></g>
+              <g class="h-key"><rect x="146" y="140" width="38" height="30" rx="2" fill="#f3d8a0" opacity=".9"/></g>
+              <g class="h-coins"><circle cx="40" cy="40" r="13" fill="#CFA864"/><text x="40" y="45" text-anchor="middle" font-family="Jost,sans-serif" font-size="14" font-weight="600" fill="#15120E">£</text><circle cx="66" cy="26" r="10" fill="#DDB978"/><text x="66" y="30" text-anchor="middle" font-family="Jost,sans-serif" font-size="11" font-weight="600" fill="#15120E">£</text></g>
+            </svg>
+          </div>
+          <div class="meters">
+            <div class="meter"><div class="lab"><span>Your own money in the deal</span><b id="m-cash">£0</b></div><div class="track"><div class="fill" id="f-cash"></div></div></div>
+            <div class="meter"><div class="lab"><span>What the flat is worth</span><b id="m-val">£0</b></div><div class="track"><div class="fill v" id="f-val"></div></div></div>
+            <div class="meter"><div class="lab"><span>Profit each month</span><b id="m-inc">£0</b></div><div class="track"><div class="fill" id="f-inc" style="background:#DDB978"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bar">
+        <button class="ctl" id="pp" aria-label="Play"><svg viewBox="0 0 24 24" id="pp-i"><path d="M8 5v14l11-7z"/></svg></button>
+        <button class="ctl" id="rs" aria-label="Start again"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg></button>
+        <div class="prog"><i id="prog"></i></div>
+        <span class="time" id="time">0:00 / 0:40</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="s">
+  <div class="wrap">
+    <h2>The four steps, written out</h2>
+    <p class="intro">This is a real flat we have agreed on the Isle of Wight. The figures are rounded to keep them simple.</p>
+    <div class="steps">
+      <div class="card"><div class="n">STEP 1</div><h3>Buy</h3><p>We buy a 2-bed flat below its value. A short-term loan (a bridging loan) pays for most of it, so you only put in part of the money.</p><div class="num">£55,000<small>purchase price. You put in about £31,000, including all costs.</small></div></div>
+      <div class="card"><div class="n">STEP 2</div><h3>Refurb</h3><p>A light refresh: paint, flooring and a deep clean, so it's ready for a tenant and worth what similar flats sell for.</p><div class="num">£1,500<small>of works. The flat is now worth about £95,000.</small></div></div>
+      <div class="card"><div class="n">STEP 3</div><h3>Refinance</h3><p>You take a normal buy-to-let mortgage on the new value. That pays off the bridging loan, and the rest comes back to you.</p><div class="num">£76,000<small>mortgage (80% of £95,000). Your £31,000 comes back, plus about £2,500.</small></div></div>
+      <div class="card"><div class="n">STEP 4</div><h3>Rent</h3><p>A tenant moves in. The rent covers the mortgage, insurance and management, and what's left over is yours every month.</p><div class="num">£650<small>rent a month. You keep about £136 a month after every cost.</small></div></div>
+    </div>
+    <div class="sum">
+      <div><b>£31k</b><span>your money in at the start</span></div>
+      <div><b>£0</b><span>of your money left in after refinancing</span></div>
+      <div><b>£136</b><span>profit each month after all costs</span></div>
+      <div><b>Repeat</b><span>use the same money on the next one</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="s" style="padding-top:0">
+  <div class="wrap">
+    <h2>Common questions</h2>
+    <div class="faq">
+      <details><summary>What is a bridging loan?</summary><p>A short-term loan used to buy a property quickly, before a normal mortgage is in place. It usually lasts a few months and is paid off in full when you refinance in step 3.</p></details>
+      <details><summary>Why does refinancing give me my money back?</summary><p>The bank lends against what the flat is worth now, not what you paid. Because it was bought below its value and refreshed, 80% of the new value is enough to pay off the bridging loan and return your own money.</p></details>
+      <details><summary>What if the valuation comes in lower?</summary><p>Then some of your money stays in the deal until the value rises. You still own the flat and still collect the rent. We only pick flats bought well below what similar ones have sold for, to give room for this.</p></details>
+      <details><summary>Do I have to manage the tenant?</summary><p>No. A letting agent finds the tenant and handles repairs, and that cost is already included in the £136 a month.</p></details>
+      <details><summary>What does Lera do?</summary><p>We find the deal, check the legal pack, arrange the refurb, line up the bridging and the mortgage broker, and get it let. You make the decisions; we do the legwork.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Want to see one that fits your budget?</h2>
+    <p>Book a free 15-minute call with Akiva, our founder. We'll go through a live deal with you, line by line.</p>
+    <div class="btns">
+      <a class="btn btn-gold" href="/guide/?book=1">Book a free call</a>
+      <a class="btn btn-ghost" href="/guide/">Get the free HMO guide</a>
+    </div>
+  </div>
+</section>
+<footer class="legal">
+  <div class="wrap">
+    <p>Nothing on this page is financial, investment, tax or legal advice. Figures are an illustrative example, rounded, and are not a forecast or a guarantee. Property values and rents can fall, mortgage rates and lending terms change, and refinancing depends on the lender's valuation.</p>
+    <p>AS London 4 Ltd trading as Lera Real Estate, 137–139 Brent Street, London NW4 4DJ. <a href="mailto:info@lera-realestate.com">info@lera-realestate.com</a></p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var S=[
+    {n:'STEP 1',t:'Buy',p:'You buy a 2-bed flat for <b>£55,000</b>. A short-term bridging loan covers most of it, so you put in about <b>£31,000</b>, including all costs.',cash:31,val:55,inc:0,badge:''},
+    {n:'STEP 2',t:'Refurb',p:'A light refresh: paint, flooring, a deep clean. About <b>£1,500</b>. Now it’s worth what similar flats sell for: about <b>£95,000</b>.',cash:31,val:95,inc:0,badge:'+£40,000 value'},
+    {n:'STEP 3',t:'Refinance',p:'A normal buy-to-let mortgage at 80% of the new value: <b>£76,000</b>. It pays off the bridging loan, and your <b>£31,000 comes back to you</b>, plus about £2,500.',cash:0,val:95,inc:0,badge:'Your money back'},
+    {n:'STEP 4',t:'Rent',p:'A tenant moves in at <b>£650 a month</b>. After the mortgage, insurance and management, you keep about <b>£136 a month</b>, with none of your own money left in.',cash:0,val:95,inc:136,badge:'£136 a month'},
+    {n:'THEN',t:'Repeat',p:'You still own the flat and collect the rent. And the £31,000 you got back can go into <b>the next one</b>.',cash:0,val:95,inc:136,badge:'Ready for the next'}
+  ];
+  var DUR=8000, TOTAL=S.length*DUR, el=function(i){return document.getElementById(i)};
+  var stage=el('stage'),cap=el('cap'),badge=el('badge'),chips=[].slice.call(document.querySelectorAll('.chip'));
+  var cur=-1,t0=0,elapsed=0,playing=false,raf=0;
+  function money(k){return k?'£'+(k>=1000?k.toLocaleString('en-GB'):k.toLocaleString('en-GB')):'£0'}
+  function show(i){
+    if(i===cur)return; cur=i; var s=S[i];
+    stage.className='stage st-'+i;
+    chips.forEach(function(c,j){c.classList.toggle('on',j===i);c.classList.toggle('done',j<i)});
+    cap.classList.add('out');
+    setTimeout(function(){cap.innerHTML='<div class="step-n">'+s.n+'</div><h2>'+s.t+'</h2><p>'+s.p+'</p>';cap.classList.remove('out')},220);
+    el('m-cash').textContent=money(s.cash*1000); el('f-cash').style.width=(s.cash/31*100)+'%';
+    el('m-val').textContent=money(s.val*1000); el('f-val').style.width=(s.val/95*100)+'%';
+    el('m-inc').textContent=s.inc?money(s.inc)+' a month':'£0'; el('f-inc').style.width=(s.inc/136*100)+'%';
+    badge.textContent=s.badge; badge.classList.toggle('on',!!s.badge);
+  }
+  function fmt(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
+  function tick(now){
+    if(!playing)return;
+    elapsed=Math.max(0,Math.min(TOTAL,now-t0));
+    show(Math.min(S.length-1,Math.floor(elapsed/DUR)));
+    el('prog').style.width=(elapsed/TOTAL*100)+'%';
+    el('time').textContent=fmt(elapsed)+' / '+fmt(TOTAL);
+    if(elapsed>=TOTAL){pause();return}
+    raf=requestAnimationFrame(tick);
+  }
+  function play(){if(elapsed>=TOTAL)elapsed=0;playing=true;t0=performance.now()-elapsed;setIcon();raf=requestAnimationFrame(tick);try{fbq('trackCustom','BTLVideoPlay')}catch(x){}}
+  function pause(){playing=false;cancelAnimationFrame(raf);setIcon()}
+  function setIcon(){el('pp-i').innerHTML=playing?'<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>':'<path d="M8 5v14l11-7z"/>';el('pp').setAttribute('aria-label',playing?'Pause':'Play')}
+  el('pp').onclick=function(){playing?pause():play()};
+  el('rs').onclick=function(){elapsed=0;cur=-1;show(0);el('prog').style.width='0';if(!playing)play();else t0=performance.now()};
+  chips.forEach(function(c){c.onclick=function(){elapsed=+c.dataset.go*DUR+1;cur=-1;show(+c.dataset.go);if(playing)t0=performance.now()-elapsed;else{el('prog').style.width=(elapsed/TOTAL*100)+'%';el('time').textContent=fmt(elapsed)+' / '+fmt(TOTAL)}}});
+  show(0);
+  var auto=/[?&]autoplay=1/.test(location.search);
+  if(auto)play();
+  else if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&elapsed===0&&!playing){play();io.disconnect()}})},{threshold:.6});io.observe(el('player'))}
+})();
+</script>
+</body>
+</html>
