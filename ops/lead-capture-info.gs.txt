@@ -224,7 +224,8 @@ function syncGmail() {
       people.forEach(function (who) {
         var c = findContact_(who); if (!c) return;
         logComm_(c, when + ' EMAIL ' + (out ? 'to them' : 'from them') + ': ' + subj + (snip ? ' - ' + snip : ''));
-        if (out) advance_(c, 'Contacted');
+        // automatic emails (guide, booking confirmations, reminders) don't count as us getting in touch
+        if (out && !/^(Your free HMO guide is here|You're booked in|In one hour:|Starting now:|Your free guide:)/.test(subj)) advance_(c, 'Contacted');
       });
     } catch (x) { console.error('Gmail sync ' + m.getId() + ': ' + x); }
   });
