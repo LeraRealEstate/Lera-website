@@ -154,7 +154,8 @@ function doPost(e) {
   var isAd = /facebook|instagram|^fb|^ig|meta/.test(src) || !!p.fbclid;
   var name = String(p.name || [p.first_name, p.last_name].filter(String).join(' ') || '').trim();
   var when = Utilities.formatDate(new Date(), 'Europe/London', 'dd/MM HH:mm');
-  var action = p.action === 'call' ? 'Booked / requested a call' : p.action === 'enquiry' ? 'Website enquiry' : 'Downloaded HMO guide';
+  var guideName = p.guide === 'btl' ? 'Downloaded buy-to-let guide' : 'Downloaded HMO guide';
+  var action = p.action === 'call' ? 'Booked / requested a call' : p.action === 'enquiry' ? 'Website enquiry' : guideName;
   var line = when + ' ' + action + (p.message ? ': ' + p.message : '') + (p.page ? ' (' + p.page + ')' : '');
 
   var lock = LockService.getScriptLock();
@@ -173,7 +174,7 @@ function doPost(e) {
         'name': name, 'phone': String(p.phone || ''), 'email': String(p.email || ''),
         'source': isAd ? (src.indexOf('insta') > -1 ? 'Instagram ad' : 'Facebook ad') : 'Website' + (p.referrer ? ' (came from ' + p.referrer + ')' : ''),
         'status': 'New', 'budget': p.budget || '',
-        'looking for': p.action === 'call' ? 'Asked for a call' : p.action === 'enquiry' ? 'Website enquiry' : 'Downloaded HMO guide',
+        'looking for': (p.action === 'call' ? 'Asked for a call' : p.action === 'enquiry' ? 'Website enquiry' : guideName) + (p.guide === 'btl' ? ' (buy-to-let)' : ''),
         'notes': p.message || '', 'communication log': line, 'last contacted': '',
         'campaign': p.utm_campaign || '', 'ad': p.utm_content || '', 'landing page': p.page || '', 'meta click id': p.fbclid || ''
       };
@@ -191,7 +192,7 @@ function doPost(e) {
 // New-lead alert to info@ (sent from Google's servers, so it can't be lost the way FormSubmit alerts were)
 function alertLead_(p, existing) {
   var rows = [['Name', p.name], ['Email', p.email], ['Phone', p.phone], ['Budget', p.budget], ['Timeline', p.timeline],
-    ['Wants', p.action === 'call' ? 'A call' : p.action === 'enquiry' ? 'Enquiry' : 'The guide'], ['Page', p.page],
+    ['Wants', (p.action === 'call' ? 'A call' : p.action === 'enquiry' ? 'Enquiry' : p.guide === 'btl' ? 'The buy-to-let guide' : 'The HMO guide') + (p.guide === 'btl' && p.action === 'call' ? ' (buy-to-let page)' : '')], ['Page', p.page],
     ['Campaign', p.utm_campaign], ['Ad', p.utm_content], ['Message', p.message],
     ['On the Sheet', existing ? 'Already a contact - added to their record (' + existing.sh.getName() + ')' : 'New row on the Leads tab']]
     .filter(function (r) { return r[1]; });
@@ -240,7 +241,7 @@ function syncGmail() {
         var c = findContact_(who); if (!c) return;
         logComm_(c, when + ' EMAIL ' + (out ? 'to them' : 'from them') + ': ' + subj + (snip ? ' - ' + snip : ''));
         // automatic emails (guide, booking confirmations, reminders) don't count as us getting in touch
-        if (out && !/^(Your free HMO guide is here|You're booked in|In one hour:|Starting now:|Your free guide:)/.test(subj)) advance_(c, 'Contacted');
+        if (out && !/^(Your free HMO guide is here|Your free buy-to-let guide is here|You're booked in|In one hour:|Starting now:|Your free guide:)/.test(subj)) advance_(c, 'Contacted');
       });
     } catch (x) { console.error('Gmail sync ' + m.getId() + ': ' + x); }
   });
@@ -299,6 +300,9 @@ function notifyLead_(p) {
       'Hi ' + first + ',\n\nThanks for asking for a call. If you haven\'t picked a time yet, choose one here:\n' + BOOK_URL +
       '\n\nIt\'s 15 minutes with an HMO specialist. We\'ll go through what your budget could do and walk you through a real deal line by line.\n\nLera Real Estate\n' + REPLY_TO);
     sendWa_(p.phone, 'lera_call_request', [first]);
+  } else if (p.guide === 'btl') {
+    if (email) sendMail_(email, 'Your free buy-to-let guide is here, ' + first,
+      'Hi ' + first + ',\n\nHere\'s your copy of the Lera buy-to-let guide: ' + BTL_GUIDE_URL + '\n\nWant to talk it through? Book a free call with Akiva: ' + BOOK_URL + '\n\nLera Real Estate', btlGuideEmail_(first));
   } else {
     if (email) sendMail_(email, 'Your free HMO guide is here, ' + first,
       'Hi ' + first + ',\n\nHere\'s your copy of the Lera HMO guide: ' + GUIDE_URL + '\n\nWant to talk it through? Book a free call with Akiva: ' + BOOK_URL + '\n\nLera Real Estate', guideEmail_(first));
@@ -561,6 +565,19 @@ function guideEmail_(first) {
     '<p style="margin:20px 0 0">If you\'d like to see what your budget could do, book a free 15-minute call with Akiva. Video or phone, whichever suits you.</p>' +
     btn_(BOOK_URL, 'Book a free call', true);
   return shell_('Your copy of HMOs In & Out, with four real projects and every number.', inner);
+}
+
+var BTL_GUIDE_URL = 'https://lera-realestate.com/lera-btl-guide.pdf';
+function btlGuideEmail_(first) {
+  var inner = kick_('Your free guide') + h1_('Here\'s your buy-to-let guide, ' + esc_(first) + '.') +
+    '<p style="margin:0">Thanks for downloading <b>Buy-to-Lets In &amp; Out</b>. It shows exactly how we put a buy-to-let together for our investors, with one clear example and every number shown.</p>' +
+    btn_(BTL_GUIDE_URL, 'Open the guide') +
+    '<p style="margin:26px 0 8px;font-weight:600;color:#15120E">Inside, you\'ll see:</p>' +
+    '<p style="margin:0">✓ How to buy below value, refresh, refinance and rent<br>✓ How most or all of your money comes back out<br>✓ The lender\'s rent test and every cost to plan for<br>✓ The rules in 2026, and the risks</p>' +
+    host_('Want to talk it through?') +
+    '<p style="margin:20px 0 0">If you\'d like to see a live deal in your budget, book a free 15-minute call with Akiva. Video or phone, whichever suits you.</p>' +
+    btn_(BOOK_URL, 'Book a free call', true);
+  return shell_('Your copy of Buy-to-Lets In & Out, with every number shown.', inner);
 }
 
 function bookedEmail_(first, whenTxt, video, meet, phone) {
