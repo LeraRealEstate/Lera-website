@@ -386,6 +386,17 @@ section{padding:110px 0}
 .bsum span{display:block;margin-top:8px;font-size:14px;color:rgba(245,239,228,.7)}
 @media (max-width:860px){.bsteps,.bsum{grid-template-columns:1fr 1fr}}
 @media (max-width:520px){.bsteps{grid-template-columns:1fr}}
+
+.cba{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}
+.cba figure{margin:0;position:relative;border-radius:16px;overflow:hidden;aspect-ratio:3/4;background:#e9e1d3}
+.cba img{width:100%;height:100%;object-fit:cover;display:block}
+.cba figcaption{position:absolute;left:10px;top:10px;font:600 11px var(--body);letter-spacing:.14em;text-transform:uppercase;background:rgba(21,18,14,.78);color:#F5EFE4;padding:6px 10px;border-radius:99px}
+.cba figure:nth-child(even) figcaption{background:var(--gold);color:var(--ink)}
+.cflow{display:flex;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.cf{flex:1;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.cf span{display:block;font-size:13px;color:var(--stone)}.cf b{font:500 24px var(--display)}
+.cf-a{color:var(--gold-deep);font:300 22px var(--display)}
+@media (max-width:760px){.cba{grid-template-columns:1fr 1fr}.cf-a{display:none}.cf{min-width:40%}}
 </style>
 </head>
 <body>
@@ -446,6 +457,34 @@ section{padding:110px 0}
     </div>
     <div class="ctas" style="margin-top:34px"><button class="btn btn-ink" data-open="guide">Get the free guide</button></div>
     <p class="disclaim">Illustrative example, rounded, before tax. Real figures depend on the property, the lender's valuation and mortgage rates. Property values and rents can fall. Your capital is at risk.</p>
+  </div>
+</section>
+
+<section id="chorley" style="padding-top:0">
+  <div class="wrap">
+    <p class="kicker">A real Lera buy-to-let</p>
+    <h2 class="sec-h">Chorley: bought for £90k, now worth £125k.</h2>
+    <p class="sec-p">A tired terraced house in Chorley, Lancashire, left full of rubbish. We cleared it, repaired the chimney, treated the damp and gave it a full refresh for about £9,000, then let it at £850 a month.</p>
+    <div class="cba">
+      <figure><img src="/img/chorley-before-043.jpg" alt="Chorley bedroom as bought, full of rubbish" loading="lazy"><figcaption>Before</figcaption></figure>
+      <figure><img src="/img/chorley-done-039.jpg" alt="Chorley main bedroom after the refresh" loading="lazy"><figcaption>After</figcaption></figure>
+      <figure><img src="/img/chorley-before-032.jpg" alt="Chorley front room with walls stripped" loading="lazy"><figcaption>Before</figcaption></figure>
+      <figure><img src="/img/chorley-done-012.jpg" alt="Chorley front room after the refresh" loading="lazy"><figcaption>After</figcaption></figure>
+    </div>
+    <div class="cflow">
+      <div class="cf"><span>Bought for</span><b>£90,000</b></div><div class="cf-a">+</div>
+      <div class="cf"><span>Works</span><b>£9,000</b></div><div class="cf-a">→</div>
+      <div class="cf"><span>Valued at</span><b>£125,000</b></div><div class="cf-a">→</div>
+      <div class="cf"><span>Rent</span><b>£850/m</b></div>
+    </div>
+    <div class="bsum" style="margin-top:14px">
+      <div><b>£46k</b><span>cash in, including every cost and our fees</span></div>
+      <div><b>£26k</b><span>back out at refinance</span></div>
+      <div><b>£20k</b><span>left in the deal</span></div>
+      <div><b>17%</b><span>a year on the money left in</span></div>
+    </div>
+    <div class="ctas" style="margin-top:26px"><a class="btn btn-ink" href="/#chorley">See every photo and number</a></div>
+    <p class="disclaim">A completed Lera project. Rounded; refinance at 75% of the valuation, mortgage at 5% interest-only, 15% of rent for the agent and empty weeks. Past results are not a guide to future returns. Your capital is at risk.</p>
   </div>
 </section>
 
@@ -525,7 +564,7 @@ section{padding:110px 0}
       <p class="bt">Buy-to-Lets <i>In &amp; Out.</i></p>
       <p class="bs">How a buy-to-let really works, from finding the property to getting your money back out.</p>
       <div class="bk"><div><b>£50k+</b><small>a sensible start</small></div><div><b>~£0</b><small>left in, done well</small></div><div><b>4</b><small>simple steps</small></div></div>
-    </div><span class="pg">14<small>pages</small></span></div>
+    </div><span class="pg">15<small>pages</small></span></div>
     <div>
       <p class="kicker">Not ready to talk yet?</p>
       <h2 class="sec-h">Read the whole playbook first.</h2>
@@ -760,7 +799,7 @@ section{padding:110px 0}
   function startDownload(){
     var bar=$('#dlbar'),pct=$('#dlpct'),msg=$('#dlmsg');
     if(!window.fetch||!window.ReadableStream){location.href=PDF;return}
-    fetch(PDF).then(function(r){var total=+r.headers.get('content-length')||250000,got=0,chunks=[],rd=r.body.getReader();
+    fetch(PDF).then(function(r){var total=+r.headers.get('content-length')||2500000,got=0,chunks=[],rd=r.body.getReader();
       function pump(){return rd.read().then(function(x){if(x.done)return;chunks.push(x.value);got+=x.value.length;var v=Math.min(100,Math.round(got/total*100));bar.style.width=v+'%';pct.textContent=v+'%';return pump()})}
       return pump().then(function(){bar.style.width='100%';pct.textContent='100%';msg.innerHTML='<b>Downloaded.</b> Check your downloads folder, or <a href="'+PDF+'" target="_blank" rel="noopener">open the guide here</a>.';saveBlob(new Blob(chunks,{type:'application/pdf'}));trackC('GuideDownloaded')})
     }).catch(function(){msg.innerHTML='The download didn’t start. <a href="'+PDF+'" target="_blank" rel="noopener">Open the guide here</a>.'})}
@@ -769,7 +808,7 @@ section{padding:110px 0}
     var revs=$$('.rv blockquote').slice(0,3).map(function(b){return '<figure class="mrv"><span class="rv-st">★★★★★</span><blockquote>'+b.innerHTML+'</blockquote><figcaption>Google review</figcaption></figure>'}).join('');
     var wa=set(LERA.WHATSAPP)?'<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+LERA.WHATSAPP+'?text='+encodeURIComponent("Hi, it's "+name+". I've just downloaded the buy-to-let guide and I'd like to find out more.")+'">Message us on WhatsApp</a>':'';
     var h='<h2>Your guide is downloading, '+first+'.</h2>'+
-      '<p class="sub">Buy-to-Lets In &amp; Out is 14 pages, so it should only take a few seconds.</p>'+
+      '<p class="sub">Buy-to-Lets In &amp; Out is 15 pages, so it should only take a few seconds.</p>'+
       '<div class="dlwrap"><div class="dltrack"><i id="dlbar"></i></div><span id="dlpct">0%</span></div>'+
       '<p class="dlmsg" id="dlmsg">Keep this window open while it downloads.</p>'+
       '<h3 class="mrv-h">While you wait, here’s what our clients say</h3><div class="mrvs">'+revs+'</div>'+
