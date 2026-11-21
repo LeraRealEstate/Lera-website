@@ -570,10 +570,10 @@ function guideEmail_(first) {
 var BTL_GUIDE_URL = 'https://lera-realestate.com/lera-btl-guide.pdf';
 function btlGuideEmail_(first) {
   var inner = kick_('Your free guide') + h1_('Here\'s your buy-to-let guide, ' + esc_(first) + '.') +
-    '<p style="margin:0">Thanks for downloading <b>Buy-to-Lets In &amp; Out</b>. It shows exactly how we put a buy-to-let together for our investors, with one clear example and every number shown.</p>' +
+    '<p style="margin:0">Thanks for downloading <b>Buy-to-Lets In &amp; Out</b>. It walks you through the four steps of a buy-to-let, with a real Lera deal in Chorley and every number shown.</p>' +
     btn_(BTL_GUIDE_URL, 'Open the guide') +
     '<p style="margin:26px 0 8px;font-weight:600;color:#15120E">Inside, you\'ll see:</p>' +
-    '<p style="margin:0">✓ How to buy below value, refresh, refinance and rent<br>✓ How most or all of your money comes back out<br>✓ The lender\'s rent test and every cost to plan for<br>✓ The rules in 2026, and the risks</p>' +
+    '<p style="margin:0">✓ The four steps: buy, refurbish, refinance, rent<br>✓ How most or all of your money comes back out<br>✓ The lender\'s rent test and every cost to plan for<br>✓ The rules in 2026, and the risks</p>' +
     host_('Want to talk it through?') +
     '<p style="margin:20px 0 0">If you\'d like to see a live deal in your budget, book a free 15-minute call with Akiva. Video or phone, whichever suits you.</p>' +
     btn_(BOOK_URL, 'Book a free call', true);
