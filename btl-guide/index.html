@@ -397,6 +397,12 @@ section{padding:110px 0}
 .cf span{display:block;font-size:13px;color:var(--stone)}.cf b{font:500 24px var(--display)}
 .cf-a{color:var(--gold-deep);font:300 22px var(--display)}
 @media (max-width:760px){.cba{grid-template-columns:1fr 1fr}.cf-a{display:none}.cf{min-width:40%}}
+.book.book-img{padding:0;overflow:hidden}.book.book-img img{width:100%;height:100%;object-fit:cover;display:block}
+.inside{margin-top:56px}.inside h3{font:500 15px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-d,#A9833F);margin:0 0 16px}
+.inside-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.inside-row figure{margin:0}.inside-row img{width:100%;aspect-ratio:210/297;object-fit:cover;border-radius:6px;box-shadow:0 18px 40px -22px rgba(21,18,14,.55);display:block;background:#fff}
+.inside-row figcaption{font-size:13px;color:#857B6D;margin-top:8px}
+@media(max-width:760px){.cover .pg{right:-4px;width:80px;height:80px}.inside-row{grid-template-columns:repeat(5,62%);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}.inside-row figure{scroll-snap-align:start}}
 </style>
 </head>
 <body>
@@ -484,7 +490,7 @@ section{padding:110px 0}
       <div><b>17%</b><span>a year on the money left in</span></div>
     </div>
     <div class="ctas" style="margin-top:26px"><a class="btn btn-ink" href="/#chorley">See every photo and number</a></div>
-    <p class="disclaim">A completed Lera project. Rounded; refinance at 75% of the valuation, mortgage at 5% interest-only, 15% of rent for the agent and empty weeks. Past results are not a guide to future returns. Your capital is at risk.</p>
+    <p class="disclaim">A completed Lera project. Rounded; refinance at 75% of the valuation, mortgage at 4.5% interest-only, 15% of rent for the agent and empty weeks. Past results are not a guide to future returns. Your capital is at risk.</p>
   </div>
 </section>
 
@@ -558,13 +564,7 @@ section{padding:110px 0}
 
 <section class="guide">
   <div class="wrap gwrap">
-    <div class="cover"><div class="book" role="img" aria-label="Cover of Buy-to-Lets In and Out, the free Lera Real Estate guide">
-      <div class="bl"><img src="/email/lera-logo.png" alt=""><span>The investor's guide<br>UK buy-to-let 2026</span></div>
-      <div class="bg" style="display:grid;place-items:center"><svg viewBox="0 0 400 300" width="80%" fill="none" stroke="#CFA864" stroke-width="2"><path d="M40 150 L200 40 L360 150"/><path d="M70 130 V280 H330 V130"/><rect x="170" y="200" width="60" height="80"/><rect x="100" y="160" width="50" height="45"/><rect x="250" y="160" width="50" height="45"/><path d="M280 85 V55 H305 V102"/></svg></div>
-      <p class="bt">Buy-to-Lets <i>In &amp; Out.</i></p>
-      <p class="bs">How a buy-to-let really works, from finding the property to getting your money back out.</p>
-      <div class="bk"><div><b>£50k+</b><small>a sensible start</small></div><div><b>~£0</b><small>left in, done well</small></div><div><b>4</b><small>simple steps</small></div></div>
-    </div><span class="pg">15<small>pages</small></span></div>
+    <div class="cover"><div class="book book-img" role="img" aria-label="Cover of Buy-to-Lets In and Out, the free Lera Real Estate guide"><img src="/img/btl-guide/cover.jpg" alt="Buy-to-Lets In and Out guide cover"></div><span class="pg">16<small>pages</small></span></div>
     <div>
       <p class="kicker">Not ready to talk yet?</p>
       <h2 class="sec-h">Read the whole playbook first.</h2>
@@ -572,11 +572,19 @@ section{padding:110px 0}
       <ul class="chap">
         <li><b>The four steps</b><span>Buy, refurbish, refinance, rent, shown with a real Lera deal.</span></li>
         <li><b>The money</b><span>Where the money goes, and how it comes back out.</span></li>
+        <li><b>The growth</b><span>What the house could be worth in 10 years.</span></li>
         <li><b>The rules</b><span>Renting in 2026, made simple.</span></li>
       </ul>
       <button class="btn btn-ink" data-open="guide">Get the free guide</button>
     </div>
   </div>
+  <div class="wrap inside"><h3>A look inside</h3><div class="inside-row">
+    <figure><img src="/img/btl-guide/buy.jpg" alt="Guide page: Buy below value" loading="lazy"><figcaption>Buy, with every cost</figcaption></figure>
+    <figure><img src="/img/btl-guide/refurbish.jpg" alt="Guide page: Refurbish" loading="lazy"><figcaption>Refurbish, before and after</figcaption></figure>
+    <figure><img src="/img/btl-guide/rent.jpg" alt="Guide page: Rent" loading="lazy"><figcaption>Rent, £3,360 a year</figcaption></figure>
+    <figure><img src="/img/btl-guide/growth.jpg" alt="Guide page: Capital growth" loading="lazy"><figcaption>Growth over 10 years</figcaption></figure>
+    <figure><img src="/img/btl-guide/chorley.jpg" alt="Guide page: Chorley start to finish" loading="lazy"><figcaption>Chorley, start to finish</figcaption></figure>
+  </div></div>
 </section>
 
 <section style="padding-top:0">
