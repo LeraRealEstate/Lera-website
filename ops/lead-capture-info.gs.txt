@@ -302,7 +302,7 @@ function notifyLead_(p) {
     sendWa_(p.phone, 'lera_call_request', [first]);
   } else if (p.guide === 'btl') {
     if (email) sendMail_(email, 'Your free buy-to-let guide is here, ' + first,
-      'Hi ' + first + ',\n\nHere\'s your copy of the Lera buy-to-let guide: ' + BTL_GUIDE_URL + '\n\nWant to talk it through? Book a free call with Akiva: ' + BOOK_URL + '\n\nLera Real Estate', btlGuideEmail_(first));
+      'Hi ' + first + ',\n\nHere\'s your copy of the Lera buy-to-let guide: ' + BTL_GUIDE_URL + '\n\nWant to talk it through? Book a free call with Akiva: ' + BTL_BOOK_URL + '\n\nLera Real Estate', btlGuideEmail_(first));
   } else {
     if (email) sendMail_(email, 'Your free HMO guide is here, ' + first,
       'Hi ' + first + ',\n\nHere\'s your copy of the Lera HMO guide: ' + GUIDE_URL + '\n\nWant to talk it through? Book a free call with Akiva: ' + BOOK_URL + '\n\nLera Real Estate', guideEmail_(first));
@@ -568,6 +568,7 @@ function guideEmail_(first) {
 }
 
 var BTL_GUIDE_URL = 'https://lera-realestate.com/lera-btl-guide.pdf';
+var BTL_BOOK_URL  = 'https://lera-realestate.com/btl-guide/' + String.fromCharCode(63) + 'book=1';
 function btlGuideEmail_(first) {
   var inner = kick_('Your free guide') + h1_('Here\'s your buy-to-let guide, ' + esc_(first) + '.') +
     '<p style="margin:0">Thanks for downloading <b>Buy-to-Lets In &amp; Out</b>. It walks you through the four steps of a buy-to-let, with a real Lera deal in Chorley and every number shown.</p>' +
@@ -576,7 +577,7 @@ function btlGuideEmail_(first) {
     '<p style="margin:0">✓ The four steps: buy, refurbish, refinance, rent<br>✓ How most or all of your money comes back out<br>✓ The lender\'s rent test and every cost to plan for<br>✓ The rules in 2026, and the risks</p>' +
     host_('Want to talk it through?') +
     '<p style="margin:20px 0 0">If you\'d like to see a live deal in your budget, book a free 15-minute call with Akiva. Video or phone, whichever suits you.</p>' +
-    btn_(BOOK_URL, 'Book a free call', true);
+    btn_(BTL_BOOK_URL, 'Book a free call', true);
   return shell_('Your copy of Buy-to-Lets In & Out, with every number shown.', inner);
 }
 
