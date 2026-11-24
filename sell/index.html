@@ -166,6 +166,19 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 .basis{font-size:13px;color:var(--mud);margin-top:8px}
 .nextup{background:var(--sand);border-radius:14px;padding:16px 18px;margin-bottom:14px;font-size:15px}.nextup b{display:block;margin-bottom:2px}
 .proof2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.proof2 img{width:100%;aspect-ratio:2.2/1;object-fit:cover;border-radius:18px}.note{text-align:center;color:var(--mu);font-size:14px;margin-top:14px}
+.intro{max-width:720px;margin:-28px auto 48px;text-align:center;font-size:19px;color:var(--mu)}.dark .intro{color:var(--mud)}
+.pack{display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,64px);align-items:center}
+.pack .t{flex:1 1 420px;min-width:0}.pack .t h2{text-align:left;margin-bottom:18px}.pack .t p{font-size:19px;color:#4A4036;margin-bottom:14px}
+.doc{flex:1 1 380px;min-width:0;background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 30px 70px rgba(15,12,9,.12)}
+.doc .dh{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:6px}
+.doc .dh b{font-family:var(--D);font-weight:500;font-size:22px}.doc .dh span{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--gd)}
+.doc ul{list-style:none;margin:0;padding:0}.doc li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #F2E8D8;font-size:16px}.doc li:last-child{border-bottom:0}.doc li span{color:var(--mu)}.doc li b{font-weight:600}
+.free{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;max-width:1000px;margin:0 auto}
+.free div{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-weight:600}
+.free svg{flex:0 0 22px;width:22px;height:22px;color:var(--gd)}
+.band{background:var(--ink2);color:#FBF6EE;border-radius:22px;padding:clamp(26px,4vw,40px);display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
+.band h3{font-size:clamp(26px,3vw,34px);margin-bottom:6px}.band p{color:var(--mud);max-width:560px}
+.band a{background:var(--gold);color:#17110A;text-decoration:none;font-weight:700;padding:16px 26px;border-radius:12px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -258,6 +271,7 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 
 <section><div class="wrap">
 <h2 class="h2">What we <em>do.</em></h2>
+<p class="intro">Most landlords sell through a high-street agent, who markets to homebuyers. We sell straight to property investors instead. They buy for the rent, so your tenants can stay, and because the investor pays our fee, selling costs you nothing.</p>
 <div class="what">
 <div><div class="ic"><svg><use href="#ppl"/></svg></div><h3>Investors ready to buy</h3><p>Our network buys across the UK, tenanted and empty.</p></div>
 <div><div class="ic"><svg><use href="#key"/></svg></div><h3>We match and sell</h3><p>We find the right buyer and handle it to completion.</p></div>
@@ -267,6 +281,7 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 
 <section class="dark" id="compare"><div class="wrap">
 <h2 class="h2">Estate agent <span class="vs">vs</span> <em>Lera.</em></h2>
+<p class="intro">Estate agents sell homes, not investments. Their buyers want it empty, which usually means months of notice, lost rent and a refurb before you even get an offer.</p>
 <div class="slide">
 <div class="sr sh"><div></div><div>Estate agent</div><div class="lc">Lera</div></div>
 <div class="sr"><div class="k">Your selling fee</div><div class="x"><svg><use href="#no"/></svg>1–1.5% + VAT</div><div class="y lc"><svg><use href="#ok"/></svg>£0. The buyer pays</div></div>
@@ -274,6 +289,25 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 <div class="sr"><div class="k">Tenants</div><div class="x"><svg><use href="#no"/></svg>Usually have to leave</div><div class="y lc"><svg><use href="#ok"/></svg>Can stay</div></div>
 <div class="sr"><div class="k">Condition</div><div class="x"><svg><use href="#no"/></svg>Refurb to sell</div><div class="y lc"><svg><use href="#ok"/></svg>Sold as it is</div></div>
 <div class="sr"><div class="k">Viewings</div><div class="x"><svg><use href="#no"/></svg>Open to the public</div><div class="y lc"><svg><use href="#ok"/></svg>Discreet, by arrangement</div></div>
+</div>
+</div></section>
+
+<section><div class="wrap pack">
+<div class="t">
+<h2 class="h2">The Lera <em>Deal Pack.</em></h2>
+<p>Investors don't buy on photos. They buy on numbers. So we turn your property into a clear investment pack: the rent, the yield, the costs to buy and how it could be financed.</p>
+<p>That means investors can decide quickly, with less back-and-forth, and your property stands out against everything else they're looking at.</p>
+</div>
+<div class="doc" aria-label="Example deal pack">
+<div class="dh"><b>Deal Pack</b><span>Example</span></div>
+<ul>
+<li><span>Property</span><b>Terraced house, tenanted</b></li>
+<li><span>Monthly rent</span><b>£850</b></li>
+<li><span>Gross yield</span><b>8.2%</b></li>
+<li><span>Costs to buy</span><b>Itemised</b></li>
+<li><span>Finance options</span><b>Cash, mortgage, bridge</b></li>
+<li><span>Photos and documents</span><b>Included</b></li>
+</ul>
 </div>
 </div></section>
 
@@ -290,6 +324,19 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 <div><div class="ic"><svg><use href="#ppl"/></svg><i>2</i></div><h3>Matched</h3><p>To our investors</p></div>
 <div><div class="ic"><svg><use href="#key"/></svg><i>3</i></div><h3>Sold</h3><p>You choose the offer</p></div>
 </div>
+</div></section>
+
+<section><div class="wrap">
+<h2 class="h2">Everything we do. <em>Free to you.</em></h2>
+<div class="free">
+<div><svg><use href="#ok"/></svg>Instant online valuation, then a proper one on the phone</div>
+<div><svg><use href="#ok"/></svg>Photos and a Deal Pack for your property</div>
+<div><svg><use href="#ok"/></svg>Matched with investors in our network</div>
+<div><svg><use href="#ok"/></svg>Viewings arranged around your tenants</div>
+<div><svg><use href="#ok"/></svg>Offers negotiated on your behalf</div>
+<div><svg><use href="#ok"/></svg>Sale managed through to completion</div>
+</div>
+<p class="intro" style="margin:28px auto 0">No upfront costs and no tie-in. If we don't find you a buyer in the time we agree, you walk away and pay nothing.</p>
 </div></section>
 
 <section><div class="wrap">
@@ -310,12 +357,17 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 </div>
 </div></section>
 
+<section style="padding-bottom:0"><div class="wrap">
+<div class="band"><div><h3>Selling more than one?</h3><p>Whether it's two properties or twenty, we can sell them together or one at a time. Start with one postcode and tell us about the rest on the call.</p></div><a href="#valuation">Start with one postcode</a></div>
+</div></section>
+
 <section><div class="wrap">
 <h2 class="h2">Good <em>questions.</em></h2>
 <div class="faq">
 <details><summary>Do you only buy tenanted property?</summary><p>No. Our investors buy tenanted, empty and part-let property, in any condition.</p></details>
 <details><summary>Why is it free for me?</summary><p>The investor who buys pays our fee. Nothing comes off your price.</p></details>
 <details><summary>How is the valuation worked out?</summary><p>From recent sold prices of similar properties near you (HM Land Registry). We then confirm it with you, taking size, condition and rent into account.</p></details>
+<details><summary>How quickly can it sell?</summary><p>Investors move faster than homebuyers because there's no chain to wait on. Once you accept an offer, the legal side usually takes a few weeks.</p></details>
 <details><summary>Am I tied in?</summary><p>No. You only accept an offer you're happy with.</p></details>
 </div>
 </div></section>
