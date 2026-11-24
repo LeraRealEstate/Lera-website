@@ -179,6 +179,8 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 .band{background:var(--ink2);color:#FBF6EE;border-radius:22px;padding:clamp(26px,4vw,40px);display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
 .band h3{font-size:clamp(26px,3vw,34px);margin-bottom:6px}.band p{color:var(--mud);max-width:560px}
 .band a{background:var(--gold);color:#17110A;text-decoration:none;font-weight:700;padding:16px 26px;border-radius:12px;white-space:nowrap}
+.chips button{line-height:1.15}
+@media(max-width:640px){.hero .copy{text-align:center}.hero .sub{justify-content:center}.hero .sub span{font-size:15px;padding:8px 13px}.hero .lead{margin-left:auto;margin-right:auto}.pill{font-size:11px;letter-spacing:.08em;padding:6px 12px}.card{margin:0 auto}.pack .t,.pack .t h2{text-align:center}.founder div{text-align:center}.band{text-align:center;justify-content:center}.row2{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -226,8 +228,15 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 <div class="chips c3" role="group" aria-labelledby="l-ten" data-name="tenanted">
 <button type="button" aria-pressed="true">Tenanted</button><button type="button" aria-pressed="false">Empty</button><button type="button" aria-pressed="false">Part let</button>
 </div>
-<label class="lbl" for="pc">Postcode</label>
-<input class="in" id="pc" name="postcode" autocomplete="postal-code" placeholder="e.g. M14 5RJ">
+<span class="lbl" id="l-cond">Condition</span>
+<div class="chips c3" role="group" aria-labelledby="l-cond" data-name="cond">
+<button type="button" aria-pressed="true">Good</button><button type="button" aria-pressed="false">Needs some work</button><button type="button" aria-pressed="false">Needs full refurb</button>
+</div>
+<div class="row2">
+<div><label class="lbl" for="hn">House no. / name</label><input class="in" id="hn" name="house" autocomplete="address-line1" placeholder="e.g. 17 or Flat 2, 17"></div>
+<div><label class="lbl" for="pc">Postcode</label><input class="in" id="pc" name="postcode" autocomplete="postal-code" placeholder="e.g. M14 5RJ"></div>
+</div>
+<p class="err" id="e0">Please add the house number or name.</p>
 <p class="err" id="e1">Please enter a full UK postcode.</p>
 <button class="go" type="button" id="next">Get my valuation <svg width="20" height="20"><use href="#arr"/></svg></button>
 </div>
@@ -386,8 +395,8 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 (function(){
 var EXEC='https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec';
 var $=function(id){return document.getElementById(id)};
-var val={ptype:'Terraced',tenanted:'Tenanted'};
-var place=null, valuation=null, valP=null;
+var val={ptype:'Terraced',tenanted:'Tenanted',cond:'Good'};
+var place=null, valP=null, houseNo='';
 
 document.querySelectorAll('.chips').forEach(function(g){
   g.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
@@ -398,23 +407,48 @@ function show(n){$('s1').hidden=n!==1;$('s2').hidden=n!==2;$('s3').hidden=n!==3;
   $('stepno').textContent=n===3?'Done':'Step '+n+' of 2';$('bar').style.width=n===1?'50%':'100%';
   $('hdt').textContent=n===3?'Your valuation':'Free instant valuation';}
 
-/* ---------- valuation: HM Land Registry sold prices near the postcode ---------- */
+/* ---------- valuation: HM Land Registry sold prices + House Price Index ---------- */
 var LR={Flat:['flat-maisonette'],Terraced:['terraced'],Semi:['semi-detached'],Detached:['detached'],HMO:['terraced','semi-detached']};
 var NAME={Flat:'flat',Terraced:'terraced house',Semi:'semi-detached house',Detached:'detached house',HMO:'house'};
+var COND={'Good':1,'Needs some work':0.93,'Needs full refurb':0.82};
+var SPQ='https://landregistry.data.gov.uk/landregistry/query?output=json&query=';
+var PFX='PREFIX lrppi: <http://landregistry.data.gov.uk/def/ppi/> PREFIX lrcommon: <http://landregistry.data.gov.uk/def/common/> PREFIX ukhpi: <http://landregistry.data.gov.uk/def/ukhpi/> ';
 function q(a,p){var i=(a.length-1)*p,lo=Math.floor(i),hi=Math.ceil(i);return a[lo]+(a[hi]-a[lo])*(i-lo)}
 function r5(x){return Math.round(x/5000)*5000}
-function gbp(x){return '£'+x.toLocaleString('en-GB')}
+function gbp(x){return '£'+Math.round(x).toLocaleString('en-GB')}
 function getJSON(u){return fetch(u).then(function(r){if(!r.ok)throw r.status;return r.json()})}
-function sales(lat,lon,radius,months,types){
+function sparql(s){return getJSON(SPQ+encodeURIComponent(PFX+s)).then(function(r){return r.results.bindings})}
+function slug(s){return (s||'').toLowerCase().replace(/,/g,'').replace(/&/g,'and').replace(/\s+/g,'-')}
+function monthsAgo(m){var d=new Date();d.setMonth(d.getMonth()-m);return d.toISOString().slice(0,10)}
+
+function comps(lat,lon,radius,months,types){
   return getJSON('https://api.postcodes.io/postcodes?lon='+lon+'&lat='+lat+'&radius='+radius+'&limit=100').then(function(j){
     var pcs=(j.result||[]).map(function(x){return '"'+x.postcode+'"'});if(!pcs.length)return [];
-    var d=new Date();d.setMonth(d.getMonth()-months);var since=d.toISOString().slice(0,10);
-    var sp='PREFIX lrppi: <http://landregistry.data.gov.uk/def/ppi/> PREFIX lrcommon: <http://landregistry.data.gov.uk/def/common/> '+
-      'SELECT ?amount ?type WHERE { VALUES ?pc { '+pcs.join(' ')+' } ?addr lrcommon:postcode ?pc . ?tx lrppi:propertyAddress ?addr ; lrppi:pricePaid ?amount ; lrppi:transactionDate ?date ; lrppi:propertyType ?type ; lrppi:transactionCategory <http://landregistry.data.gov.uk/def/ppi/standardPricePaidTransaction> . FILTER(?date > "'+since+'"^^<http://www.w3.org/2001/XMLSchema#date>) }';
-    return getJSON('https://landregistry.data.gov.uk/landregistry/query?output=json&query='+encodeURIComponent(sp)).then(function(r){
-      return r.results.bindings.filter(function(b){return types.indexOf(b.type.value.split('/').pop())>-1}).map(function(b){return +b.amount.value});
-    });
+    return sparql('SELECT ?amount ?type WHERE { VALUES ?pc { '+pcs.join(' ')+' } ?addr lrcommon:postcode ?pc . ?tx lrppi:propertyAddress ?addr ; lrppi:pricePaid ?amount ; lrppi:transactionDate ?date ; lrppi:propertyType ?type ; lrppi:transactionCategory <http://landregistry.data.gov.uk/def/ppi/standardPricePaidTransaction> . FILTER(?date > "'+monthsAgo(months)+'"^^<http://www.w3.org/2001/XMLSchema#date>) }')
+      .then(function(b){return b.filter(function(x){return types.indexOf(x.type.value.split('/').pop())>-1}).map(function(x){return +x.amount.value})});
   });
+}
+function lastSale(pc,no){
+  if(!no)return Promise.resolve(null);
+  var want=no.toUpperCase().replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  return sparql('SELECT ?paon ?saon ?amount ?date WHERE { ?addr lrcommon:postcode "'+pc+'" ; lrcommon:paon ?paon . OPTIONAL { ?addr lrcommon:saon ?saon } ?tx lrppi:propertyAddress ?addr ; lrppi:pricePaid ?amount ; lrppi:transactionDate ?date } ORDER BY DESC(?date)').then(function(b){
+    var clean=function(s){return (s||'').toUpperCase().replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim()};
+    var hit=b.filter(function(x){var p=clean(x.paon&&x.paon.value),s=clean(x.saon&&x.saon.value);
+      if(!s)return p===want||want===p.split(' ')[0];
+      return want.indexOf(p)>-1&&want.indexOf(s.replace(/^FLAT /,''))>-1;})[0];
+    return hit?{price:+hit.amount.value,date:hit.date.value}:null;
+  }).catch(function(){return null});
+}
+function hpiRatio(regions,date){
+  var ym=date.slice(0,7);
+  function tryR(i){
+    if(i>=regions.length)return Promise.resolve(null);
+    return sparql('SELECT ?m ?hpi WHERE { ?o ukhpi:refRegion <http://landregistry.data.gov.uk/id/region/'+regions[i]+'> ; ukhpi:refMonth ?m ; ukhpi:housePriceIndex ?hpi . FILTER(?m = "'+ym+'"^^<http://www.w3.org/2001/XMLSchema#gYearMonth> || ?m >= "'+monthsAgo(6).slice(0,7)+'"^^<http://www.w3.org/2001/XMLSchema#gYearMonth>) } ORDER BY ?m').then(function(b){
+      if(b.length<2||b[0].m.value!==ym)return tryR(i+1);
+      return {ratio:+b[b.length-1].hpi.value/+b[0].hpi.value,region:regions[i]};
+    }).catch(function(){return tryR(i+1)});
+  }
+  return tryR(0);
 }
 function manual(why){return {manual:true,why:why}}
 function runValuation(){
@@ -424,46 +458,66 @@ function runValuation(){
   if(place.country!=='England'&&place.country!=='Wales')return Promise.resolve(manual('region'));
   var tries=[[800,24],[1600,36]];
   function attempt(i){
-    if(i>=tries.length)return Promise.resolve(manual('data'));
-    return sales(place.latitude,place.longitude,tries[i][0],tries[i][1],LR[t]).then(function(a){
+    if(i>=tries.length)return Promise.resolve(null);
+    return comps(place.latitude,place.longitude,tries[i][0],tries[i][1],LR[t]).then(function(a){
       if(a.length<5)return attempt(i+1);
       a.sort(function(x,y){return x-y});
-      var lo=r5(q(a,.3)),hi=r5(q(a,.7));if(hi-lo<10000){lo=r5(lo*.95);hi=r5(hi*1.05)}
-      return {lo:lo,hi:hi,n:a.length,km:tries[i][0]/1000,yrs:tries[i][1]/12};
+      return {lo:q(a,.3),hi:q(a,.7),med:q(a,.5),n:a.length,km:tries[i][0]/1000,yrs:tries[i][1]/12};
     });
   }
-  return attempt(0).catch(function(){return manual('data')});
+  var regions=[slug(place.admin_district),slug(place.region),slug(place.country)];
+  var own=lastSale(place.postcode,houseNo).then(function(s){
+    if(!s)return null;
+    return hpiRatio(regions,s.date).then(function(h){return h?{price:s.price,date:s.date,now:s.price*h.ratio}:null});
+  });
+  return Promise.all([attempt(0).catch(function(){return null}),own]).then(function(r){
+    var c=r[0],o=r[1],k=COND[val.cond]||1,est,lo,hi,basis=[];
+    if(o&&c){est=o.now*0.6+c.med*0.4}
+    else if(o){est=o.now}
+    else if(c){est=null}
+    else return manual('data');
+    if(est){lo=est*0.95*k;hi=est*1.05*k}else{lo=c.lo*k;hi=c.hi*k;if(hi-lo<10000){lo*=0.97;hi*=1.03}}
+    if(o)basis.push('its last sale ('+gbp(o.price)+', '+o.date.slice(0,4)+') adjusted for local price growth');
+    if(c)basis.push(c.n+' '+NAME[t]+' sales within '+(c.km<1?'0.8':c.km)+' km in the last '+c.yrs+' years');
+    return {lo:r5(lo),hi:r5(hi),basis:'Based on '+basis.join(' and ')+' (HM Land Registry)'+(k<1?', allowing for the work it needs.':'.'),own:!!o,c:c};
+  }).catch(function(){return manual('data')});
 }
 function render(v){
   var t=val.ptype;
+  $('vrange').classList.remove('sm');
   if(v.manual){
     $('vlabel').textContent='Your valuation';
     $('vrange').textContent='Prepared personally';
     $('vrange').classList.add('sm');
-    $('vbasis').textContent=v.why==='portfolio'?'Portfolios are valued property by property, on price and rent.':v.why==='region'?'Instant valuations cover England and Wales. We still buy here.':'There aren\'t enough recent sales nearby for an instant figure.';
+    $('vbasis').textContent=v.why==='portfolio'?'Portfolios are valued property by property, on price and rent.':v.why==='region'?'Instant valuations cover England and Wales. We still buy here.':'There isn\'t enough recent sales data nearby for an instant figure.';
     $('vnext').textContent='Akiva will call you, usually the same day, with your investor valuation.';
     return;
   }
-  $('vlabel').textContent=t==='HMO'?'Bricks-and-mortar value':'Estimated investor value';
+  $('vlabel').textContent=t==='HMO'?'Bricks-and-mortar value':'Estimated value';
   $('vrange').textContent=gbp(v.lo)+' – '+gbp(v.hi);
-  $('vbasis').textContent='Based on '+v.n+' '+NAME[t]+' sales within '+(v.km<1?'0.8':v.km)+' km in the last '+v.yrs+' years (HM Land Registry).';
-  $('vnext').textContent=t==='HMO'?'HMOs are also valued on their rent. Akiva will call to confirm your full price and match you with investors.':'Akiva will call to confirm the figure (size, condition and rent) and match you with investors.';
+  $('vbasis').textContent=v.basis;
+  $('vnext').textContent=t==='HMO'?'HMOs are also valued on their rent. Akiva will call to confirm your full price and match you with investors.':'Akiva will call to confirm the figure and match your property with investors. Your final price depends on its size, condition and rent.';
 }
 
 $('next').addEventListener('click',function(){
   var pc=$('pc').value.trim().toUpperCase().replace(/\s+/g,' ');
-  if(pc.replace(/\s/g,'').length<5){$('e1').style.display='block';$('pc').focus();return}
+  houseNo=$('hn').value.trim();
+  var bad=false;
+  if(!houseNo){$('e0').style.display='block';bad=true}else $('e0').style.display='none';
+  if(pc.replace(/\s/g,'').length<5){$('e1').style.display='block';bad=true}
+  if(bad)return;
   var b=$('next');b.disabled=true;
   getJSON('https://api.postcodes.io/postcodes/'+encodeURIComponent(pc)).then(function(j){
     place=j.result;$('e1').style.display='none';
-    valP=runValuation().then(function(v){valuation=v;return v});
-    $('s2').querySelector('h2').textContent=(val.ptype==='Portfolio'||(place.country!=='England'&&place.country!=='Wales'))?'Where shall we send your valuation?':'Your valuation is ready. Where shall we send it?';
+    valP=runValuation();
+    var inst=!(val.ptype==='Portfolio'||(place.country!=='England'&&place.country!=='Wales'));
+    $('s2').querySelector('h2').textContent=inst?'Your valuation is ready. Where shall we send it?':'Where shall we send your valuation?';
     show(2);$('nm').focus();
-    try{fbq('trackCustom','SellerStep1',{type:val.ptype,tenanted:val.tenanted})}catch(x){}
+    try{fbq('trackCustom','SellerStep1',{type:val.ptype,tenanted:val.tenanted,condition:val.cond})}catch(x){}
   }).catch(function(){$('e1').style.display='block';$('pc').focus()}).then(function(){b.disabled=false});
 });
 window.leraValuation=function(){return valP};
-$('pc').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('next').click()}});
+['pc','hn'].forEach(function(id){$(id).addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('next').click()}})});
 $('back').addEventListener('click',function(){show(1)});
 
 $('f').addEventListener('submit',function(e){
@@ -472,24 +526,24 @@ $('f').addEventListener('submit',function(e){
   var name=$('nm').value.trim(),phone=$('ph').value.trim(),email=$('em').value.trim();
   if(!name||phone.replace(/\D/g,'').length<10){$('e2').style.display='block';return}
   $('e2').style.display='none';$('send').disabled=true;$('send').textContent='Working out your valuation…';
-  var timeout=new Promise(function(r){setTimeout(function(){r(manual('data'))},8000)});
+  var timeout=new Promise(function(r){setTimeout(function(){r(manual('data'))},9000)});
   Promise.race([valP||Promise.resolve(manual('data')),timeout]).then(function(v){
     var pc=place?place.postcode:$('pc').value.trim().toUpperCase();
-    var vtxt=v.manual?'manual valuation needed ('+v.why+')':gbp(v.lo)+'-'+gbp(v.hi)+' ('+v.n+' sales, '+v.km+'km, '+v.yrs+'y)';
-    var msg='SELLER LEAD: '+val.ptype+', '+val.tenanted+', '+pc+(place&&place.admin_district?' ('+place.admin_district+')':'')+'. Instant valuation: '+vtxt;
+    var vtxt=v.manual?'manual valuation needed ('+v.why+')':gbp(v.lo)+'-'+gbp(v.hi)+(v.own?' (incl. own sale history)':'');
+    var msg='SELLER LEAD: '+houseNo+', '+pc+(place&&place.admin_district?' ('+place.admin_district+')':'')+'. '+val.ptype+', '+val.tenanted+', condition: '+val.cond+'. Instant valuation: '+vtxt;
     var p=new URLSearchParams();
     p.append('key','lera-7Qm4xV9pT2');p.append('action','enquiry');
     p.append('name',name);p.append('phone',phone);p.append('email',email);p.append('message',msg);
     ['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){var x=utmv(k);if(x)p.append(k,x)});
     p.append('page',location.pathname);p.append('url',location.href);
-    p.append('alert','SELLER LEAD: '+name+' - '+val.ptype+' '+pc);
+    p.append('alert','SELLER LEAD: '+name+' - '+houseNo+' '+pc);
     fetch(EXEC,{method:'POST',mode:'no-cors',keepalive:true,body:p}).catch(function(){});
     track('Lead',{content_name:'seller-valuation',content_category:val.ptype});
     render(v);show(3);
   });
 });
 })();
-(function(){var m=document.getElementById('mob'),c=document.getElementById('valuation');if(!('IntersectionObserver' in window))return;new IntersectionObserver(function(e){m.classList.toggle('on',!e[0].isIntersecting)},{threshold:0}).observe(c)})();
 </script>
+<script>(function(){var m=document.getElementById('mob'),c=document.getElementById('valuation');if(!m||!('IntersectionObserver' in window))return;new IntersectionObserver(function(e){m.classList.toggle('on',!e[0].isIntersecting)},{threshold:0}).observe(c)})();</script>
 </body>
 </html>
