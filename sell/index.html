@@ -71,7 +71,7 @@ section{padding:clamp(64px,9vw,112px) 0}
 
 /* TWO PATHS */
 .paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:980px;margin:0 auto}
-.path{border-radius:24px;padding:clamp(24px,3.5vw,36px)}
+.path{border-radius:24px;padding:clamp(24px,3.5vw,36px);display:flex;flex-direction:column}.path ol{margin-bottom:26px!important}
 .path.old{background:#fff;border:1px solid var(--line)}
 .path.new{background:var(--ink);color:#FBF6EE;box-shadow:0 30px 70px rgba(15,12,9,.25)}
 .path h3{font-size:15px;font-family:var(--B);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px}
@@ -85,7 +85,7 @@ section{padding:clamp(64px,9vw,112px) 0}
 .dot svg{width:16px;height:16px}
 .old .dot{background:#F3EDE3;color:#A4513A}.old li{color:var(--mu)}
 .new .dot{background:var(--gold);color:#17110A}
-.path .end{margin-top:26px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.path .end{margin-top:auto;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
 .new .end{border-color:var(--ld)}
 .end small{font-size:14px;color:var(--mu)}.new .end small{color:var(--mud)}
 .end b{font-family:var(--D);font-weight:500;font-size:40px;line-height:1}
