@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Sell your rental with the tenants in | Lera Real Estate</title>
-<meta name="description" content="Sell your London rental, HMO or portfolio to an investor. Tenants stay, no refurb, no selling fee. Free, confidential investor valuation.">
+<title>Sell your property to an investor, pay no fee | Lera Real Estate</title>
+<meta name="description" content="Sell your property to an investor anywhere in the UK, tenanted or empty, in any condition. The buyer pays our fee, so you pay nothing. Free instant valuation.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0F0C09">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -141,6 +141,30 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 .mob.on{transform:none}
 .mob a{display:flex;justify-content:center;align-items:center;gap:10px;background:var(--gold);color:#17110A;text-decoration:none;font-weight:700;font-size:18px;height:58px;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
 @media(max-width:860px){.mob{display:block}}
+.hero h1{font-size:clamp(44px,6.6vw,82px);line-height:.98;margin-bottom:18px}
+.pill{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:7px 16px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:22px}
+.hero .lead{font-size:clamp(18px,2vw,21px);color:var(--sd);max-width:520px;margin-bottom:26px}
+.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.what{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(20px,3vw,36px);text-align:center;max-width:1000px;margin:0 auto}
+.what h3{font-size:24px;margin-bottom:6px}.what p{color:var(--mu);max-width:280px;margin:0 auto}
+.what .ic{width:76px;height:76px;border-radius:22px;background:var(--ink);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}.what .ic svg{width:34px;height:34px}
+.vs{font-family:var(--B);font-size:.45em;vertical-align:middle;color:var(--mud);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin:0 .2em}
+.slide{max-width:1000px;margin:0 auto;border-radius:26px;overflow:hidden;border:1px solid var(--ld);background:var(--ink2)}
+.sr{display:grid;grid-template-columns:1fr 1.2fr 1.2fr;align-items:center;border-top:1px solid var(--ld)}
+.sr>div{padding:20px 24px;font-size:18px}
+.sr.sh{border-top:0;font-weight:700;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--mud)}
+.sr.sh .lc{color:#17110A;background:var(--gold)}
+.sr .k{font-weight:600;color:#FBF6EE}
+.sr .x{color:var(--mud);display:flex;gap:10px;align-items:center}.sr .x svg{width:18px;height:18px;color:#C9846F;flex:0 0 18px}
+.sr .lc{background:rgba(207,168,100,.1);height:100%;display:flex;align-items:center;gap:10px}
+.sr .y{color:#FBF6EE;font-weight:600}.sr .y svg{width:18px;height:18px;color:var(--gold);flex:0 0 18px}
+@media(max-width:640px){.sr{grid-template-columns:1fr 1fr}.sr .k{grid-column:span 2;padding-bottom:0;font-size:14px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase}.sr.sh>div:first-child{display:none}.sr>div{padding:12px 16px;font-size:16px}}
+.big{background:var(--paper)}.big .n{color:var(--gd)}.big .l{color:var(--fg)}.big .s{color:var(--mu)}
+.val{background:var(--ink);color:#FBF6EE;border-radius:16px;padding:22px;text-align:center;margin-bottom:14px}
+.val small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:6px}
+.range{font-family:var(--D);font-weight:500;font-size:clamp(30px,4vw,38px);line-height:1.1}.range.sm{font-size:28px}
+.basis{font-size:13px;color:var(--mud);margin-top:8px}
+.nextup{background:var(--sand);border-radius:14px;padding:16px 18px;margin-bottom:14px;font-size:15px}.nextup b{display:block;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -155,7 +179,6 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 <symbol id="key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 12l8-8M16 7l2 2M14 9l2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
 <symbol id="ppl" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3.5 3.5 0 010 7M18 14c2 .6 3 3 3 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
 </svg>
-
 <div class="top"><div class="wrap">
 <a class="logo" href="/">LERA</a>
 <a class="call" href="tel:02038647021" onclick="track('Contact',{content_name:'seller-call'})"><svg><use href="#tel"/></svg>020 3864 7021</a>
@@ -163,126 +186,126 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 
 <header class="hero"><div class="wrap">
 <div class="copy">
-<h1>Sell your rental.<br>Tenants <em>included.</em></h1>
+<div class="pill">Tenanted or empty · Anywhere in the UK</div>
+<h1>Sell your property to an investor. <em>Pay no fee.</em></h1>
+<p class="lead">We match your property with investors from our network who are ready to buy. They pay our fee, not you.</p>
 <div class="sub">
-<span><svg><use href="#ok"/></svg>No eviction</span>
-<span><svg><use href="#ok"/></svg>No refurb</span>
-<span><svg><use href="#ok"/></svg>No selling fee</span>
+<span><svg><use href="#ok"/></svg>Tenants can stay</span>
+<span><svg><use href="#ok"/></svg>Any condition</span>
+<span><svg><use href="#ok"/></svg>£0 selling fee</span>
 </div>
 </div>
 
 <div class="card" id="valuation">
 <form id="f" novalidate>
 <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-<div class="hd">Free investor valuation <span id="stepno">Step 1 of 2</span></div>
+<div class="hd"><span id="hdt">Free instant valuation</span><span id="stepno">Step 1 of 2</span></div>
 <div class="bar"><i id="bar"></i></div>
 
 <div id="s1">
-<h2>What would an investor pay?</h2>
-<span class="lbl" id="l-type">Property</span>
-<div class="chips c4" role="group" aria-labelledby="l-type" data-name="ptype">
-<button type="button" aria-pressed="true">House</button><button type="button" aria-pressed="false">Flat</button><button type="button" aria-pressed="false">HMO</button><button type="button" aria-pressed="false">Portfolio</button>
+<h2>What's your property worth to an investor?</h2>
+<span class="lbl" id="l-type">Property type</span>
+<div class="chips c3" role="group" aria-labelledby="l-type" data-name="ptype">
+<button type="button" aria-pressed="false">Flat</button><button type="button" aria-pressed="true">Terraced</button><button type="button" aria-pressed="false">Semi</button><button type="button" aria-pressed="false">Detached</button><button type="button" aria-pressed="false">HMO</button><button type="button" aria-pressed="false">Portfolio</button>
 </div>
-<span class="lbl" id="l-ten">Tenanted?</span>
+<span class="lbl" id="l-ten">Is it tenanted?</span>
 <div class="chips c3" role="group" aria-labelledby="l-ten" data-name="tenanted">
-<button type="button" aria-pressed="true">Yes</button><button type="button" aria-pressed="false">Part let</button><button type="button" aria-pressed="false">No</button>
+<button type="button" aria-pressed="true">Tenanted</button><button type="button" aria-pressed="false">Empty</button><button type="button" aria-pressed="false">Part let</button>
 </div>
 <label class="lbl" for="pc">Postcode</label>
-<input class="in" id="pc" name="postcode" autocomplete="postal-code" placeholder="e.g. N9 7AB">
-<p class="err" id="e1">Please enter the postcode.</p>
+<input class="in" id="pc" name="postcode" autocomplete="postal-code" placeholder="e.g. M14 5RJ">
+<p class="err" id="e1">Please enter a full UK postcode.</p>
 <button class="go" type="button" id="next">Get my valuation <svg width="20" height="20"><use href="#arr"/></svg></button>
 </div>
 
 <div id="s2" hidden>
 <button type="button" class="back" id="back">← Back</button>
-<h2>Where shall we send it?</h2>
-<label class="lbl" for="nm">Name</label>
+<h2>Your valuation is ready. Where shall we send it?</h2>
+<label class="lbl" for="nm">Full name</label>
 <input class="in" id="nm" name="name" autocomplete="name">
 <label class="lbl" for="ph">Mobile</label>
 <input class="in" id="ph" name="phone" type="tel" autocomplete="tel" placeholder="07…">
 <label class="lbl" for="em">Email</label>
 <input class="in" id="em" name="email" type="email" autocomplete="email">
-<div class="row2">
-<div><label class="lbl" for="rent">Rent / month</label><input class="in" id="rent" name="rent" inputmode="numeric" placeholder="Optional"></div>
-<div><label class="lbl" for="tl">Selling</label><select class="in" id="tl" name="timeline"><option>ASAP</option><option>Within 3 months</option><option>3–6 months</option><option>Just curious</option></select></div>
-</div>
-<p class="err" id="e2">Add your name and a phone or email.</p>
-<button class="go" type="submit" id="send">Send my valuation <svg width="20" height="20"><use href="#arr"/></svg></button>
+<p class="err" id="e2">Please add your name and mobile number.</p>
+<button class="go" type="submit" id="send">Show my valuation <svg width="20" height="20"><use href="#arr"/></svg></button>
 </div>
 
-<div id="s3" class="done" hidden>
-<div class="tick"><svg><use href="#ok"/></svg></div>
-<h2>Got it, thank you.</h2>
-<p>We'll be in touch shortly with your investor valuation.</p>
+<div id="s3" hidden>
+<div class="val">
+<small id="vlabel">Estimated investor value</small>
+<div class="range" id="vrange">£—</div>
+<p class="basis" id="vbasis"></p>
 </div>
-<p class="fine" id="fine"><svg><use href="#lock"/></svg>Confidential. Your tenants won't be contacted.</p>
+<div class="nextup">
+<b>What happens next</b>
+<p id="vnext">Akiva will call you to confirm the figure, then match your property with investors from our network.</p>
+</div>
+<a class="go" href="tel:02038647021" style="text-decoration:none" onclick="track('Contact',{content_name:'seller-call-after-valuation'})"><svg width="20" height="20"><use href="#tel"/></svg> Call us now</a>
+</div>
+<p class="fine" id="fine"><svg><use href="#lock"/></svg>Confidential. No obligation. Tenants never contacted.</p>
 </form>
 </div>
 </div></header>
 
 <div class="trust"><div class="wrap">
 <span><span class="stars">★★★★★</span>5.0 on Google</span>
-<span><svg><use href="#pin"/></svg>All of London</span>
+<span><svg><use href="#pin"/></svg>Buying across the UK</span>
 <span><svg><use href="#lock"/></svg>100% confidential</span>
 <span><svg><use href="#ok"/></svg>No obligation</span>
 </div></div>
 
 <section><div class="wrap">
-<h2 class="h2">Two ways to sell<br><em>a rental.</em></h2>
-<div class="paths">
-<div class="path old">
-<h3>High-street agent</h3>
-<ol>
-<li><span class="dot"><svg><use href="#no"/></svg></span>Serve notice</li>
-<li><span class="dot"><svg><use href="#no"/></svg></span>Wait for it to empty</li>
-<li><span class="dot"><svg><use href="#no"/></svg></span>Lose the rent</li>
-<li><span class="dot"><svg><use href="#no"/></svg></span>Refurb for buyers</li>
-<li><span class="dot"><svg><use href="#no"/></svg></span>Pay the agent</li>
-</ol>
-<div class="end"><small>Typical fee</small><b>1.5% + VAT</b></div>
-</div>
-<div class="path new">
-<h3>Lera</h3>
-<ol>
-<li><span class="dot"><svg><use href="#ok"/></svg></span>Free valuation</li>
-<li><span class="dot"><svg><use href="#ok"/></svg></span>Investor offer</li>
-<li><span class="dot"><svg><use href="#ok"/></svg></span>Sold. Tenants stay.</li>
-</ol>
-<div class="end"><small>Your fee</small><b>£0</b></div>
-</div>
+<h2 class="h2">What we <em>do.</em></h2>
+<div class="what">
+<div><div class="ic"><svg><use href="#ppl"/></svg></div><h3>Investors ready to buy</h3><p>Our network buys across the UK, tenanted and empty.</p></div>
+<div><div class="ic"><svg><use href="#key"/></svg></div><h3>We match and sell</h3><p>We find the right buyer and handle it to completion.</p></div>
+<div><div class="ic"><svg><use href="#calc"/></svg></div><h3>The buyer pays us</h3><p>So you pay no selling fee. Nothing off your price.</p></div>
 </div>
 </div></section>
 
-<section class="dark big"><div class="wrap">
+<section class="dark" id="compare"><div class="wrap">
+<h2 class="h2">Estate agent <span class="vs">vs</span> <em>Lera.</em></h2>
+<div class="slide">
+<div class="sr sh"><div></div><div>Estate agent</div><div class="lc">Lera</div></div>
+<div class="sr"><div class="k">Your selling fee</div><div class="x"><svg><use href="#no"/></svg>1–1.5% + VAT</div><div class="y lc"><svg><use href="#ok"/></svg>£0. The buyer pays</div></div>
+<div class="sr"><div class="k">Who buys</div><div class="x"><svg><use href="#no"/></svg>Homebuyers in chains</div><div class="y lc"><svg><use href="#ok"/></svg>Investors ready to buy</div></div>
+<div class="sr"><div class="k">Tenants</div><div class="x"><svg><use href="#no"/></svg>Usually have to leave</div><div class="y lc"><svg><use href="#ok"/></svg>Can stay</div></div>
+<div class="sr"><div class="k">Condition</div><div class="x"><svg><use href="#no"/></svg>Refurb to sell</div><div class="y lc"><svg><use href="#ok"/></svg>Sold as it is</div></div>
+<div class="sr"><div class="k">Viewings</div><div class="x"><svg><use href="#no"/></svg>Open to the public</div><div class="y lc"><svg><use href="#ok"/></svg>Discreet, by arrangement</div></div>
+</div>
+</div></section>
+
+<section class="big"><div class="wrap">
 <div class="n">£8,100</div>
 <div class="l">kept in your pocket on a £450k sale.</div>
 <p class="s">vs a 1.5% + VAT agent fee. Illustration only; fees vary.</p>
 </div></section>
 
-<section><div class="wrap">
+<section style="background:var(--sand)"><div class="wrap">
 <h2 class="h2">Three steps. <em>That's it.</em></h2>
 <div class="steps">
-<div><div class="ic"><svg><use href="#pin"/></svg><i>1</i></div><h3>Postcode</h3><p>30 seconds</p></div>
-<div><div class="ic"><svg><use href="#calc"/></svg><i>2</i></div><h3>Valuation</h3><p>Priced on the rent</p></div>
-<div><div class="ic"><svg><use href="#key"/></svg><i>3</i></div><h3>Offer</h3><p>You decide</p></div>
+<div><div class="ic"><svg><use href="#pin"/></svg><i>1</i></div><h3>Postcode</h3><p>Instant valuation</p></div>
+<div><div class="ic"><svg><use href="#ppl"/></svg><i>2</i></div><h3>Matched</h3><p>To our investors</p></div>
+<div><div class="ic"><svg><use href="#key"/></svg><i>3</i></div><h3>Sold</h3><p>You choose the offer</p></div>
 </div>
 </div></section>
 
-<section style="background:var(--sand)"><div class="wrap">
-<h2 class="h2">Investors buy <em>through us.</em></h2>
+<section><div class="wrap">
+<h2 class="h2">Investors trust <em>our numbers.</em></h2>
 <div class="proof">
-<img class="a" src="/img/4b190517484b7027.jpg" alt="Finished shared kitchen in a Lera HMO" loading="lazy">
-<img class="b" src="/img/53ab3013668e6892.jpg" alt="Bay-window bedroom in a Lera HMO" loading="lazy">
-<img class="c" src="/img/ef4821e549a1a0a9.jpg" alt="En-suite bedroom in a Lera HMO" loading="lazy">
-<img class="d" src="/img/2b6e2e85d4400f91.jpg" alt="En-suite shower room in a Lera HMO" loading="lazy">
+<img class="a" src="/img/4b190517484b7027.jpg" alt="Furnished shared kitchen in a Lera project" loading="lazy">
+<img class="b" src="/img/53ab3013668e6892.jpg" alt="Furnished bay-window bedroom in a Lera project" loading="lazy">
+<img class="c" src="/img/ef4821e549a1a0a9.jpg" alt="Furnished en-suite bedroom in a Lera project" loading="lazy">
+<img class="d" src="/img/bc815eade312c144.jpg" alt="Kitchen with garden window in a Lera project" loading="lazy">
 </div>
-<div class="cap"><span>Houses</span><span>Flats</span><span>HMOs</span><span>Needs work</span><span>Portfolios</span></div>
+<div class="cap"><span>Flats</span><span>Houses</span><span>HMOs</span><span>Needs work</span><span>Portfolios</span></div>
 </div></section>
 
 <section class="dark"><div class="wrap">
 <div class="founder">
 <img src="/img/akiva-solomon-2.jpg" alt="Akiva Solomon, founder of Lera Real Estate" loading="lazy">
-<div><blockquote>"An honest number. <em>No pressure.</em> No eviction."</blockquote>
+<div><blockquote>"An honest number. <em>No pressure.</em> No fee."</blockquote>
 <p>Akiva Solomon, Founder</p></div>
 </div>
 </div></section>
@@ -290,10 +313,10 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 <section><div class="wrap">
 <h2 class="h2">Good <em>questions.</em></h2>
 <div class="faq">
-<details><summary>Will my tenants find out?</summary><p>Only when you're ready.</p></details>
+<details><summary>Do you only buy tenanted property?</summary><p>No. Our investors buy tenanted, empty and part-let property, in any condition.</p></details>
 <details><summary>Why is it free for me?</summary><p>The investor who buys pays our fee. Nothing comes off your price.</p></details>
-<details><summary>Will I get a fair price?</summary><p>Investors price on the rent, so a well-let property can sell at full value. You only accept what you're happy with.</p></details>
-<details><summary>Am I tied in?</summary><p>No. No buyer in the agreed time? You walk away, nothing to pay.</p></details>
+<details><summary>How is the valuation worked out?</summary><p>From recent sold prices of similar properties near you (HM Land Registry). We then confirm it with you, taking size, condition and rent into account.</p></details>
+<details><summary>Am I tied in?</summary><p>No. You only accept an offer you're happy with.</p></details>
 </div>
 </div></section>
 
@@ -303,49 +326,117 @@ footer{background:var(--ink);color:var(--mud);font-size:13px;padding:24px 0 96px
 <a class="ph" href="tel:02038647021">or call <b>020 3864 7021</b></a>
 </div></section>
 
-<footer><div class="wrap">Lera Real Estate is a trading name of AS London 4 Ltd (company no. 16419301), 137–139 Brent Street, London NW4 4DJ · <a href="mailto:info@lera-realestate.com">info@lera-realestate.com</a> · <a href="/privacy/">Privacy</a></div></footer>
+<footer><div class="wrap">Lera Real Estate is a trading name of AS London 4 Ltd (company no. 16419301), 137–139 Brent Street, London NW4 4DJ · <a href="mailto:info@lera-realestate.com">info@lera-realestate.com</a> · <a href="/privacy/">Privacy</a> · Valuations are estimates based on HM Land Registry Price Paid Data (Crown copyright, OGL v3.0).</div></footer>
 
 <div class="mob" id="mob"><a href="#valuation" onclick="setTimeout(function(){document.getElementById('pc').focus()},500)">Get my free valuation <svg width="20" height="20"><use href="#arr"/></svg></a></div>
+
 <script>
 (function(){
 var EXEC='https://script.google.com/macros/s/AKfycbwf4waOlLXySLCoR7IFVy3cJHCbqOMoZ5qeJWeJf18i86S0RIgxJm7H0Po8dwNDGIAy/exec';
 var $=function(id){return document.getElementById(id)};
-var val={ptype:'House',tenanted:'Yes'};
+var val={ptype:'Terraced',tenanted:'Tenanted'};
+var place=null, valuation=null, valP=null;
+
 document.querySelectorAll('.chips').forEach(function(g){
   g.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
     g.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
     val[g.getAttribute('data-name')]=b.textContent;});
 });
 function show(n){$('s1').hidden=n!==1;$('s2').hidden=n!==2;$('s3').hidden=n!==3;
-  $('stepno').textContent=n===3?'Done':'Step '+n+' of 2';$('bar').style.width=n===1?'50%':'100%';$('fine').hidden=n===3;}
+  $('stepno').textContent=n===3?'Done':'Step '+n+' of 2';$('bar').style.width=n===1?'50%':'100%';
+  $('hdt').textContent=n===3?'Your valuation':'Free instant valuation';}
+
+/* ---------- valuation: HM Land Registry sold prices near the postcode ---------- */
+var LR={Flat:['flat-maisonette'],Terraced:['terraced'],Semi:['semi-detached'],Detached:['detached'],HMO:['terraced','semi-detached']};
+var NAME={Flat:'flat',Terraced:'terraced house',Semi:'semi-detached house',Detached:'detached house',HMO:'house'};
+function q(a,p){var i=(a.length-1)*p,lo=Math.floor(i),hi=Math.ceil(i);return a[lo]+(a[hi]-a[lo])*(i-lo)}
+function r5(x){return Math.round(x/5000)*5000}
+function gbp(x){return '£'+x.toLocaleString('en-GB')}
+function getJSON(u){return fetch(u).then(function(r){if(!r.ok)throw r.status;return r.json()})}
+function sales(lat,lon,radius,months,types){
+  return getJSON('https://api.postcodes.io/postcodes?lon='+lon+'&lat='+lat+'&radius='+radius+'&limit=100').then(function(j){
+    var pcs=(j.result||[]).map(function(x){return '"'+x.postcode+'"'});if(!pcs.length)return [];
+    var d=new Date();d.setMonth(d.getMonth()-months);var since=d.toISOString().slice(0,10);
+    var sp='PREFIX lrppi: <http://landregistry.data.gov.uk/def/ppi/> PREFIX lrcommon: <http://landregistry.data.gov.uk/def/common/> '+
+      'SELECT ?amount ?type WHERE { VALUES ?pc { '+pcs.join(' ')+' } ?addr lrcommon:postcode ?pc . ?tx lrppi:propertyAddress ?addr ; lrppi:pricePaid ?amount ; lrppi:transactionDate ?date ; lrppi:propertyType ?type ; lrppi:transactionCategory <http://landregistry.data.gov.uk/def/ppi/standardPricePaidTransaction> . FILTER(?date > "'+since+'"^^<http://www.w3.org/2001/XMLSchema#date>) }';
+    return getJSON('https://landregistry.data.gov.uk/landregistry/query?output=json&query='+encodeURIComponent(sp)).then(function(r){
+      return r.results.bindings.filter(function(b){return types.indexOf(b.type.value.split('/').pop())>-1}).map(function(b){return +b.amount.value});
+    });
+  });
+}
+function manual(why){return {manual:true,why:why}}
+function runValuation(){
+  var t=val.ptype;
+  if(!place)return Promise.resolve(manual('postcode'));
+  if(t==='Portfolio')return Promise.resolve(manual('portfolio'));
+  if(place.country!=='England'&&place.country!=='Wales')return Promise.resolve(manual('region'));
+  var tries=[[800,24],[1600,36]];
+  function attempt(i){
+    if(i>=tries.length)return Promise.resolve(manual('data'));
+    return sales(place.latitude,place.longitude,tries[i][0],tries[i][1],LR[t]).then(function(a){
+      if(a.length<5)return attempt(i+1);
+      a.sort(function(x,y){return x-y});
+      var lo=r5(q(a,.3)),hi=r5(q(a,.7));if(hi-lo<10000){lo=r5(lo*.95);hi=r5(hi*1.05)}
+      return {lo:lo,hi:hi,n:a.length,km:tries[i][0]/1000,yrs:tries[i][1]/12};
+    });
+  }
+  return attempt(0).catch(function(){return manual('data')});
+}
+function render(v){
+  var t=val.ptype;
+  if(v.manual){
+    $('vlabel').textContent='Your valuation';
+    $('vrange').textContent='Prepared personally';
+    $('vrange').classList.add('sm');
+    $('vbasis').textContent=v.why==='portfolio'?'Portfolios are valued property by property, on price and rent.':v.why==='region'?'Instant valuations cover England and Wales. We still buy here.':'There aren\'t enough recent sales nearby for an instant figure.';
+    $('vnext').textContent='Akiva will call you, usually the same day, with your investor valuation.';
+    return;
+  }
+  $('vlabel').textContent=t==='HMO'?'Bricks-and-mortar value':'Estimated investor value';
+  $('vrange').textContent=gbp(v.lo)+' – '+gbp(v.hi);
+  $('vbasis').textContent='Based on '+v.n+' '+NAME[t]+' sales within '+(v.km<1?'0.8':v.km)+' km in the last '+v.yrs+' years (HM Land Registry).';
+  $('vnext').textContent=t==='HMO'?'HMOs are also valued on their rent. Akiva will call to confirm your full price and match you with investors.':'Akiva will call to confirm the figure (size, condition and rent) and match you with investors.';
+}
+
 $('next').addEventListener('click',function(){
-  var pc=$('pc').value.trim();if(pc.length<2){$('e1').style.display='block';$('pc').focus();return}
-  $('e1').style.display='none';show(2);$('nm').focus();
-  try{fbq('trackCustom','SellerStep1',{type:val.ptype,tenanted:val.tenanted})}catch(x){}
+  var pc=$('pc').value.trim().toUpperCase().replace(/\s+/g,' ');
+  if(pc.replace(/\s/g,'').length<5){$('e1').style.display='block';$('pc').focus();return}
+  var b=$('next');b.disabled=true;
+  getJSON('https://api.postcodes.io/postcodes/'+encodeURIComponent(pc)).then(function(j){
+    place=j.result;$('e1').style.display='none';
+    valP=runValuation().then(function(v){valuation=v;return v});
+    $('s2').querySelector('h2').textContent=(val.ptype==='Portfolio'||(place.country!=='England'&&place.country!=='Wales'))?'Where shall we send your valuation?':'Your valuation is ready. Where shall we send it?';
+    show(2);$('nm').focus();
+    try{fbq('trackCustom','SellerStep1',{type:val.ptype,tenanted:val.tenanted})}catch(x){}
+  }).catch(function(){$('e1').style.display='block';$('pc').focus()}).then(function(){b.disabled=false});
 });
+window.leraValuation=function(){return valP};
 $('pc').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('next').click()}});
 $('back').addEventListener('click',function(){show(1)});
+
 $('f').addEventListener('submit',function(e){
   e.preventDefault();
   if(document.querySelector('[name=_honey]').value)return;
   var name=$('nm').value.trim(),phone=$('ph').value.trim(),email=$('em').value.trim();
-  if(!name||(!phone&&!email)){$('e2').style.display='block';return}
-  $('e2').style.display='none';$('send').disabled=true;$('send').textContent='Sending…';
-  var msg='SELLER LEAD: '+val.ptype+', tenanted: '+val.tenanted+', postcode '+$('pc').value.trim().toUpperCase()+
-    ($('rent').value.trim()?', rent '+$('rent').value.trim():'')+', timeline: '+$('tl').value;
-  var p=new URLSearchParams();
-  p.append('key','lera-7Qm4xV9pT2');p.append('action','enquiry');
-  p.append('name',name);p.append('phone',phone);p.append('email',email);p.append('message',msg);
-  p.append('timeline',$('tl').value);
-  ['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){var v=utmv(k);if(v)p.append(k,v)});
-  p.append('page',location.pathname);p.append('url',location.href);
-  p.append('alert','SELLER LEAD: '+name+' - '+val.ptype+' '+$('pc').value.trim().toUpperCase());
-  var finish=function(){show(3);track('Lead',{content_name:'seller-valuation',content_category:val.ptype})};
-  fetch(EXEC,{method:'POST',mode:'no-cors',keepalive:true,body:p}).then(finish,finish);
+  if(!name||phone.replace(/\D/g,'').length<10){$('e2').style.display='block';return}
+  $('e2').style.display='none';$('send').disabled=true;$('send').textContent='Working out your valuation…';
+  var timeout=new Promise(function(r){setTimeout(function(){r(manual('data'))},8000)});
+  Promise.race([valP||Promise.resolve(manual('data')),timeout]).then(function(v){
+    var pc=place?place.postcode:$('pc').value.trim().toUpperCase();
+    var vtxt=v.manual?'manual valuation needed ('+v.why+')':gbp(v.lo)+'-'+gbp(v.hi)+' ('+v.n+' sales, '+v.km+'km, '+v.yrs+'y)';
+    var msg='SELLER LEAD: '+val.ptype+', '+val.tenanted+', '+pc+(place&&place.admin_district?' ('+place.admin_district+')':'')+'. Instant valuation: '+vtxt;
+    var p=new URLSearchParams();
+    p.append('key','lera-7Qm4xV9pT2');p.append('action','enquiry');
+    p.append('name',name);p.append('phone',phone);p.append('email',email);p.append('message',msg);
+    ['utm_source','utm_campaign','utm_content','fbclid'].forEach(function(k){var x=utmv(k);if(x)p.append(k,x)});
+    p.append('page',location.pathname);p.append('url',location.href);
+    p.append('alert','SELLER LEAD: '+name+' - '+val.ptype+' '+pc);
+    fetch(EXEC,{method:'POST',mode:'no-cors',keepalive:true,body:p}).catch(function(){});
+    track('Lead',{content_name:'seller-valuation',content_category:val.ptype});
+    render(v);show(3);
+  });
 });
 })();
-</script>
-<script>
 (function(){var m=document.getElementById('mob'),c=document.getElementById('valuation');if(!('IntersectionObserver' in window))return;new IntersectionObserver(function(e){m.classList.toggle('on',!e[0].isIntersecting)},{threshold:0}).observe(c)})();
 </script>
 </body>
